@@ -21,7 +21,7 @@ const messageSchema = new mongoose.Schema({
     text: String,
     replyTo: Object,
     edited: { type: Boolean, default: false },
-    status: { type: String, default: 'sent' }, // 'sent', 'delivered', 'read'
+    status: { type: String, default: 'sent' },
     timestamp: { type: Date, default: Date.now }
 });
 
@@ -47,7 +47,8 @@ io.on('connection', async (socket) => {
     });
 
     try {
-        const history = await Message.find().sort({ timestamp: 1 }).limit(100);
+        // Correct chronological order: oldest to newest
+        const history = await Message.find().sort({ timestamp: 1 }).limit(200);
         socket.emit('loadHistory', history);
     } catch (err) {
         console.log('History load error:', err);
@@ -55,7 +56,6 @@ io.on('connection', async (socket) => {
 
     socket.on('chatMessage', async (data) => {
         try {
-            // Check if other users are online to set initial status
             const uniqueNames = [...new Set(Object.values(activeUsers))];
             const otherUsersOnline = uniqueNames.filter(name => name !== data.user);
             
@@ -69,7 +69,6 @@ io.on('connection', async (socket) => {
         }
     });
 
-    // Mark messages as read
     socket.on('markAsRead', async (readerUsername) => {
         try {
             await Message.updateMany(
