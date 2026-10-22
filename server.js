@@ -25,6 +25,15 @@ io.on('connection', (socket) => {
         io.emit('message', data);
     });
 
+    // Typing Indicator Events
+    socket.on('typing', (data) => {
+        socket.broadcast.emit('displayTyping', data);
+    });
+
+    socket.on('stopTyping', () => {
+        socket.broadcast.emit('hideTyping');
+    });
+
     socket.on('deleteForEveryone', (msgId) => {
         const msg = messageHistory.find(m => m.id === msgId);
         if (msg) {
