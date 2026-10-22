@@ -6,18 +6,31 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Same folder se direct index.html serve karega
 app.use(express.static(__dirname));
 
-io.on('connection', (socket) => {
-    console.log('Ek user connect ho gaya:', socket.id);
+let messageHistory = [];
+let onlineUsers = 0;
 
+io.on('connection', (socket) => {
+    onlineUsers++;
+    io.emit('onlineCount', onlineUsers);
+
+    // Purani chat history bhej do
+    socket.emit('loadHistory', messageHistory);
+
+    // Naya message ya reply aane par
     socket.on('chatMessage', (data) => {
+        messageHistory.push(data);
+        if (messageHistory.length > 100) {
+            messageHistory.shift();
+        }
         io.emit('message', data);
     });
 
     socket.on('disconnect', () => {
-        console.log('User disconnect ho gaya.');
+        onlineUsers--;
+        if (onlineUsers < 0) onlineUsers = 0;
+        io.emit('onlineCount', onlineUsers);
     });
 });
 
