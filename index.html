@@ -3,30 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BAZIGAR-MOONIE Chating Server</title>
+    <title>Bini 💘 Faru</title>
     <script src="/socket.io/socket.io.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: #efeae2; height: 100vh; display: flex; justify-content: center; align-items: center; }
+        body { background-color: #efeae2; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         
         /* Passcode Lock Overlay */
         #passcodeOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #075e54; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; }
         #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 8px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; }
         #passcodeOverlay button { margin-top: 15px; padding: 10px 25px; background: #25d366; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
 
-        .chat-container { width: 100%; max-width: 450px; height: 100vh; background: #efeae2; display: flex; flex-direction: column; position: relative; }
+        .chat-container { width: 100%; max-width: 450px; height: 100vh; background: #efeae2; display: flex; flex-direction: column; position: relative; overflow: hidden; }
         
-        /* Header */
-        .chat-header { background-color: #075e54; color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        .chat-header h2 { font-size: 15px; font-weight: 600; }
-        .online-status { font-size: 11px; color: #25d366; margin-top: 3px; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .btn-name { background: #128c7e; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; flex-shrink: 0; }
+        /* Header - Fixed at Top */
+        .chat-header { background-color: #075e54; color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2); z-index: 100; flex-shrink: 0; }
+        .chat-header h2 { font-size: 16px; font-weight: 600; }
+        .online-status { font-size: 11px; color: #25d366; margin-top: 3px; max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .btn-name { background: #128c7e; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; flex-shrink: 0; font-weight: bold; }
 
-        /* Messages Container */
-        .chat-messages { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        /* Messages Container - Scrollable */
+        .chat-messages { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background-color: #efeae2; }
         
         /* Message Wrapper */
-        .message-wrapper { display: flex; flex-direction: column; max-width: 80%; position: relative; }
+        .message-wrapper { display: flex; flex-direction: column; max-width: 80%; position: relative; cursor: pointer; }
         .message-wrapper.sent { align-self: flex-end; }
         .message-wrapper.received { align-self: flex-start; }
 
@@ -39,10 +39,10 @@
         .sent .message-box { background-color: #d9fdd3; border-top-right-radius: 0; }
         .received .message-box { background-color: #ffffff; border-top-left-radius: 0; }
 
-        /* Action Buttons (Reply, Edit, Delete) */
-        .msg-actions { display: none; position: absolute; top: -10px; right: 0; background: #fff; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); padding: 2px 6px; gap: 6px; z-index: 10; }
-        .message-wrapper:hover .msg-actions { display: flex; }
-        .action-btn { font-size: 11px; cursor: pointer; color: #555; }
+        /* Action Buttons (Reply, Edit, Delete) - Shows on Tap */
+        .msg-actions { display: none; position: absolute; top: -12px; right: 0; background: #fff; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); padding: 3px 8px; gap: 8px; z-index: 20; }
+        .message-wrapper.active .msg-actions { display: flex; }
+        .action-btn { font-size: 12px; cursor: pointer; color: #555; }
 
         /* Time & Meta Ticks */
         .msg-meta { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: #667781; float: right; margin-left: 10px; margin-top: 4px; }
@@ -51,11 +51,11 @@
         /* Typing Indicator at bottom */
         .typing-indicator { display: none; align-self: flex-start; background: #ffffff; padding: 6px 12px; border-radius: 8px; font-size: 12px; color: #667781; font-style: italic; box-shadow: 0 1px 1px rgba(0,0,0,0.1); margin-bottom: 4px; }
 
-        /* Input Area & Reply Bar */
-        .reply-bar { display: none; background: #e9edef; padding: 6px 12px; border-left: 4px solid #00a884; font-size: 12px; color: #111b21; justify-content: space-between; align-items: center; }
+        /* Reply Bar & Input Area - Fixed at Bottom */
+        .reply-bar { display: none; background: #e9edef; padding: 6px 12px; border-left: 4px solid #00a884; font-size: 12px; color: #111b21; justify-content: space-between; align-items: center; flex-shrink: 0; }
         .reply-bar button { background: none; border: none; font-size: 14px; cursor: pointer; color: #667781; }
 
-        .chat-input-area { background: #f0f2f5; padding: 10px; display: flex; align-items: center; gap: 8px; }
+        .chat-input-area { background: #f0f2f5; padding: 10px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
         .chat-input-area input { flex: 1; border: none; padding: 10px 14px; border-radius: 20px; outline: none; font-size: 14px; background: white; }
         .send-btn { background: #00a884; border: none; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 18px; }
     </style>
@@ -64,8 +64,8 @@
 
 <!-- Strict Passcode Protection -->
 <div id="passcodeOverlay">
-    <h2>🔒 Enter Passcode</h2>
-    <input type="password" id="passcodeInput" placeholder="ENTER PASSWORD" />
+    <h2>🔒 Enter Password</h2>
+    <input type="password" id="passcodeInput" placeholder="ENTER PIN" />
     <button onclick="checkPasscode()">Unlock</button>
 </div>
 
@@ -78,7 +78,7 @@
         <button class="btn-name" onclick="changeUsername()">CHANGE NAME</button>
     </div>
 
-    <div class="chat-messages" id="chatBox">
+    <div class="chat-messages" id="chatBox" onclick="closeAllActions(event)">
         <div class="typing-indicator" id="typingIndicator"></div>
     </div>
 
@@ -101,7 +101,7 @@
         if (pin === "8085") {
             document.getElementById('passcodeOverlay').style.display = "none";
         } else {
-            alert("Galat Passcode!");
+            alert("Galat if (usersList && usersList.length > 1) {Passcode!");
         }
     }
 
@@ -120,7 +120,6 @@
     let typingTimeout;
     let selectedReply = null;
 
-    // Strict IST Time Formatter
     function formatTime(dateStr) {
         const date = dateStr ? new Date(dateStr) : new Date();
         return date.toLocaleTimeString('en-IN', {
@@ -143,8 +142,6 @@
 
     socket.on('onlineUsersList', (usersList) => {
         onlineCount.innerText = usersList && usersList.length > 0 ? `🟢 Online: ${usersList.join(', ')}` : `🟢 Online: 0`;
-        
-        // Mark messages as read when another user is online/active
         if (usersList && usersList.length > 1) {
             socket.emit('markAsRead', myUsername);
         }
@@ -165,7 +162,6 @@
         }
     });
 
-    // Update Ticks to Blue when Read
     socket.on('messagesReadUpdate', () => {
         document.querySelectorAll('.msg-ticks').forEach(el => {
             if (el.dataset.sender === myUsername) {
@@ -204,6 +200,15 @@
         wrapper.className = `message-wrapper ${isMe ? 'sent' : 'received'}`;
         wrapper.id = data.id;
 
+        // Toggle action menu on click/tap
+        wrapper.onclick = function(e) {
+            e.stopPropagation();
+            document.querySelectorAll('.message-wrapper').forEach(w => {
+                if (w !== wrapper) w.classList.remove('active');
+            });
+            wrapper.classList.toggle('active');
+        };
+
         const timeString = formatTime(data.timestamp || data.createdAt);
 
         let replyHTML = '';
@@ -225,7 +230,6 @@
             `;
         }
 
-        // Ticks Logic: Sent (✓), Delivered (✓✓ grey), Read (✓✓ blue)
         let ticksHTML = '';
         if (isMe && !isDeleted) {
             let tickSymbol = '✓';
@@ -258,6 +262,10 @@
         `;
 
         chatBox.insertBefore(wrapper, typingIndicator);
+    }
+
+    function closeAllActions(e) {
+        document.querySelectorAll('.message-wrapper').forEach(w => w.classList.remove('active'));
     }
 
     function setReply(user, text) {
