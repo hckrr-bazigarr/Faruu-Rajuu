@@ -22,6 +22,7 @@ const messageSchema = new mongoose.Schema({
     replyTo: Object,
     edited: { type: Boolean, default: false },
     status: { type: String, default: 'sent' },
+    reactions: { type: Object, default: {} }, // Reactions storage: { username: emoji }
     timestamp: { type: Date, default: Date.now }
 });
 
@@ -47,7 +48,6 @@ io.on('connection', async (socket) => {
     });
 
     try {
-        // Correct chronological order: oldest to newest
         const history = await Message.find().sort({ timestamp: 1 }).limit(200);
         socket.emit('loadHistory', history);
     } catch (err) {
@@ -60,12 +60,34 @@ io.on('connection', async (socket) => {
             const otherUsersOnline = uniqueNames.filter(name => name !== data.user);
             
             data.status = otherUsersOnline.length > 0 ? 'delivered' : 'sent';
+            data.reactions = {};
 
             const newMessage = new Message(data);
             await newMessage.save();
             io.emit('message', data);
         } catch (err) {
             console.log('Message save error:', err);
+        }
+    });
+
+    // Handle Emoji Reactions
+    socket.on('reactMessage', async ({ id, user, emoji }) => {
+        try {
+            const message = await Message.findOne({ id });
+            if (message) {
+                if (!message.reactions) message.reactions = {};
+                // Toggle reaction: if same emoji clicked again, remove it
+                if (message.reactions[user] === emoji) {
+                    delete message.reactions[user];
+                } else {
+                    message.reactions[user] = emoji;
+                }
+                message.markModified('reactions');
+                await message.save();
+                io.emit('messageReacted', { id, reactions: message.reactions });
+            }
+        } catch (err) {
+            console.log('Reaction error:', err);
         }
     });
 
@@ -92,7 +114,7 @@ io.on('connection', async (socket) => {
 
     socket.on('deleteEveryone', async (id) => {
         try {
-            await Message.findOneAndUpdate({ id }, { text: '🚫 This message was deleted' });
+            await Message.findOneAndUpdate({ id }, { text: '🚫 This message was deleted', reactions: {} });
             io.emit('messageDeletedEveryone', id);
         } catch (err) {
             console.log('Delete error:', err);
