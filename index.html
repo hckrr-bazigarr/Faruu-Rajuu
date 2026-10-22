@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Private Chat</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #ece5dd; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .chat-container { width: 100%; max-width: 450px; height: 90vh; background: #fff; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+        .header { background: #075e54; color: white; padding: 15px; text-align: center; font-size: 1.2rem; font-weight: bold; }
+        .chat-box { flex: 1; padding: 15px; overflow-y: auto; background: #e5ddd5; display: flex; flex-direction: column; gap: 10px; }
+        .message { max-width: 75%; padding: 10px 14px; border-radius: 8px; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; }
+        .received { background: #ffffff; align-self: flex-start; border-top-left-radius: 0; }
+        .sent { background: #dcf8c6; align-self: flex-end; border-top-right-radius: 0; }
+        .sender-name { font-size: 0.75rem; color: #555; margin-bottom: 3px; font-weight: bold; }
+        .input-area { display: flex; padding: 10px; background: #f0f0f0; gap: 8px; }
+        input[type="text"] { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 20px; outline: none; }
+        button { background: #128c7e; color: white; border: none; padding: 10px 18px; border-radius: 50%; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="header">❤️ Secret Chat</div>
+    <div class="chat-box" id="chatBox"></div>
+    <div class="input-area">
+        <input type="text" id="messageInput" placeholder="Type a message..." onkeypress="handleKey(event)">
+        <button onclick="sendMessage()">➤</button>
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+    let myName = prompt("Apna Name dalo:") || "Anonymous";
+
+    socket.on('message', (data) => {
+        const chatBox = document.getElementById('chatBox');
+        const msgDiv = document.createElement('div');
+        
+        const isMe = data.user === myName;
+        msgDiv.classList.add('message', isMe ? 'sent' : 'received');
+        
+        msgDiv.innerHTML = `<div class="sender-name">${isMe ? 'You' : data.user}</div>${data.text}`;
+        chatBox.appendChild(msgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+
+    function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const text = input.value.trim();
+        if (text) {
+            socket.emit('chatMessage', { user: myName, text: text });
+            input.value = '';
+        }
+    }
+
+    function handleKey(e) {
+        if (e.key === 'Enter') sendMessage();
+    }
+</script>
+
+</body>
+</html>
