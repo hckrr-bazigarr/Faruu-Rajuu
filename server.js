@@ -17,7 +17,6 @@ io.on('connection', (socket) => {
 
     socket.emit('loadHistory', messageHistory);
 
-    // Naya message
     socket.on('chatMessage', (data) => {
         messageHistory.push(data);
         if (messageHistory.length > 100) {
@@ -26,7 +25,6 @@ io.on('connection', (socket) => {
         io.emit('message', data);
     });
 
-    // Delete for Everyone
     socket.on('deleteForEveryone', (msgId) => {
         const msg = messageHistory.find(m => m.id === msgId);
         if (msg) {
@@ -36,7 +34,6 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Edit Message
     socket.on('editMessage', ({ id, newText }) => {
         const msg = messageHistory.find(m => m.id === id);
         if (msg) {
@@ -55,5 +52,5 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`Server chal pada: http://localhost:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
