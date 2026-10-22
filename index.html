@@ -66,14 +66,12 @@
 
     <div class="input-area">
         <div class="input-row">
-            <!-- Enter key press listener hata diya hai, ab sirf send button se send hoga -->
             <input type="text" id="messageInput" placeholder="Type a message...">
             <button class="send-btn" onclick="sendMessage()">➤</button>
         </div>
     </div>
 </div>
 
-<!-- Action Modal for Message Options -->
 <div class="action-modal" id="actionModal" onclick="closeActionModal(event)">
     <div class="action-sheet" id="actionSheet">
         <button class="action-btn" onclick="triggerReply()">Reply</button>
@@ -178,7 +176,6 @@
     function appendMessage(data) {
         let existingMsg = document.getElementById(`msg-${data.id}`);
         if (existingMsg) {
-            // Update existing message (for edit or delete for everyone)
             existingMsg.querySelector('.msg-text').innerText = data.text;
             if (data.edited) {
                 let infoDiv = existingMsg.querySelector('.msg-info');
@@ -213,7 +210,6 @@
             <div class="msg-info">${editedTag}</div>
         `;
 
-        // Click on message to open options menu
         msgDiv.onclick = () => openActionModal(data, msgDiv);
 
         chatBox.appendChild(msgDiv);
@@ -240,7 +236,7 @@
         const text = input.value.trim();
         if (text) {
             const messageData = {
-                id: 'msg_' + Date.now() + '_' + Math.random().toString(36.substring(2, 9)),
+                id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
                 user: myName,
                 text: text,
                 replyTo: currentReplyData,
@@ -255,4 +251,5 @@
 </script>
 
 </body>
-</html>
+                                          </html>
+                                          
