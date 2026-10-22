@@ -19,13 +19,14 @@ const messageSchema = new mongoose.Schema({
     id: { type: String, unique: true },
     user: String,
     text: String,
+    replyTo: Object,
     edited: { type: Boolean, default: false },
+    status: { type: String, default: 'sent' }, // 'sent', 'delivered', 'read'
     timestamp: { type: Date, default: Date.now }
 });
 
 const Message = mongoose.model('Message', messageSchema);
 
-// Store active users mapping (socket.id => username)
 const activeUsers = {};
 
 function broadcastOnlineUsers() {
@@ -54,11 +55,48 @@ io.on('connection', async (socket) => {
 
     socket.on('chatMessage', async (data) => {
         try {
+            // Check if other users are online to set initial status
+            const uniqueNames = [...new Set(Object.values(activeUsers))];
+            const otherUsersOnline = uniqueNames.filter(name => name !== data.user);
+            
+            data.status = otherUsersOnline.length > 0 ? 'delivered' : 'sent';
+
             const newMessage = new Message(data);
             await newMessage.save();
             io.emit('message', data);
         } catch (err) {
             console.log('Message save error:', err);
+        }
+    });
+
+    // Mark messages as read
+    socket.on('markAsRead', async (readerUsername) => {
+        try {
+            await Message.updateMany(
+                { user: { $ne: readerUsername }, status: { $ne: 'read' } },
+                { status: 'read' }
+            );
+            io.emit('messagesReadUpdate');
+        } catch (err) {
+            console.log('Mark read error:', err);
+        }
+    });
+
+    socket.on('editMessage', async ({ id, text }) => {
+        try {
+            await Message.findOneAndUpdate({ id }, { text, edited: true });
+            io.emit('messageUpdated', { id, text });
+        } catch (err) {
+            console.log('Edit error:', err);
+        }
+    });
+
+    socket.on('deleteEveryone', async (id) => {
+        try {
+            await Message.findOneAndUpdate({ id }, { text: '🚫 This message was deleted' });
+            io.emit('messageDeletedEveryone', id);
+        } catch (err) {
+            console.log('Delete error:', err);
         }
     });
 
