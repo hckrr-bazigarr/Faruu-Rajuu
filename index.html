@@ -3,56 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Private Chat</title>
+    <title>WhatsApp Style Chat with Reply</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: #ece5dd; display: flex; justify-content: center; align-items: center; height: 100vh; }
         .chat-container { width: 100%; max-width: 450px; height: 90vh; background: #fff; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
-        .header { background: #075e54; color: white; padding: 15px; text-align: center; font-size: 1.2rem; font-weight: bold; }
+        .header { background: #075e54; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; }
+        .header-info div { font-size: 1.1rem; font-weight: bold; }
+        .status-info { font-size: 0.8rem; display: flex; align-items: center; gap: 5px; margin-top: 2px; color: #dcf8c6; }
+        .status-dot { width: 8px; height: 8px; background-color: #25d366; border-radius: 50%; display: inline-block; box-shadow: 0 0 5px #25d366; }
+        .change-name { font-size: 0.75rem; background: #128c7e; padding: 6px 10px; border-radius: 4px; cursor: pointer; border: none; color: white; font-weight: bold; }
+        
         .chat-box { flex: 1; padding: 15px; overflow-y: auto; background: #e5ddd5; display: flex; flex-direction: column; gap: 10px; }
-        .message { max-width: 75%; padding: 10px 14px; border-radius: 8px; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; }
+        .message { max-width: 80%; padding: 10px 14px; border-radius: 8px; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; position: relative; box-shadow: 0 1px 0.5px rgba(0,0,0,0.13); }
         .received { background: #ffffff; align-self: flex-start; border-top-left-radius: 0; }
         .sent { background: #dcf8c6; align-self: flex-end; border-top-right-radius: 0; }
-        .sender-name { font-size: 0.75rem; color: #555; margin-bottom: 3px; font-weight: bold; }
-        .input-area { display: flex; padding: 10px; background: #f0f0f0; gap: 8px; }
-        input[type="text"] { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 20px; outline: none; }
-        button { background: #128c7e; color: white; border: none; padding: 10px 18px; border-radius: 50%; cursor: pointer; font-weight: bold; }
+        .sender-name { font-size: 0.75rem; color: #075e54; margin-bottom: 3px; font-weight: bold; }
+        
+        /* Reply quote inside message */
+        .quoted-msg { background: rgba(0, 0, 0, 0.05); border-left: 4px solid #128c7e; padding: 5px 8px; margin-bottom: 6px; border-radius: 4px; font-size: 0.85rem; }
+        .quoted-author { font-weight: bold; color: #075e54; font-size: 0.75rem; }
+        
+        /* Reply button on messages */
+        .reply-btn { position: absolute; right: 8px; bottom: 4px; font-size: 0.7rem; color: #666; background: none; border: none; cursor: pointer; opacity: 0; transition: opacity 0.2s; }
+        .message:hover .reply-btn { opacity: 1; }
+
+        /* Reply preview box above input */
+        .reply-preview { background: #f0f0f0; padding: 8px 12px; display: none; justify-content: space-between; align-items: center; border-left: 4px solid #128c7e; font-size: 0.85rem; }
+        .reply-preview-text { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: #333; }
+        .cancel-reply { background: none; border: none; font-weight: bold; cursor: pointer; color: #888; font-size: 1rem; }
+
+        .input-area { display: flex; flex-direction: column; background: #f0f0f0; }
+        .input-row { display: flex; padding: 10px; gap: 8px; align-items: center; }
+        input[type="text"] { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 20px; outline: none; font-size: 0.95rem; background: #fff; }
+        button.send-btn { background: #128c7e; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; justify-content: center; align-items: center; font-size: 1.1rem; flex-shrink: 0; }
     </style>
 </head>
 <body>
 
 <div class="chat-container">
-    <div class="header">❤️ Secret Chat</div>
+    <div class="header">
+        <div class="header-info">
+            <div>❤️ Secret Chat</div>
+            <div class="status-info">
+                <span class="status-dot"></span> <span id="onlineStatus">Connecting...</span>
+            </div>
+        </div>
+        <button class="change-name" onclick="changeName()">Naam Badlo</button>
+    </div>
+    
     <div class="chat-box" id="chatBox"></div>
+    
+    <!-- Reply Preview Box -->
+    <div class="reply-preview" id="replyPreview">
+        <div>
+            <div style="font-size: 0.75rem; color: #128c7e; font-weight: bold;" id="replyingToUser">Replying</div>
+            <div class="reply-preview-text" id="replyingToText"></div>
+        </div>
+        <button class="cancel-reply" onclick="cancelReply()">×</button>
+    </div>
+
     <div class="input-area">
-        <input type="text" id="messageInput" placeholder="Type a message..." onkeypress="handleKey(event)">
-        <button onclick="sendMessage()">➤</button>
+        <div class="input-row">
+            <input type="text" id="messageInput" placeholder="Type a message..." onkeypress="handleKey(event)">
+            <button class="send-btn" onclick="sendMessage()">➤</button>
+        </div>
     </div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
     const socket = io();
-    let myName = prompt("Apna Name dalo:") || "Anonymous";
 
-    socket.on('message', (data) => {
-        const chatBox = document.getElementById('chatBox');
+    let myName = localStorage.getItem('chat_username');
+    if (!myName) {
+        myName = prompt("Apna naam dalo:") || "Anonymous";
+        localStorage.setItem('chat_username', myName);
+    }
+
+    function changeName() {
+        let newName = prompt("Naya naam dalo:", myName);
+        if (newName && newName.trim() !== "") {
+            myName = newName.trim();
+            localStorage.setItem('chat_username', myName);
+            alert("Naam update ho gaya: " + myName);
+        }
+    }
+
+    const chatBox = document.getElementById('chatBox');
+    const onlineStatus = document.getElementById('onlineStatus');
+    const replyPreview = document.getElementById('replyPreview');
+    const replyingToUser = document.getElementById('replyingToUser');
+    const replyingToText = document.getElementById('replyingToText');
+
+    let currentReplyData = null;
+
+    socket.on('onlineCount', (count) => {
+        onlineStatus.innerText = `${count} Online`;
+    });
+
+    function setReply(user, text) {
+        currentReplyData = { user, text };
+        replyingToUser.innerText = `Replying to ${user}`;
+        replyingToText.innerText = text;
+        replyPreview.style.display = 'flex';
+        document.getElementById('messageInput').focus();
+    }
+
+    function cancelReply() {
+        currentReplyData = null;
+        replyPreview.style.display = 'none';
+    }
+
+    function appendMessage(data) {
         const msgDiv = document.createElement('div');
-        
         const isMe = data.user === myName;
         msgDiv.classList.add('message', isMe ? 'sent' : 'received');
-        
-        msgDiv.innerHTML = `<div class="sender-name">${isMe ? 'You' : data.user}</div>${data.text}`;
+
+        let replyHtml = '';
+        if (data.replyTo) {
+            replyHtml = `
+                <div class="quoted-msg">
+                    <div class="quoted-author">${data.replyTo.user}</div>
+                    <div>${data.replyTo.text}</div>
+                </div>
+            `;
+        }
+
+        msgDiv.innerHTML = `
+            ${replyHtml}
+            <div class="sender-name">${isMe ? 'You' : data.user}</div>
+            <div class="msg-text">${data.text}</div>
+            <button class="reply-btn" onclick="setReply('${data.user}', '${data.text.replace(/'/g, "\\'")}')">Reply</button>
+        `;
+
         chatBox.appendChild(msgDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    socket.on('loadHistory', (history) => {
+        chatBox.innerHTML = '';
+        history.forEach(data => {
+            appendMessage(data);
+        });
+    });
+
+    socket.on('message', (data) => {
+        appendMessage(data);
     });
 
     function sendMessage() {
         const input = document.getElementById('messageInput');
         const text = input.value.trim();
         if (text) {
-            socket.emit('chatMessage', { user: myName, text: text });
+            const messageData = {
+                user: myName,
+                text: text,
+                replyTo: currentReplyData
+            };
+            socket.emit('chatMessage', messageData);
             input.value = '';
+            cancelReply();
         }
     }
 
