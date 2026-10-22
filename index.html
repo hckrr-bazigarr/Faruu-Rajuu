@@ -2,28 +2,65 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bini 💘 Faru</title>
     <script src="/socket.io/socket.io.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: #efeae2; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background-color: #efeae2;
+        }
+
         /* Passcode Lock Overlay */
         #passcodeOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #075e54; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; }
         #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 8px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; }
         #passcodeOverlay button { margin-top: 15px; padding: 10px 25px; background: #25d366; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
 
-        .chat-container { width: 100%; max-width: 450px; height: 100vh; background: #efeae2; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        /* Main Chat Container - Fixed 100vh Layout */
+        .chat-container { 
+            width: 100%; 
+            max-width: 450px; 
+            height: 100vh; 
+            height: 100dvh; 
+            margin: 0 auto;
+            background: #efeae2; 
+            display: flex; 
+            flex-direction: column; 
+            position: relative; 
+            overflow: hidden; 
+        }
         
-        /* Header - Fixed at Top */
-        .chat-header { background-color: #075e54; color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2); z-index: 100; flex-shrink: 0; }
+        /* Header - Fixed Top */
+        .chat-header { 
+            background-color: #075e54; 
+            color: white; 
+            padding: 10px 16px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2); 
+            z-index: 10; 
+            flex-shrink: 0; 
+        }
         .chat-header h2 { font-size: 16px; font-weight: 600; }
-        .online-status { font-size: 11px; color: #25d366; margin-top: 3px; max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .online-status { font-size: 11px; color: #25d366; margin-top: 2px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .btn-name { background: #128c7e; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; flex-shrink: 0; font-weight: bold; }
 
-        /* Messages Container - Scrollable */
-        .chat-messages { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background-color: #efeae2; }
+        /* Messages Area - Scrollable Middle */
+        .chat-messages { 
+            flex: 1; 
+            padding: 12px; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+            background-color: #efeae2;
+            -webkit-overflow-scrolling: touch;
+        }
         
         /* Message Wrapper */
         .message-wrapper { display: flex; flex-direction: column; max-width: 80%; position: relative; cursor: pointer; }
@@ -32,32 +69,42 @@
 
         .sender-name { font-size: 11px; color: #075e54; font-weight: bold; margin-bottom: 2px; margin-left: 4px; }
 
-        /* Reply Box inside message */
+        /* Reply Preview Box inside message */
         .reply-preview-box { background: rgba(0,0,0,0.06); border-left: 4px solid #075e54; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 4px; color: #555; }
 
         .message-box { padding: 6px 10px 4px 10px; border-radius: 8px; position: relative; word-wrap: break-word; font-size: 14px; line-height: 18px; color: #111b21; }
         .sent .message-box { background-color: #d9fdd3; border-top-right-radius: 0; }
         .received .message-box { background-color: #ffffff; border-top-left-radius: 0; }
 
-        /* Action Buttons (Reply, Edit, Delete) - Shows on Tap */
-        .msg-actions { display: none; position: absolute; top: -12px; right: 0; background: #fff; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); padding: 3px 8px; gap: 8px; z-index: 20; }
+        /* 1-Tap Action Menu */
+        .msg-actions { display: none; position: absolute; top: -14px; right: 0; background: #fff; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); padding: 3px 8px; gap: 8px; z-index: 20; }
         .message-wrapper.active .msg-actions { display: flex; }
         .action-btn { font-size: 12px; cursor: pointer; color: #555; }
 
-        /* Time & Meta Ticks */
+        /* Time & Ticks Meta */
         .msg-meta { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: #667781; float: right; margin-left: 10px; margin-top: 4px; }
         .edited-tag { font-size: 10px; color: #667781; font-style: italic; }
 
-        /* Typing Indicator at bottom */
+        /* Typing Indicator */
         .typing-indicator { display: none; align-self: flex-start; background: #ffffff; padding: 6px 12px; border-radius: 8px; font-size: 12px; color: #667781; font-style: italic; box-shadow: 0 1px 1px rgba(0,0,0,0.1); margin-bottom: 4px; }
 
-        /* Reply Bar & Input Area - Fixed at Bottom */
+        /* Reply Bar - Fixed Bottom Above Input */
         .reply-bar { display: none; background: #e9edef; padding: 6px 12px; border-left: 4px solid #00a884; font-size: 12px; color: #111b21; justify-content: space-between; align-items: center; flex-shrink: 0; }
         .reply-bar button { background: none; border: none; font-size: 14px; cursor: pointer; color: #667781; }
 
-        .chat-input-area { background: #f0f2f5; padding: 10px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        /* Input Area - Fixed Bottom */
+        .chat-input-area { 
+            background: #f0f2f5; 
+            padding: 8px 10px; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            flex-shrink: 0; 
+            z-index: 10;
+            border-top: 1px solid #ddd;
+        }
         .chat-input-area input { flex: 1; border: none; padding: 10px 14px; border-radius: 20px; outline: none; font-size: 14px; background: white; }
-        .send-btn { background: #00a884; border: none; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 18px; }
+        .send-btn { background: #00a884; border: none; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 18px; flex-shrink: 0; }
     </style>
 </head>
 <body>
@@ -70,6 +117,7 @@
 </div>
 
 <div class="chat-container">
+    <!-- Header -->
     <div class="chat-header">
         <div>
             <h2>Bini 💘 Faru</h2>
@@ -78,10 +126,12 @@
         <button class="btn-name" onclick="changeUsername()">CHANGE NAME</button>
     </div>
 
+    <!-- Scrollable Messages Area -->
     <div class="chat-messages" id="chatBox" onclick="closeAllActions(event)">
         <div class="typing-indicator" id="typingIndicator"></div>
     </div>
 
+    <!-- Reply Bar -->
     <div class="reply-bar" id="replyBar">
         <div>
             <strong id="replyUser">Name</strong>: <span id="replyText">Message text...</span>
@@ -89,6 +139,7 @@
         <button onclick="cancelReply()">✖</button>
     </div>
 
+    <!-- Fixed Input Area -->
     <div class="chat-input-area">
         <input type="text" id="msgInput" placeholder="Type a message..." oninput="handleTyping()" onkeypress="handleKeyPress(event)">
         <button class="send-btn" onclick="sendMessage()">➤</button>
@@ -101,7 +152,7 @@
         if (pin === "8085") {
             document.getElementById('passcodeOverlay').style.display = "none";
         } else {
-            alert("Galat if (usersList && usersList.length > 1) {Passcode!");
+            alert("Wrong Password!");
         }
     }
 
@@ -200,7 +251,7 @@
         wrapper.className = `message-wrapper ${isMe ? 'sent' : 'received'}`;
         wrapper.id = data.id;
 
-        // Toggle action menu on click/tap
+        // 1-Tap toggle for actions (Reply, Edit, Delete)
         wrapper.onclick = function(e) {
             e.stopPropagation();
             document.querySelectorAll('.message-wrapper').forEach(w => {
