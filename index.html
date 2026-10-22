@@ -111,8 +111,8 @@
 <body>
 
 <div id="passcodeOverlay">
-    <h2>🔒 Enter Passcode</h2>
-    <input type="password" id="passcodeInput" placeholder="PIN Daalein" />
+    <h2>🔒 Enter Password</h2>
+    <input type="password" id="passcodeInput" placeholder="ENTER PIN" />
     <button onclick="checkPasscode()">Unlock</button>
 </div>
 
@@ -145,10 +145,10 @@
 <script>
     function checkPasscode() {
         const pin = document.getElementById('passcodeInput').value;
-        if (pin === "1234") {
+        if (pin === "8085") {
             document.getElementById('passcodeOverlay').style.display = "none";
         } else {
-            alert("Galat Passcode!");
+            alert("Wrong Password!");
         }
     }
 
