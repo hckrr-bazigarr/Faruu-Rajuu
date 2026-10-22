@@ -20,7 +20,7 @@
         #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 8px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; }
         #passcodeOverlay button { margin-top: 15px; padding: 10px 25px; background: #25d366; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
 
-        /* Main Chat Container - Fixed Layout */
+        /* Main Chat Container */
         .chat-container { 
             width: 100%; 
             max-width: 450px; 
@@ -34,7 +34,7 @@
             overflow: hidden; 
         }
         
-        /* Header - Fixed Top */
+        /* Header */
         .chat-header { 
             background-color: #075e54; 
             color: white; 
@@ -50,9 +50,10 @@
         .online-status { font-size: 11px; color: #25d366; margin-top: 2px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .btn-name { background: #128c7e; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; flex-shrink: 0; font-weight: bold; }
 
-        /* Messages Area - Scrollable Middle */
+        /* Messages Area */
         .chat-messages { 
             flex: 1; 
+            min-height: 0;
             padding: 12px; 
             overflow-y: auto; 
             display: flex; 
@@ -62,37 +63,37 @@
             -webkit-overflow-scrolling: touch;
         }
         
-        /* Message Wrapper */
-        .message-wrapper { display: flex; flex-direction: column; max-width: 80%; position: relative; cursor: pointer; }
+        .message-wrapper { display: flex; flex-direction: column; max-width: 80%; position: relative; cursor: pointer; margin-bottom: 4px; }
         .message-wrapper.sent { align-self: flex-end; }
         .message-wrapper.received { align-self: flex-start; }
 
         .sender-name { font-size: 11px; color: #075e54; font-weight: bold; margin-bottom: 2px; margin-left: 4px; }
 
-        /* Reply Preview Box inside message */
         .reply-preview-box { background: rgba(0,0,0,0.06); border-left: 4px solid #075e54; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 4px; color: #555; }
 
         .message-box { padding: 6px 10px 4px 10px; border-radius: 8px; position: relative; word-wrap: break-word; font-size: 14px; line-height: 18px; color: #111b21; }
         .sent .message-box { background-color: #d9fdd3; border-top-right-radius: 0; }
         .received .message-box { background-color: #ffffff; border-top-left-radius: 0; }
 
-        /* 1-Tap Action Menu */
-        .msg-actions { display: none; position: absolute; top: -14px; right: 0; background: #fff; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); padding: 3px 8px; gap: 8px; z-index: 20; }
+        /* Action Menu & Emoji Reactions Picker */
+        .msg-actions { display: none; position: absolute; top: -38px; left: 0; background: #fff; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.25); padding: 4px 10px; gap: 8px; z-index: 20; align-items: center; }
         .message-wrapper.active .msg-actions { display: flex; }
-        .action-btn { font-size: 12px; cursor: pointer; color: #555; }
+        .action-btn { font-size: 13px; cursor: pointer; color: #555; }
+        .reaction-picker { display: flex; gap: 6px; font-size: 15px; border-right: 1px solid #ddd; padding-right: 8px; }
+        .reaction-picker span { cursor: pointer; transition: transform 0.1s; }
+        .reaction-picker span:hover { transform: scale(1.2); }
 
-        /* Time & Ticks Meta */
+        /* Displayed Reactions Badge */
+        .msg-reactions { display: flex; gap: 3px; position: absolute; bottom: -10px; right: 10px; background: #fff; border: 1px solid #ddd; border-radius: 12px; padding: 1px 6px; font-size: 11px; box-shadow: 0 1px 3px rgba(0,0,0,0.15); z-index: 5; }
+
         .msg-meta { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: #667781; float: right; margin-left: 10px; margin-top: 4px; }
         .edited-tag { font-size: 10px; color: #667781; font-style: italic; }
 
-        /* Typing Indicator */
         .typing-indicator { display: none; align-self: flex-start; background: #ffffff; padding: 6px 12px; border-radius: 8px; font-size: 12px; color: #667781; font-style: italic; box-shadow: 0 1px 1px rgba(0,0,0,0.1); margin-bottom: 4px; }
 
-        /* Reply Bar - Fixed Bottom Above Input */
         .reply-bar { display: none; background: #e9edef; padding: 6px 12px; border-left: 4px solid #00a884; font-size: 12px; color: #111b21; justify-content: space-between; align-items: center; flex-shrink: 0; }
         .reply-bar button { background: none; border: none; font-size: 14px; cursor: pointer; color: #667781; }
 
-        /* Input Area - Fixed Bottom */
         .chat-input-area { 
             background: #f0f2f5; 
             padding: 8px 10px; 
@@ -109,15 +110,13 @@
 </head>
 <body>
 
-<!-- Strict Passcode Protection -->
 <div id="passcodeOverlay">
-    <h2>🔒 Enter Password 🔑</h2>
-    <input type="password" id="passcodeInput" placeholder="ENTER PIN" />
+    <h2>🔒 Enter Passcode</h2>
+    <input type="password" id="passcodeInput" placeholder="PIN Daalein" />
     <button onclick="checkPasscode()">Unlock</button>
 </div>
 
 <div class="chat-container">
-    <!-- Header -->
     <div class="chat-header">
         <div>
             <h2>Bini 💘 Faru</h2>
@@ -126,13 +125,10 @@
         <button class="btn-name" onclick="changeUsername()">CHANGE NAME</button>
     </div>
 
-    <!-- Scrollable Messages Area -->
     <div class="chat-messages" id="chatBox" onclick="closeAllActions(event)">
-        <!-- Messages Will Append Here in Sequence -->
         <div class="typing-indicator" id="typingIndicator"></div>
     </div>
 
-    <!-- Reply Bar -->
     <div class="reply-bar" id="replyBar">
         <div>
             <strong id="replyUser">Name</strong>: <span id="replyText">Message text...</span>
@@ -140,7 +136,6 @@
         <button onclick="cancelReply()">✖</button>
     </div>
 
-    <!-- Fixed Input Area -->
     <div class="chat-input-area">
         <input type="text" id="msgInput" placeholder="Type a message..." oninput="handleTyping()" onkeypress="handleKeyPress(event)">
         <button class="send-btn" onclick="sendMessage()">➤</button>
@@ -150,10 +145,10 @@
 <script>
     function checkPasscode() {
         const pin = document.getElementById('passcodeInput').value;
-        if (pin === "8085") {
+        if (pin === "1234") {
             document.getElementById('passcodeOverlay').style.display = "none";
         } else {
-            alert("Wrong Password!");
+            alert("Galat Passcode!");
         }
     }
 
@@ -215,6 +210,13 @@
         }
     });
 
+    socket.on('messageReacted', (data) => {
+        const msgEl = document.getElementById(data.id);
+        if (msgEl) {
+            updateReactionsUI(msgEl, data.reactions);
+        }
+    });
+
     socket.on('messagesReadUpdate', () => {
         document.querySelectorAll('.msg-ticks').forEach(el => {
             if (el.dataset.sender === myUsername) {
@@ -244,8 +246,28 @@
             msgEl.querySelector('.msg-content').style.color = '#777';
             const actions = msgEl.querySelector('.msg-actions');
             if (actions) actions.remove();
+            const reactions = msgEl.querySelector('.msg-reactions');
+            if (reactions) reactions.remove();
         }
     });
+
+    function sendReaction(id, emoji) {
+        socket.emit('reactMessage', { id, user: myUsername, emoji });
+        closeAllActions();
+    }
+
+    function updateReactionsUI(wrapper, reactions) {
+        let existingBadge = wrapper.querySelector('.msg-reactions');
+        if (existingBadge) existingBadge.remove();
+
+        if (reactions && Object.keys(reactions).length > 0) {
+            const uniqueEmojis = [...new Set(Object.values(reactions))].join(' ');
+            const badge = document.createElement('div');
+            badge.className = 'msg-reactions';
+            badge.innerHTML = `<span>${uniqueEmojis}</span>`;
+            wrapper.appendChild(badge);
+        }
+    }
 
     function appendMessage(data) {
         const isMe = data.user === myUsername;
@@ -274,6 +296,13 @@
         if (!isDeleted) {
             actionsHTML = `
                 <div class="msg-actions">
+                    <div class="reaction-picker">
+                        <span onclick="sendReaction('${data.id}', '❤️')">❤️</span>
+                        <span onclick="sendReaction('${data.id}', '👍')">👍</span>
+                        <span onclick="sendReaction('${data.id}', '😂')">😂</span>
+                        <span onclick="sendReaction('${data.id}', '😮')">😮</span>
+                        <span onclick="sendReaction('${data.id}', '😢')">😢</span>
+                    </div>
                     <span class="action-btn" onclick="setReply('${data.user}', '${data.text.replace(/'/g, "\\'")}')">↩️</span>
                     ${isMe ? `<span class="action-btn" onclick="editMessage('${data.id}', '${data.text.replace(/'/g, "\\'")}')">✏️</span>` : ''}
                     ${isMe ? `<span class="action-btn" onclick="deleteEveryone('${data.id}')">🗑️</span>` : ''}
@@ -291,9 +320,6 @@
                 tickColor = '#34b7f1';
             } else if (data.status === 'delivered') {
                 tickSymbol = '✓✓';
-                tickColor = '#667781';
-            } else {
-                tickSymbol = '✓';
                 tickColor = '#667781';
             }
             ticksHTML = `<span class="msg-ticks" data-sender="${data.user}" style="color: ${tickColor}; font-weight: ${data.status === 'read' ? 'bold' : 'normal'};">${tickSymbol}</span>`;
@@ -313,8 +339,8 @@
             </div>
         `;
 
-        // Proper order: Appending before typing indicator keeps chronological order intact!
         chatBox.insertBefore(wrapper, typingIndicator);
+        updateReactionsUI(wrapper, data.reactions);
     }
 
     function closeAllActions(e) {
