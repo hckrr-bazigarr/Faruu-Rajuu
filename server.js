@@ -15,16 +15,35 @@ io.on('connection', (socket) => {
     onlineUsers++;
     io.emit('onlineCount', onlineUsers);
 
-    // Purani chat history bhej do
     socket.emit('loadHistory', messageHistory);
 
-    // Naya message ya reply aane par
+    // Naya message
     socket.on('chatMessage', (data) => {
         messageHistory.push(data);
         if (messageHistory.length > 100) {
             messageHistory.shift();
         }
         io.emit('message', data);
+    });
+
+    // Delete for Everyone
+    socket.on('deleteForEveryone', (msgId) => {
+        const msg = messageHistory.find(m => m.id === msgId);
+        if (msg) {
+            msg.text = '🚫 This message was deleted';
+            msg.deletedForEveryone = true;
+            io.emit('updateMessage', msg);
+        }
+    });
+
+    // Edit Message
+    socket.on('editMessage', ({ id, newText }) => {
+        const msg = messageHistory.find(m => m.id === id);
+        if (msg) {
+            msg.text = newText;
+            msg.edited = true;
+            io.emit('updateMessage', msg);
+        }
     });
 
     socket.on('disconnect', () => {
