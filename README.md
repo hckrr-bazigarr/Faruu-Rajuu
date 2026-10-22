@@ -1,4 +1,4 @@
-# 💬 — Real-Time Web Chat Application
+# 💬  Real-Time Web Chat Application
 
 A lightweight, modern, and feature-rich real-time live chat application inspired by WhatsApp. Built with **Node.js, Express, Socket.io, and MongoDB**, this application delivers instant messaging with live status indicators, privacy passcode lock, and interactive emoji reactions.
 
@@ -39,5 +39,6 @@ A lightweight, modern, and feature-rich real-time live chat application inspired
 
 1. **Clone the repository:**
    ```bash
-   
+   git clone [https://github.com/rajib02-bot/Faruu-Rajuu.git](https://github.com/rajib02-bot/Faruu-Rajuu.git)
+   cd Faruu-Rajuu
    
