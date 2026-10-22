@@ -3,18 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Style Chat with Typing</title>
+    <title>Strictly Secured Chat</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: #ece5dd; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .chat-container { width: 100%; max-width: 450px; height: 90vh; background: #fff; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15); position: relative; }
+        
+        /* Passcode Lock Screen Overlay */
+        .lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #075e54; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; color: white; gap: 15px; }
+        .lock-box { background: white; padding: 25px; border-radius: 12px; display: flex; flex-direction: column; gap: 15px; width: 85%; max-width: 320px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); color: #333; text-align: center; }
+        .lock-box h3 { color: #075e54; margin-bottom: 5px; }
+        .lock-input { padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1.1rem; text-align: center; outline: none; letter-spacing: 5px; }
+        .unlock-btn { background: #128c7e; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+        .unlock-btn:active { background: #075e54; }
+        .error-msg { color: #d9534f; font-size: 0.85rem; display: none; }
+
+        .chat-container { width: 100%; max-width: 450px; height: 90vh; background: #fff; border-radius: 12px; display: none; flex-direction: column; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15); position: relative; }
         .header { background: #075e54; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; }
         .header-info div { font-size: 1.1rem; font-weight: bold; }
         .status-info { font-size: 0.8rem; display: flex; align-items: center; gap: 5px; margin-top: 2px; color: #dcf8c6; }
         .status-dot { width: 8px; height: 8px; background-color: #25d366; border-radius: 50%; display: inline-block; box-shadow: 0 0 5px #25d366; }
         .change-name { font-size: 0.75rem; background: #128c7e; padding: 6px 10px; border-radius: 4px; cursor: pointer; border: none; color: white; font-weight: bold; }
         
-        /* Typing Indicator bar below header */
         .typing-bar { background: #f0f0f0; padding: 4px 15px; font-size: 0.75rem; color: #128c7e; font-style: italic; font-weight: bold; display: none; border-bottom: 1px solid #ddd; }
 
         .chat-box { flex: 1; padding: 15px; overflow-y: auto; background: #e5ddd5; display: flex; flex-direction: column; gap: 10px; }
@@ -33,7 +42,7 @@
 
         .input-area { display: flex; flex-direction: column; background: #f0f0f0; }
         .input-row { display: flex; padding: 10px; gap: 8px; align-items: center; }
-        input[type="text"] { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 20px; outline: none; font-size: 0.95rem; background: #fff; }
+        input[type="text"], input[type="password"] { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 20px; outline: none; font-size: 0.95rem; background: #fff; }
         button.send-btn { background: #128c7e; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; justify-content: center; align-items: center; font-size: 1.1rem; flex-shrink: 0; }
 
         .action-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 100; }
@@ -45,10 +54,21 @@
 </head>
 <body>
 
-<div class="chat-container">
+<!-- Passcode Screen -->
+<div class="lock-screen" id="lockScreen">
+    <div class="lock-box">
+        <h3>🔒 Protected Chat</h3>
+        <p style="font-size: 0.85rem; color: #666;">Access karne ke liye passcode dalo:</p>
+        <input type="password" id="passcodeInput" class="lock-input" placeholder="••••" maxlength="6">
+        <div class="error-msg" id="errorMsg">Galat Password! Phir se try karo.</div>
+        <button class="unlock-btn" onclick="checkPasscode()">Unlock Chat</button>
+    </div>
+</div>
+
+<div class="chat-container" id="chatContainer">
     <div class="header">
         <div class="header-info">
-            <div>❤️ Secret Chat</div>
+            <div>BAZIGAR-MOONIE Chating Server 🫀🎀</div>
             <div class="status-info">
                 <span class="status-dot"></span> <span id="onlineStatus">Connecting...</span>
             </div>
@@ -56,7 +76,6 @@
         <button class="change-name" onclick="changeName()">Naam Badlo</button>
     </div>
     
-    <!-- Typing indicator display -->
     <div class="typing-bar" id="typingBar"></div>
 
     <div class="chat-box" id="chatBox"></div>
@@ -89,189 +108,215 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    const socket = io();
+    // Yahan apna passcode change kar sakta hai (Abhi "8085" hai)
+    const CORRECT_PIN = "8085";
 
-    let myName = localStorage.getItem('chat_username');
-    if (!myName) {
-        myName = prompt("Apna naam dalo:") || "Anonymous";
-        localStorage.setItem('chat_username', myName);
-    }
+    const lockScreen = document.getElementById('lockScreen');
+    const chatContainer = document.getElementById('chatContainer');
+    const passcodeInput = document.getElementById('passcodeInput');
+    const errorMsg = document.getElementById('errorMsg');
 
-    function changeName() {
-        let newName = prompt("Naya naam dalo:", myName);
-        if (newName && newName.trim() !== "") {
-            myName = newName.trim();
-            localStorage.setItem('chat_username', myName);
-            alert("Naam update ho gaya: " + myName);
-        }
-    }
-
-    const chatBox = document.getElementById('chatBox');
-    const onlineStatus = document.getElementById('onlineStatus');
-    const replyPreview = document.getElementById('replyPreview');
-    const replyingToUser = document.getElementById('replyingToUser');
-    const replyingToText = document.getElementById('replyingToText');
-    const actionModal = document.getElementById('actionModal');
-    const editOptionBtn = document.getElementById('editOptionBtn');
-    const deleteEveryoneBtn = document.getElementById('deleteEveryoneBtn');
-    const messageInput = document.getElementById('messageInput');
-    const typingBar = document.getElementById('typingBar');
-
-    let currentReplyData = null;
-    let selectedMessage = null;
-    let typingTimeout = null;
-
-    socket.on('onlineCount', (count) => {
-        onlineStatus.innerText = `${count} Online`;
-    });
-
-    // Typing emission when typing in input
-    messageInput.addEventListener('input', () => {
-        socket.emit('typing', { user: myName });
-        clearTimeout(typingTimeout);
-        typingTimeout = setTimeout(() => {
-            socket.emit('stopTyping');
-        }, 1200);
-    });
-
-    socket.on('displayTyping', (data) => {
-        typingBar.innerText = `${data.user} is typing...`;
-        typingBar.style.display = 'block';
-    });
-
-    socket.on('hideTyping', () => {
-        typingBar.style.display = 'none';
-    });
-
-    function setReply(user, text) {
-        currentReplyData = { user, text };
-        replyingToUser.innerText = `Replying to ${user}`;
-        replyingToText.innerText = text;
-        replyPreview.style.display = 'flex';
-        messageInput.focus();
-    }
-
-    function cancelReply() {
-        currentReplyData = null;
-        replyPreview.style.display = 'none';
-    }
-
-    function openActionModal(data, element) {
-        selectedMessage = { data, element };
-        if (data.user === myName && !data.deletedForEveryone) {
-            editOptionBtn.style.display = 'block';
-            deleteEveryoneBtn.style.display = 'block';
+    function checkPasscode() {
+        if (passcodeInput.value === CORRECT_PIN) {
+            // Storage hata di hai, isliye ab har refresh par lock hoga
+            lockScreen.style.display = 'none';
+            chatContainer.style.display = 'flex';
+            initChat();
         } else {
-            editOptionBtn.style.display = 'none';
-            deleteEveryoneBtn.style.display = 'none';
-        }
-        actionModal.style.display = 'flex';
-    }
-
-    function closeActionModal(e) {
-        if (!e || e.target === actionModal) {
-            actionModal.style.display = 'none';
+            errorMsg.style.display = 'block';
+            passcodeInput.value = '';
         }
     }
 
-    function triggerReply() {
-        actionModal.style.display = 'none';
-        setReply(selectedMessage.data.user, selectedMessage.data.text);
-    }
+    // Enter key support for passcode login
+    passcodeInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') checkPasscode();
+    });
 
-    function triggerEdit() {
-        actionModal.style.display = 'none';
-        if (selectedMessage.data.user !== myName) return;
-        let newText = prompt("Edit message:", selectedMessage.data.text);
-        if (newText && newText.trim() !== "") {
-            socket.emit('editMessage', { id: selectedMessage.data.id, newText: newText.trim() });
+    function initChat() {
+        const socket = io();
+
+        let myName = localStorage.getItem('chat_username');
+        if (!myName) {
+            myName = prompt("Apna naam dalo:") || "Anonymous";
+            localStorage.setItem('chat_username', myName);
         }
-    }
 
-    function triggerDeleteForMe() {
-        actionModal.style.display = 'none';
-        selectedMessage.element.remove();
-    }
-
-    function triggerDeleteForEveryone() {
-        actionModal.style.display = 'none';
-        if (selectedMessage.data.user !== myName) return;
-        socket.emit('deleteForEveryone', selectedMessage.data.id);
-    }
-
-    function appendMessage(data) {
-        let existingMsg = document.getElementById(`msg-${data.id}`);
-        if (existingMsg) {
-            existingMsg.querySelector('.msg-text').innerText = data.text;
-            if (data.edited) {
-                let infoDiv = existingMsg.querySelector('.msg-info');
-                if (!infoDiv.innerText.includes('edited')) {
-                    infoDiv.innerHTML += ' <span style="font-style:italic;">(edited)</span>';
-                }
+        window.changeName = function() {
+            let newName = prompt("Naya naam dalo:", myName);
+            if (newName && newName.trim() !== "") {
+                myName = newName.trim();
+                localStorage.setItem('chat_username', myName);
+                alert("Naam update ho gaya: " + myName);
             }
-            return;
         }
 
-        const msgDiv = document.createElement('div');
-        msgDiv.id = `msg-${data.id}`;
-        const isMe = data.user === myName;
-        msgDiv.classList.add('message', isMe ? 'sent' : 'received');
+        const chatBox = document.getElementById('chatBox');
+        const onlineStatus = document.getElementById('onlineStatus');
+        const replyPreview = document.getElementById('replyPreview');
+        const replyingToUser = document.getElementById('replyingToUser');
+        const replyingToText = document.getElementById('replyingToText');
+        const actionModal = document.getElementById('actionModal');
+        const editOptionBtn = document.getElementById('editOptionBtn');
+        const deleteEveryoneBtn = document.getElementById('deleteEveryoneBtn');
+        const messageInput = document.getElementById('messageInput');
+        const typingBar = document.getElementById('typingBar');
 
-        let replyHtml = '';
-        if (data.replyTo) {
-            replyHtml = `
-                <div class="quoted-msg">
-                    <div class="quoted-author">${data.replyTo.user}</div>
-                    <div>${data.replyTo.text}</div>
-                </div>
+        let currentReplyData = null;
+        let selectedMessage = null;
+        let typingTimeout = null;
+
+        socket.on('onlineCount', (count) => {
+            onlineStatus.innerText = `${count} Online`;
+        });
+
+        messageInput.addEventListener('input', () => {
+            socket.emit('typing', { user: myName });
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                socket.emit('stopTyping');
+            }, 1200);
+        });
+
+        socket.on('displayTyping', (data) => {
+            typingBar.innerText = `${data.user} is typing...`;
+            typingBar.style.display = 'block';
+        });
+
+        socket.on('hideTyping', () => {
+            typingBar.style.display = 'none';
+        });
+
+        window.setReply = function(user, text) {
+            currentReplyData = { user, text };
+            replyingToUser.innerText = `Replying to ${user}`;
+            replyingToText.innerText = text;
+            replyPreview.style.display = 'flex';
+            messageInput.focus();
+        }
+
+        window.cancelReply = function() {
+            currentReplyData = null;
+            replyPreview.style.display = 'none';
+        }
+
+        function openActionModal(data, element) {
+            selectedMessage = { data, element };
+            if (data.user === myName && !data.deletedForEveryone) {
+                editOptionBtn.style.display = 'block';
+                deleteEveryoneBtn.style.display = 'block';
+            } else {
+                editOptionBtn.style.display = 'none';
+                deleteEveryoneBtn.style.display = 'none';
+            }
+            actionModal.style.display = 'flex';
+        }
+
+        window.closeActionModal = function(e) {
+            if (!e || e.target === actionModal) {
+                actionModal.style.display = 'none';
+            }
+        }
+
+        window.triggerReply = function() {
+            actionModal.style.display = 'none';
+            setReply(selectedMessage.data.user, selectedMessage.data.text);
+        }
+
+        window.triggerEdit = function() {
+            actionModal.style.display = 'none';
+            if (selectedMessage.data.user !== myName) return;
+            let newText = prompt("Edit message:", selectedMessage.data.text);
+            if (newText && newText.trim() !== "") {
+                socket.emit('editMessage', { id: selectedMessage.data.id, newText: newText.trim() });
+            }
+        }
+
+        window.triggerDeleteForMe = function() {
+            actionModal.style.display = 'none';
+            selectedMessage.element.remove();
+        }
+
+        window.triggerDeleteForEveryone = function() {
+            actionModal.style.display = 'none';
+            if (selectedMessage.data.user !== myName) return;
+            socket.emit('deleteForEveryone', selectedMessage.data.id);
+        }
+
+        function appendMessage(data) {
+            let existingMsg = document.getElementById(`msg-${data.id}`);
+            if (existingMsg) {
+                existingMsg.querySelector('.msg-text').innerText = data.text;
+                if (data.edited) {
+                    let infoDiv = existingMsg.querySelector('.msg-info');
+                    if (!infoDiv.innerText.includes('edited')) {
+                        infoDiv.innerHTML += ' <span style="font-style:italic;">(edited)</span>';
+                    }
+                }
+                return;
+            }
+
+            const msgDiv = document.createElement('div');
+            msgDiv.id = `msg-${data.id}`;
+            const isMe = data.user === myName;
+            msgDiv.classList.add('message', isMe ? 'sent' : 'received');
+
+            let replyHtml = '';
+            if (data.replyTo) {
+                replyHtml = `
+                    <div class="quoted-msg">
+                        <div class="quoted-author">${data.replyTo.user}</div>
+                        <div>${data.replyTo.text}</div>
+                    </div>
+                `;
+            }
+
+            let editedTag = data.edited ? ' <span style="font-style:italic;">(edited)</span>' : '';
+
+            msgDiv.innerHTML = `
+                ${replyHtml}
+                <div class="sender-name">${isMe ? 'You' : data.user}</div>
+                <div class="msg-text">${data.text}</div>
+                <div class="msg-info">${editedTag}</div>
             `;
+
+            msgDiv.onclick = () => openActionModal(data, msgDiv);
+
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        let editedTag = data.edited ? ' <span style="font-style:italic;">(edited)</span>' : '';
+        socket.on('loadHistory', (history) => {
+            chatBox.innerHTML = '';
+            history.forEach(data => {
+                appendMessage(data);
+            });
+        });
 
-        msgDiv.innerHTML = `
-            ${replyHtml}
-            <div class="sender-name">${isMe ? 'You' : data.user}</div>
-            <div class="msg-text">${data.text}</div>
-            <div class="msg-info">${editedTag}</div>
-        `;
-
-        msgDiv.onclick = () => openActionModal(data, msgDiv);
-
-        chatBox.appendChild(msgDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    socket.on('loadHistory', (history) => {
-        chatBox.innerHTML = '';
-        history.forEach(data => {
+        socket.on('message', (data) => {
             appendMessage(data);
         });
-    });
 
-    socket.on('message', (data) => {
-        appendMessage(data);
-    });
+        socket.on('updateMessage', (data) => {
+            appendMessage(data);
+        });
 
-    socket.on('updateMessage', (data) => {
-        appendMessage(data);
-    });
-
-    function sendMessage() {
-        const text = messageInput.value.trim();
-        if (text) {
-            socket.emit('stopTyping'); // Message send hote hi typing band dikhe
-            const messageData = {
-                id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
-                user: myName,
-                text: text,
-                replyTo: currentReplyData,
-                edited: false,
-                deletedForEveryone: false
-            };
-            socket.emit('chatMessage', messageData);
-            messageInput.value = '';
-            cancelReply();
+        window.sendMessage = function() {
+            const text = messageInput.value.trim();
+            if (text) {
+                socket.emit('stopTyping');
+                const messageData = {
+                    id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
+                    user: myName,
+                    text: text,
+                    replyTo: currentReplyData,
+                    edited: false,
+                    deletedForEveryone: false
+                };
+                socket.emit('chatMessage', messageData);
+                messageInput.value = '';
+                cancelReply();
+            }
         }
     }
 </script>
