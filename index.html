@@ -9,36 +9,52 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         body { background-color: #efeae2; height: 100vh; display: flex; justify-content: center; align-items: center; }
         
+        /* Passcode Lock Overlay */
+        #passcodeOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #075e54; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; }
+        #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 8px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; }
+        #passcodeOverlay button { margin-top: 15px; padding: 10px 25px; background: #25d366; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+
         .chat-container { width: 100%; max-width: 450px; height: 100vh; background: #efeae2; display: flex; flex-direction: column; position: relative; }
         
         /* Header */
         .chat-header { background-color: #075e54; color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        .chat-header h2 { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+        .chat-header h2 { font-size: 15px; font-weight: 600; }
         .online-status { font-size: 11px; color: #25d366; margin-top: 3px; max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .btn-name { background: #128c7e; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; flex-shrink: 0; }
 
         /* Messages Container */
         .chat-messages { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
         
-        /* Message Bubbles */
-        .message-wrapper { display: flex; flex-direction: column; max-width: 80%; }
+        /* Message Wrapper */
+        .message-wrapper { display: flex; flex-direction: column; max-width: 80%; position: relative; }
         .message-wrapper.sent { align-self: flex-end; }
         .message-wrapper.received { align-self: flex-start; }
 
         .sender-name { font-size: 11px; color: #075e54; font-weight: bold; margin-bottom: 2px; margin-left: 4px; }
 
+        /* Reply Box inside message */
+        .reply-preview-box { background: rgba(0,0,0,0.06); border-left: 4px solid #075e54; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 4px; color: #555; }
+
         .message-box { padding: 6px 10px 4px 10px; border-radius: 8px; position: relative; word-wrap: break-word; font-size: 14px; line-height: 18px; color: #111b21; }
         .sent .message-box { background-color: #d9fdd3; border-top-right-radius: 0; }
         .received .message-box { background-color: #ffffff; border-top-left-radius: 0; }
 
-        /* Time & Meta */
+        /* Action Buttons (Reply, Edit, Delete) */
+        .msg-actions { display: none; position: absolute; top: -10px; right: 0; background: #fff; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); padding: 2px 6px; gap: 6px; z-index: 10; }
+        .message-wrapper:hover .msg-actions { display: flex; }
+        .action-btn { font-size: 11px; cursor: pointer; color: #555; }
+
+        /* Time & Meta Ticks */
         .msg-meta { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: #667781; float: right; margin-left: 10px; margin-top: 4px; }
         .edited-tag { font-size: 10px; color: #667781; font-style: italic; }
 
-        /* Typing Indicator at bottom of messages */
+        /* Typing Indicator at bottom */
         .typing-indicator { display: none; align-self: flex-start; background: #ffffff; padding: 6px 12px; border-radius: 8px; font-size: 12px; color: #667781; font-style: italic; box-shadow: 0 1px 1px rgba(0,0,0,0.1); margin-bottom: 4px; }
 
-        /* Input Area */
+        /* Input Area & Reply Bar */
+        .reply-bar { display: none; background: #e9edef; padding: 6px 12px; border-left: 4px solid #00a884; font-size: 12px; color: #111b21; justify-content: space-between; align-items: center; }
+        .reply-bar button { background: none; border: none; font-size: 14px; cursor: pointer; color: #667781; }
+
         .chat-input-area { background: #f0f2f5; padding: 10px; display: flex; align-items: center; gap: 8px; }
         .chat-input-area input { flex: 1; border: none; padding: 10px 14px; border-radius: 20px; outline: none; font-size: 14px; background: white; }
         .send-btn { background: #00a884; border: none; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 18px; }
@@ -46,17 +62,31 @@
 </head>
 <body>
 
+<!-- Strict Passcode Protection -->
+<div id="passcodeOverlay">
+    <h2>🔒 Enter Passcode</h2>
+    <input type="password" id="passcodeInput" placeholder="PIN Daalein" />
+    <button onclick="checkPasscode()">Unlock</button>
+</div>
+
 <div class="chat-container">
     <div class="chat-header">
         <div>
             <h2>BAZIGAR-MOONIE Chating Server 🫀🎀</h2>
-            <div class="online-status" id="onlineCount">🟢 Online: Loading...</div>
+            <div class="online-status" id="onlineCount">🟢 Online: ...</div>
         </div>
         <button class="btn-name" onclick="changeUsername()">Naam Badlo</button>
     </div>
 
     <div class="chat-messages" id="chatBox">
         <div class="typing-indicator" id="typingIndicator"></div>
+    </div>
+
+    <div class="reply-bar" id="replyBar">
+        <div>
+            <strong id="replyUser">Name</strong>: <span id="replyText">Message text...</span>
+        </div>
+        <button onclick="cancelReply()">✖</button>
     </div>
 
     <div class="chat-input-area">
@@ -66,21 +96,31 @@
 </div>
 
 <script>
+    function checkPasscode() {
+        const pin = document.getElementById('passcodeInput').value;
+        if (pin === "1234") {
+            document.getElementById('passcodeOverlay').style.display = "none";
+        } else {
+            alert("Galat Passcode!");
+        }
+    }
+
     const socket = io();
     let myUsername = localStorage.getItem('chatUsername') || 'User_' + Math.floor(Math.random() * 1000);
     localStorage.setItem('chatUsername', myUsername);
 
-    // Initial Join Event
     socket.emit('userJoined', myUsername);
 
     const chatBox = document.getElementById('chatBox');
     const msgInput = document.getElementById('msgInput');
     const onlineCount = document.getElementById('onlineCount');
     const typingIndicator = document.getElementById('typingIndicator');
+    const replyBar = document.getElementById('replyBar');
 
     let typingTimeout;
+    let selectedReply = null;
 
-    // Strict Indian Standard Time (IST) Formatter
+    // Strict IST Time Formatter
     function formatTime(dateStr) {
         const date = dateStr ? new Date(dateStr) : new Date();
         return date.toLocaleTimeString('en-IN', {
@@ -101,47 +141,154 @@
         }
     }
 
-    // Online Users Names Update
     socket.on('onlineUsersList', (usersList) => {
-        if (usersList && usersList.length > 0) {
-            onlineCount.innerText = `🟢 Online: ${usersList.join(', ')}`;
-        } else {
-            onlineCount.innerText = `🟢 Online: 0`;
+        onlineCount.innerText = usersList && usersList.length > 0 ? `🟢 Online: ${usersList.join(', ')}` : `🟢 Online: 0`;
+        
+        // Mark messages as read when another user is online/active
+        if (usersList && usersList.length > 1) {
+            socket.emit('markAsRead', myUsername);
         }
     });
 
-    // Load Message History
     socket.on('loadHistory', (messages) => {
         chatBox.querySelectorAll('.message-wrapper').forEach(el => el.remove());
         messages.forEach(msg => appendMessage(msg));
         scrollToBottom();
+        socket.emit('markAsRead', myUsername);
     });
 
-    // New Message Received
     socket.on('message', (data) => {
         appendMessage(data);
         scrollToBottom();
+        if (data.user !== myUsername) {
+            socket.emit('markAsRead', myUsername);
+        }
+    });
+
+    // Update Ticks to Blue when Read
+    socket.on('messagesReadUpdate', () => {
+        document.querySelectorAll('.msg-ticks').forEach(el => {
+            if (el.dataset.sender === myUsername) {
+                el.innerHTML = '<span style="color: #34b7f1; font-weight: bold;">✓✓</span>';
+            }
+        });
+    });
+
+    socket.on('messageUpdated', (data) => {
+        const msgEl = document.getElementById(data.id);
+        if (msgEl) {
+            msgEl.querySelector('.msg-content').innerText = data.text;
+            if (!msgEl.querySelector('.edited-tag')) {
+                const tag = document.createElement('span');
+                tag.className = 'edited-tag';
+                tag.innerText = '(edited)';
+                msgEl.querySelector('.msg-meta').prepend(tag);
+            }
+        }
+    });
+
+    socket.on('messageDeletedEveryone', (id) => {
+        const msgEl = document.getElementById(id);
+        if (msgEl) {
+            msgEl.querySelector('.msg-content').innerText = '🚫 This message was deleted';
+            msgEl.querySelector('.msg-content').style.fontStyle = 'italic';
+            msgEl.querySelector('.msg-content').style.color = '#777';
+            const actions = msgEl.querySelector('.msg-actions');
+            if (actions) actions.remove();
+        }
     });
 
     function appendMessage(data) {
         const isMe = data.user === myUsername;
         const wrapper = document.createElement('div');
         wrapper.className = `message-wrapper ${isMe ? 'sent' : 'received'}`;
+        wrapper.id = data.id;
 
         const timeString = formatTime(data.timestamp || data.createdAt);
 
+        let replyHTML = '';
+        if (data.replyTo) {
+            replyHTML = `<div class="reply-preview-box"><strong>${data.replyTo.user}</strong>: ${data.replyTo.text}</div>`;
+        }
+
+        let isDeleted = data.text === '🚫 This message was deleted';
+
+        let actionsHTML = '';
+        if (!isDeleted) {
+            actionsHTML = `
+                <div class="msg-actions">
+                    <span class="action-btn" onclick="setReply('${data.user}', '${data.text.replace(/'/g, "\\'")}')">↩️</span>
+                    ${isMe ? `<span class="action-btn" onclick="editMessage('${data.id}', '${data.text.replace(/'/g, "\\'")}')">✏️</span>` : ''}
+                    ${isMe ? `<span class="action-btn" onclick="deleteEveryone('${data.id}')">🗑️</span>` : ''}
+                    <span class="action-btn" onclick="deleteForMe('${data.id}')">❌</span>
+                </div>
+            `;
+        }
+
+        // Ticks Logic: Sent (✓), Delivered (✓✓ grey), Read (✓✓ blue)
+        let ticksHTML = '';
+        if (isMe && !isDeleted) {
+            let tickSymbol = '✓';
+            let tickColor = '#667781';
+            if (data.status === 'read') {
+                tickSymbol = '✓✓';
+                tickColor = '#34b7f1';
+            } else if (data.status === 'delivered') {
+                tickSymbol = '✓✓';
+                tickColor = '#667781';
+            } else {
+                tickSymbol = '✓';
+                tickColor = '#667781';
+            }
+            ticksHTML = `<span class="msg-ticks" data-sender="${data.user}" style="color: ${tickColor}; font-weight: ${data.status === 'read' ? 'bold' : 'normal'};">${tickSymbol}</span>`;
+        }
+
         wrapper.innerHTML = `
+            ${actionsHTML}
             ${!isMe ? `<div class="sender-name">${data.user}</div>` : ''}
             <div class="message-box">
-                ${data.text}
+                ${replyHTML}
+                <span class="msg-content" style="${isDeleted ? 'font-style: italic; color: #777;' : ''}">${data.text}</span>
                 <div class="msg-meta">
-                    ${data.edited ? `<span class="edited-tag">Edited</span>` : ''}
+                    ${data.edited && !isDeleted ? `<span class="edited-tag">(edited)</span>` : ''}
                     <span>${timeString}</span>
+                    ${ticksHTML}
                 </div>
             </div>
         `;
 
         chatBox.insertBefore(wrapper, typingIndicator);
+    }
+
+    function setReply(user, text) {
+        selectedReply = { user, text };
+        document.getElementById('replyUser').innerText = user;
+        document.getElementById('replyText').innerText = text;
+        replyBar.style.display = 'flex';
+        msgInput.focus();
+    }
+
+    function cancelReply() {
+        selectedReply = null;
+        replyBar.style.display = 'none';
+    }
+
+    function editMessage(id, oldText) {
+        const newText = prompt("Edit Message:", oldText);
+        if (newText && newText.trim() !== "" && newText !== oldText) {
+            socket.emit('editMessage', { id, text: newText.trim() });
+        }
+    }
+
+    function deleteEveryone(id) {
+        if (confirm("Delete for Everyone?")) {
+            socket.emit('deleteEveryone', id);
+        }
+    }
+
+    function deleteForMe(id) {
+        const msgEl = document.getElementById(id);
+        if (msgEl) msgEl.remove();
     }
 
     function sendMessage() {
@@ -152,11 +299,13 @@
             id: 'msg_' + Date.now(),
             user: myUsername,
             text: text,
+            replyTo: selectedReply,
             timestamp: new Date().toISOString()
         };
 
         socket.emit('chatMessage', msgData);
         msgInput.value = '';
+        cancelReply();
         socket.emit('stopTyping');
     }
 
@@ -172,7 +321,6 @@
         }, 1500);
     }
 
-    // Typing Indicator inside Message Box Area
     socket.on('displayTyping', (user) => {
         typingIndicator.innerText = `${user} is typing...`;
         typingIndicator.style.display = 'block';
