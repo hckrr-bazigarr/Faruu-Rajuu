@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Style Chat with Reply</title>
+    <title>WhatsApp Style Chat</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: #ece5dd; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .chat-container { width: 100%; max-width: 450px; height: 90vh; background: #fff; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+        .chat-container { width: 100%; max-width: 450px; height: 90vh; background: #fff; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15); position: relative; }
         .header { background: #075e54; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; }
         .header-info div { font-size: 1.1rem; font-weight: bold; }
         .status-info { font-size: 0.8rem; display: flex; align-items: center; gap: 5px; margin-top: 2px; color: #dcf8c6; }
@@ -15,20 +15,15 @@
         .change-name { font-size: 0.75rem; background: #128c7e; padding: 6px 10px; border-radius: 4px; cursor: pointer; border: none; color: white; font-weight: bold; }
         
         .chat-box { flex: 1; padding: 15px; overflow-y: auto; background: #e5ddd5; display: flex; flex-direction: column; gap: 10px; }
-        .message { max-width: 80%; padding: 10px 14px; border-radius: 8px; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; position: relative; box-shadow: 0 1px 0.5px rgba(0,0,0,0.13); }
+        .message { max-width: 80%; padding: 10px 14px; border-radius: 8px; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; position: relative; box-shadow: 0 1px 0.5px rgba(0,0,0,0.13); cursor: pointer; }
         .received { background: #ffffff; align-self: flex-start; border-top-left-radius: 0; }
         .sent { background: #dcf8c6; align-self: flex-end; border-top-right-radius: 0; }
         .sender-name { font-size: 0.75rem; color: #075e54; margin-bottom: 3px; font-weight: bold; }
+        .msg-info { font-size: 0.65rem; color: #666; text-align: right; margin-top: 2px; }
         
-        /* Reply quote inside message */
         .quoted-msg { background: rgba(0, 0, 0, 0.05); border-left: 4px solid #128c7e; padding: 5px 8px; margin-bottom: 6px; border-radius: 4px; font-size: 0.85rem; }
         .quoted-author { font-weight: bold; color: #075e54; font-size: 0.75rem; }
-        
-        /* Reply button on messages */
-        .reply-btn { position: absolute; right: 8px; bottom: 4px; font-size: 0.7rem; color: #666; background: none; border: none; cursor: pointer; opacity: 0; transition: opacity 0.2s; }
-        .message:hover .reply-btn { opacity: 1; }
 
-        /* Reply preview box above input */
         .reply-preview { background: #f0f0f0; padding: 8px 12px; display: none; justify-content: space-between; align-items: center; border-left: 4px solid #128c7e; font-size: 0.85rem; }
         .reply-preview-text { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: #333; }
         .cancel-reply { background: none; border: none; font-weight: bold; cursor: pointer; color: #888; font-size: 1rem; }
@@ -37,6 +32,13 @@
         .input-row { display: flex; padding: 10px; gap: 8px; align-items: center; }
         input[type="text"] { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 20px; outline: none; font-size: 0.95rem; background: #fff; }
         button.send-btn { background: #128c7e; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; justify-content: center; align-items: center; font-size: 1.1rem; flex-shrink: 0; }
+
+        /* Action Menu Modal */
+        .action-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 100; }
+        .action-sheet { background: white; width: 85%; max-width: 320px; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .action-btn { padding: 14px; text-align: center; border-bottom: 1px solid #eee; font-size: 1rem; cursor: pointer; background: white; border: none; width: 100%; }
+        .action-btn:active { background: #f5f5f5; }
+        .action-btn.delete { color: #d9534f; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -54,7 +56,6 @@
     
     <div class="chat-box" id="chatBox"></div>
     
-    <!-- Reply Preview Box -->
     <div class="reply-preview" id="replyPreview">
         <div>
             <div style="font-size: 0.75rem; color: #128c7e; font-weight: bold;" id="replyingToUser">Replying</div>
@@ -65,9 +66,21 @@
 
     <div class="input-area">
         <div class="input-row">
-            <input type="text" id="messageInput" placeholder="Type a message..." onkeypress="handleKey(event)">
+            <!-- Enter key press listener hata diya hai, ab sirf send button se send hoga -->
+            <input type="text" id="messageInput" placeholder="Type a message...">
             <button class="send-btn" onclick="sendMessage()">➤</button>
         </div>
+    </div>
+</div>
+
+<!-- Action Modal for Message Options -->
+<div class="action-modal" id="actionModal" onclick="closeActionModal(event)">
+    <div class="action-sheet" id="actionSheet">
+        <button class="action-btn" onclick="triggerReply()">Reply</button>
+        <button class="action-btn" id="editOptionBtn" onclick="triggerEdit()" style="display:none;">Edit</button>
+        <button class="action-btn delete" onclick="triggerDeleteForMe()">Delete for Me</button>
+        <button class="action-btn delete" id="deleteEveryoneBtn" onclick="triggerDeleteForEveryone()" style="display:none;">Delete for Everyone</button>
+        <button class="action-btn" onclick="closeActionModal()" style="color: #666; font-weight: bold;">Cancel</button>
     </div>
 </div>
 
@@ -95,8 +108,12 @@
     const replyPreview = document.getElementById('replyPreview');
     const replyingToUser = document.getElementById('replyingToUser');
     const replyingToText = document.getElementById('replyingToText');
+    const actionModal = document.getElementById('actionModal');
+    const editOptionBtn = document.getElementById('editOptionBtn');
+    const deleteEveryoneBtn = document.getElementById('deleteEveryoneBtn');
 
     let currentReplyData = null;
+    let selectedMessage = null;
 
     socket.on('onlineCount', (count) => {
         onlineStatus.innerText = `${count} Online`;
@@ -115,8 +132,65 @@
         replyPreview.style.display = 'none';
     }
 
+    function openActionModal(data, element) {
+        selectedMessage = { data, element };
+        if (data.user === myName && !data.deletedForEveryone) {
+            editOptionBtn.style.display = 'block';
+            deleteEveryoneBtn.style.display = 'block';
+        } else {
+            editOptionBtn.style.display = 'none';
+            deleteEveryoneBtn.style.display = 'none';
+        }
+        actionModal.style.display = 'flex';
+    }
+
+    function closeActionModal(e) {
+        if (!e || e.target === actionModal) {
+            actionModal.style.display = 'none';
+        }
+    }
+
+    function triggerReply() {
+        actionModal.style.display = 'none';
+        setReply(selectedMessage.data.user, selectedMessage.data.text);
+    }
+
+    function triggerEdit() {
+        actionModal.style.display = 'none';
+        if (selectedMessage.data.user !== myName) return;
+        let newText = prompt("Edit message:", selectedMessage.data.text);
+        if (newText && newText.trim() !== "") {
+            socket.emit('editMessage', { id: selectedMessage.data.id, newText: newText.trim() });
+        }
+    }
+
+    function triggerDeleteForMe() {
+        actionModal.style.display = 'none';
+        selectedMessage.element.remove();
+    }
+
+    function triggerDeleteForEveryone() {
+        actionModal.style.display = 'none';
+        if (selectedMessage.data.user !== myName) return;
+        socket.emit('deleteForEveryone', selectedMessage.data.id);
+    }
+
     function appendMessage(data) {
+        let existingMsg = document.getElementById(`msg-${data.id}`);
+        if (existingMsg) {
+            // Update existing message (for edit or delete for everyone)
+            existingMsg.querySelector('.msg-text').innerText = data.text;
+            if (data.edited) {
+                let infoDiv = existingMsg.querySelector('.msg-info');
+                if (!infoDiv.innerText.includes('edited')) {
+                    infoDiv.innerHTML += ' <span style="font-style:italic;">(edited)</span>';
+                }
+            }
+            return;
+        }
+
         const msgDiv = document.createElement('div');
+        msgDiv.id = `msg-${data.id}`;
         const isMe = data.user === myName;
         msgDiv.classList.add('message', isMe ? 'sent' : 'received');
 
@@ -130,12 +204,17 @@
             `;
         }
 
+        let editedTag = data.edited ? ' <span style="font-style:italic;">(edited)</span>' : '';
+
         msgDiv.innerHTML = `
             ${replyHtml}
             <div class="sender-name">${isMe ? 'You' : data.user}</div>
             <div class="msg-text">${data.text}</div>
-            <button class="reply-btn" onclick="setReply('${data.user}', '${data.text.replace(/'/g, "\\'")}')">Reply</button>
+            <div class="msg-info">${editedTag}</div>
         `;
+
+        // Click on message to open options menu
+        msgDiv.onclick = () => openActionModal(data, msgDiv);
 
         chatBox.appendChild(msgDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
@@ -152,23 +231,26 @@
         appendMessage(data);
     });
 
+    socket.on('updateMessage', (data) => {
+        appendMessage(data);
+    });
+
     function sendMessage() {
         const input = document.getElementById('messageInput');
         const text = input.value.trim();
         if (text) {
             const messageData = {
+                id: 'msg_' + Date.now() + '_' + Math.random().toString(36.substring(2, 9)),
                 user: myName,
                 text: text,
-                replyTo: currentReplyData
+                replyTo: currentReplyData,
+                edited: false,
+                deletedForEveryone: false
             };
             socket.emit('chatMessage', messageData);
             input.value = '';
             cancelReply();
         }
-    }
-
-    function handleKey(e) {
-        if (e.key === 'Enter') sendMessage();
     }
 </script>
 
