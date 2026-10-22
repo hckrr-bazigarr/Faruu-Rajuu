@@ -20,7 +20,7 @@
         #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 8px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; }
         #passcodeOverlay button { margin-top: 15px; padding: 10px 25px; background: #25d366; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
 
-        /* Main Chat Container - Fixed 100vh Layout */
+        /* Main Chat Container - Fixed Layout */
         .chat-container { 
             width: 100%; 
             max-width: 450px; 
@@ -111,7 +111,7 @@
 
 <!-- Strict Passcode Protection -->
 <div id="passcodeOverlay">
-    <h2>🔒 Enter Password</h2>
+    <h2>🔒 Enter Password 🔑</h2>
     <input type="password" id="passcodeInput" placeholder="ENTER PIN" />
     <button onclick="checkPasscode()">Unlock</button>
 </div>
@@ -128,6 +128,7 @@
 
     <!-- Scrollable Messages Area -->
     <div class="chat-messages" id="chatBox" onclick="closeAllActions(event)">
+        <!-- Messages Will Append Here in Sequence -->
         <div class="typing-indicator" id="typingIndicator"></div>
     </div>
 
@@ -188,6 +189,7 @@
             myUsername = newName.trim();
             localStorage.setItem('chatUsername', myUsername);
             socket.emit('updateUsername', { oldName, newName: myUsername });
+            location.reload();
         }
     }
 
@@ -251,7 +253,6 @@
         wrapper.className = `message-wrapper ${isMe ? 'sent' : 'received'}`;
         wrapper.id = data.id;
 
-        // 1-Tap toggle for actions (Reply, Edit, Delete)
         wrapper.onclick = function(e) {
             e.stopPropagation();
             document.querySelectorAll('.message-wrapper').forEach(w => {
@@ -312,6 +313,7 @@
             </div>
         `;
 
+        // Proper order: Appending before typing indicator keeps chronological order intact!
         chatBox.insertBefore(wrapper, typingIndicator);
     }
 
