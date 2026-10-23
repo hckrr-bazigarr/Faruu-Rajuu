@@ -16,10 +16,10 @@ mongoose.connect(MONGO_URI)
     .catch(err => console.log('MongoDB connection error:', err));
 
 const messageSchema = new mongoose.Schema({
-    id: { type: String, unique: true },
-    user: String,
-    text: String,
-    replyTo: Object,
+    id: { type: String, unique: true, required: true },
+    user: { type: String, required: true },
+    text: { type: String, required: true },
+    replyTo: { type: Object, default: null },
     edited: { type: Boolean, default: false },
     status: { type: String, default: 'sent' },
     reactions: { type: Object, default: {} },
@@ -47,8 +47,9 @@ io.on('connection', async (socket) => {
         broadcastOnlineUsers();
     });
 
+    // 100% Fresh Primary Read to prevent replication delay on refresh
     try {
-        const history = await Message.find().sort({ timestamp: 1, _id: 1 }).limit(500);
+        const history = await Message.find().read('primary').sort({ timestamp: 1, _id: 1 }).limit(1000);
         socket.emit('loadHistory', history);
     } catch (err) {
         console.log('History load error:', err);
@@ -56,19 +57,27 @@ io.on('connection', async (socket) => {
 
     socket.on('chatMessage', async (data) => {
         try {
-            console.log("Saving message to DB:", data);
             const uniqueNames = [...new Set(Object.values(activeUsers))];
             const otherUsersOnline = uniqueNames.filter(name => name !== data.user);
             
             data.status = otherUsersOnline.length > 0 ? 'delivered' : 'sent';
             data.reactions = {};
 
-            const newMessage = new Message(data);
+            const newMessage = new Message({
+                id: data.id,
+                user: data.user,
+                text: data.text,
+                replyTo: data.replyTo || null,
+                edited: false,
+                status: data.status,
+                reactions: {},
+                timestamp: data.timestamp ? new Date(data.timestamp) : new Date()
+            });
+
             await newMessage.save();
-            console.log("Message saved successfully! ✅");
             io.emit('message', data);
         } catch (err) {
-            console.log('❌ DETAILED MESSAGE SAVE ERROR:', err);
+            console.log('❌ MESSAGE SAVE ERROR:', err);
         }
     });
 
@@ -129,7 +138,7 @@ io.on('connection', async (socket) => {
         socket.broadcast.emit('hideTyping');
     });
 
-    // --- WhatsApp Voice Call Signaling ---
+    // --- Voice Call Signaling ---
     socket.on('callUser', (data) => {
         socket.broadcast.emit('incomingCall', { signal: data.signalData, from: data.from });
     });
