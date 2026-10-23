@@ -32,7 +32,6 @@
             color: white; 
         }
 
-        /* Dark overlay layer for perfect readability */
         #passcodeOverlay::before {
             content: "";
             position: absolute;
@@ -50,9 +49,9 @@
 
         #passcodeOverlay h2 { text-shadow: 0 2px 4px rgba(0,0,0,0.8); font-weight: 700; margin-bottom: 10px; }
         #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 8px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; background: rgba(255,255,255,0.9); color: #111; letter-spacing: 2px; }
-        #unlockBtn { margin-top: 15px; padding: 10px 25px; background: #d81b60; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        #unlockBtn { margin-top: 15px; padding: 10px 25px; background: #d81b60; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
 
-        /* Main Chat Container with Insta Love Theme */
+        /* Main Chat Container */
         .chat-container { 
             width: 100%; 
             max-width: 450px; 
@@ -66,7 +65,6 @@
             overflow: hidden; 
         }
         
-        /* Header */
         .chat-header { 
             background-color: #d81b60; 
             color: white; 
@@ -84,7 +82,6 @@
         .call-btn { background: #ff4081; color: white; border: none; padding: 6px 10px; border-radius: 50%; font-size: 14px; cursor: pointer; }
         .btn-name { background: #ad1457; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; flex-shrink: 0; font-weight: bold; }
 
-        /* Messages Area */
         .chat-messages { 
             flex: 1; 
             min-height: 0;
@@ -102,29 +99,25 @@
         .message-wrapper.received { align-self: flex-start; }
 
         .sender-name { font-size: 11px; color: #ad1457; font-weight: bold; margin-bottom: 2px; margin-left: 4px; }
-
         .reply-preview-box { background: rgba(255,255,255,0.6); border-left: 4px solid #d81b60; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 4px; color: #555; }
 
         .message-box { padding: 6px 10px 4px 10px; border-radius: 12px; position: relative; word-wrap: break-word; font-size: 14px; line-height: 18px; color: #111b21; }
         .sent .message-box { background: linear-gradient(135deg, #ff4081 0%, #f50057 100%); color: #ffffff; border-top-right-radius: 0; }
         .received .message-box { background-color: #ffffff; border-top-left-radius: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
 
-        /* Action Menu & Emoji Reactions Picker */
         .msg-actions { display: none; position: absolute; top: -38px; left: 0; background: #fff; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.25); padding: 4px 10px; gap: 8px; z-index: 20; align-items: center; }
         .message-wrapper.active .msg-actions { display: flex; }
         .action-btn { font-size: 13px; cursor: pointer; color: #555; }
         .reaction-picker { display: flex; gap: 6px; font-size: 15px; border-right: 1px solid #ddd; padding-right: 8px; }
-        .reaction-picker span { cursor: pointer; transition: transform 0.1s; }
-        .reaction-picker span:hover { transform: scale(1.2); }
+        .reaction-picker span { cursor: pointer; }
 
-        /* Displayed Reactions Badge */
         .msg-reactions { display: flex; gap: 3px; position: absolute; bottom: -10px; right: 10px; background: #fff; border: 1px solid #ddd; border-radius: 12px; padding: 1px 6px; font-size: 11px; box-shadow: 0 1px 3px rgba(0,0,0,0.15); z-index: 5; }
 
         .msg-meta { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: #667781; float: right; margin-left: 10px; margin-top: 4px; }
         .sent .msg-meta { color: #fce4ec; }
         .edited-tag { font-size: 10px; font-style: italic; }
 
-        .typing-indicator { display: none; align-self: flex-start; background: rgba(255,255,255,0.8); padding: 6px 12px; border-radius: 8px; font-size: 12px; color: #d81b60; font-style: italic; box-shadow: 0 1px 1px rgba(0,0,0,0.1); margin-bottom: 4px; }
+        .typing-indicator { display: none; align-self: flex-start; background: rgba(255,255,255,0.8); padding: 6px 12px; border-radius: 8px; font-size: 12px; color: #d81b60; font-style: italic; margin-bottom: 4px; flex-shrink: 0; }
 
         .reply-bar { display: none; background: #fce4ec; padding: 6px 12px; border-left: 4px solid #d81b60; font-size: 12px; color: #111b21; justify-content: space-between; align-items: center; flex-shrink: 0; }
         .reply-bar button { background: none; border: none; font-size: 14px; cursor: pointer; color: #667781; }
@@ -151,8 +144,8 @@
         .call-controls { display: flex; gap: 25px; align-items: center; margin-bottom: 40px; }
         .control-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 50px; height: 50px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
         .control-btn.active { background: white; color: #d81b60; }
-        .btn-call-accept { background: #25d366; color: white; border: none; padding: 14px 28px; border-radius: 35px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .btn-call-reject { background: #ea0038; color: white; border: none; padding: 14px 28px; border-radius: 35px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .btn-call-accept { background: #25d366; color: white; border: none; padding: 14px 28px; border-radius: 35px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-call-reject { background: #ea0038; color: white; border: none; padding: 14px 28px; border-radius: 35px; font-size: 16px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -160,10 +153,9 @@
 <div id="passcodeOverlay">
     <h2>Enter Password</h2>
     <input type="password" id="passcodeInput" placeholder="ENTER PIN" onkeypress="handlePinKey(event)" autocomplete="off" />
-    <button type="button" id="unlockBtn" onclick="checkPasscode()" ontouchend="checkPasscode()">Unlock</button>
+    <button type="button" id="unlockBtn" onclick="checkPasscode()">Unlock</button>
 </div>
 
-<!-- WhatsApp Style Voice Call Modal -->
 <div id="callOverlay">
     <div class="call-user-info">
         <div class="call-avatar">📞</div>
@@ -215,24 +207,15 @@
         const pinInput = document.getElementById('passcodeInput');
         const overlay = document.getElementById('passcodeOverlay');
         if (!pinInput) return;
-        
-        const pin = pinInput.value.trim();
-        
-        if (pin === "8085") {
-            if (overlay) {
-                overlay.style.display = "none";
-                overlay.remove();
-            }
+        if (pinInput.value.trim() === "8085") {
+            if (overlay) { overlay.style.display = "none"; overlay.remove(); }
         } else {
             alert("Wrong Password");
         }
     }
 
     function handlePinKey(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            checkPasscode();
-        }
+        if (e.key === 'Enter') { e.preventDefault(); checkPasscode(); }
     }
 
     const socket = io();
@@ -249,12 +232,9 @@
 
     let typingTimeout;
     let selectedReply = null;
-
-    let localStream;
-    let peerConnection;
-    let incomingSignalData = null;
-    let callTimerInterval;
-    let secondsElapsed = 0;
+    let localStream, peerConnection, incomingSignalData;
+    let callTimerInterval, secondsElapsed = 0;
+    let isSpeakerOn = false;
 
     const callOverlay = document.getElementById('callOverlay');
     const callStatusTitle = document.getElementById('callStatusTitle');
@@ -264,11 +244,7 @@
     const muteBtn = document.getElementById('muteBtn');
     const speakerBtn = document.getElementById('speakerBtn');
 
-    let isSpeakerOn = false; // Default earpiece par rahega
-
-    const rtcConfig = {
-        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
-    };
+    const rtcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
     async function getMicrophone() {
         if (!localStream) {
@@ -279,21 +255,9 @@
 
     function createPeerConnection() {
         peerConnection = new RTCPeerConnection(rtcConfig);
-
-        peerConnection.onicecandidate = (event) => {
-            if (event.candidate) {
-                socket.emit('iceCandidate', event.candidate);
-            }
-        };
-
-        peerConnection.ontrack = (event) => {
-            remoteAudio.srcObject = event.streams[0];
-            remoteAudio.volume = 0.8; // Default earpiece volume
-        };
-
-        if (localStream) {
-            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-        }
+        peerConnection.onicecandidate = (e) => { if (e.candidate) socket.emit('iceCandidate', e.candidate); };
+        peerConnection.ontrack = (e) => { remoteAudio.srcObject = e.streams[0]; remoteAudio.volume = 0.8; };
+        if (localStream) { localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream)); }
     }
 
     function startTimer() {
@@ -309,16 +273,12 @@
         }, 1000);
     }
 
-    function stopTimer() {
-        clearInterval(callTimerInterval);
-        callTimer.style.display = 'none';
-    }
+    function stopTimer() { clearInterval(callTimerInterval); callTimer.style.display = 'none'; }
 
     async function startCall() {
         try {
             await getMicrophone();
             createPeerConnection();
-
             callOverlay.style.display = 'flex';
             callStatusTitle.innerText = 'Ringing...';
             acceptCallBtn.style.display = 'none';
@@ -330,14 +290,8 @@
 
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
-
-            socket.emit('callUser', {
-                signalData: offer,
-                from: myUsername
-            });
-        } catch (err) {
-            alert('Microphone permission is required for voice calling!');
-        }
+            socket.emit('callUser', { signalData: offer, from: myUsername });
+        } catch (err) { alert('Microphone permission required!'); }
     }
 
     socket.on('incomingCall', (data) => {
@@ -353,7 +307,6 @@
         try {
             await getMicrophone();
             createPeerConnection();
-
             acceptCallBtn.style.display = 'none';
             muteBtn.style.display = 'flex';
             speakerBtn.style.display = 'flex';
@@ -366,81 +319,49 @@
             await peerConnection.setRemoteDescription(new RTCSessionDescription(incomingSignalData));
             const answer = await peerConnection.createAnswer();
             await peerConnection.setLocalDescription(answer);
-
             socket.emit('answerCall', { signal: answer });
-        } catch (err) {
-            alert('Microphone access failed!');
-        }
+        } catch (err) { alert('Microphone access failed!'); }
     }
 
     socket.on('callAccepted', async (signal) => {
         callStatusTitle.innerText = 'Connected';
         startTimer();
-        if (peerConnection) {
-            await peerConnection.setRemoteDescription(new RTCSessionDescription(signal));
-        }
+        if (peerConnection) await peerConnection.setRemoteDescription(new RTCSessionDescription(signal));
     });
 
     socket.on('iceCandidate', async (candidate) => {
-        if (peerConnection) {
-            try {
-                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-            } catch (e) {}
-        }
+        if (peerConnection) { try { await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)); } catch (e) {} }
     });
 
-    socket.on('callEnded', () => {
-        cleanupCall();
-    });
-
-    function endCall() {
-        socket.emit('endCall');
-        cleanupCall();
-    }
-
+    socket.on('callEnded', () => cleanupCall());
+    function endCall() { socket.emit('endCall'); cleanupCall(); }
     function cleanupCall() {
         stopTimer();
         callOverlay.style.display = 'none';
         isSpeakerOn = false;
         speakerBtn.classList.remove('active');
-        if (peerConnection) {
-            peerConnection.close();
-            peerConnection = null;
-        }
-        if (localStream) {
-            localStream.getTracks().forEach(track => track.stop());
-            localStream = null;
-        }
+        if (peerConnection) { peerConnection.close(); peerConnection = null; }
+        if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
     }
 
     function toggleMute() {
         if (localStream) {
-            const audioTrack = localStream.getAudioTracks()[0];
-            audioTrack.enabled = !audioTrack.enabled;
-            muteBtn.classList.toggle('active', !audioTrack.enabled);
-            muteBtn.innerText = audioTrack.enabled ? '🎤' : '🔇';
+            const track = localStream.getAudioTracks()[0];
+            track.enabled = !track.enabled;
+            muteBtn.classList.toggle('active', !track.enabled);
+            muteBtn.innerText = track.enabled ? '🎤' : '🔇';
         }
     }
 
     function toggleSpeaker() {
         isSpeakerOn = !isSpeakerOn;
         speakerBtn.classList.toggle('active', isSpeakerOn);
-        
-        if (isSpeakerOn) {
-            remoteAudio.volume = 1.0; // Loudspeaker mode
-        } else {
-            remoteAudio.volume = 0.8; // Normal earpiece mode
-        }
+        remoteAudio.volume = isSpeakerOn ? 1.0 : 0.8;
     }
 
     function formatTime(dateStr) {
         const date = dateStr ? new Date(dateStr) : new Date();
-        return date.toLocaleTimeString('en-IN', {
-            timeZone: 'Asia/Kolkata',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
-        });
+        return date.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
     }
 
     function changeUsername() {
@@ -454,21 +375,17 @@
         }
     }
 
-    socket.on('onlineUsersList', (usersList) => {
-        onlineCount.innerText = usersList && usersList.length > 0 ? `🟢 Online: ${usersList.join(', ')}` : `🟢 Online: 0`;
-        if (usersList && usersList.length > 1) {
-            socket.emit('markAsRead', myUsername);
-        }
+    socket.on('onlineUsersList', (users) => {
+        onlineCount.innerText = users && users.length > 0 ? `🟢 Online: ${users.join(', ')}` : `🟢 Online: 0`;
+        if (users && users.length > 1) socket.emit('markAsRead', myUsername);
     });
 
-        socket.on('loadHistory', (messages) => {
-        console.log("History received from server:", messages); // 👈 Check karne ke liye ki history mein naya message aa raha hai ya nahi
+    // Robust History Load Handler
+    socket.on('loadHistory', (messages) => {
         chatBox.querySelectorAll('.message-wrapper').forEach(el => el.remove());
-        
         if (messages && messages.length > 0) {
             messages.forEach(msg => appendMessage(msg));
         }
-        
         scrollToBottom();
         socket.emit('markAsRead', myUsername);
     });
@@ -476,23 +393,17 @@
     socket.on('message', (data) => {
         appendMessage(data);
         scrollToBottom();
-        if (data.user !== myUsername) {
-            socket.emit('markAsRead', myUsername);
-        }
+        if (data.user !== myUsername) socket.emit('markAsRead', myUsername);
     });
 
     socket.on('messageReacted', (data) => {
         const msgEl = document.getElementById(data.id);
-        if (msgEl) {
-            updateReactionsUI(msgEl, data.reactions);
-        }
+        if (msgEl) updateReactionsUI(msgEl, data.reactions);
     });
 
     socket.on('messagesReadUpdate', () => {
         document.querySelectorAll('.msg-ticks').forEach(el => {
-            if (el.dataset.sender === myUsername) {
-                el.innerHTML = '<span style="color: #ffeb3b; font-weight: bold;">✓✓</span>';
-            }
+            if (el.dataset.sender === myUsername) el.innerHTML = '<span style="color: #ffeb3b; font-weight: bold;">✓✓</span>';
         });
     });
 
@@ -512,9 +423,10 @@
     socket.on('messageDeletedEveryone', (id) => {
         const msgEl = document.getElementById(id);
         if (msgEl) {
-            msgEl.querySelector('.msg-content').innerText = '🚫 This message was deleted';
-            msgEl.querySelector('.msg-content').style.fontStyle = 'italic';
-            msgEl.querySelector('.msg-content').style.color = '#777';
+            const content = msgEl.querySelector('.msg-content');
+            content.innerText = '🚫 This message was deleted';
+            content.style.fontStyle = 'italic';
+            content.style.color = '#777';
             const actions = msgEl.querySelector('.msg-actions');
             if (actions) actions.remove();
             const reactions = msgEl.querySelector('.msg-reactions');
@@ -530,7 +442,6 @@
     function updateReactionsUI(wrapper, reactions) {
         let existingBadge = wrapper.querySelector('.msg-reactions');
         if (existingBadge) existingBadge.remove();
-
         if (reactions && Object.keys(reactions).length > 0) {
             const uniqueEmojis = [...new Set(Object.values(reactions))].join(' ');
             const badge = document.createElement('div');
@@ -541,6 +452,8 @@
     }
 
     function appendMessage(data) {
+        if (document.getElementById(data.id)) return; // Prevent duplicate appends
+
         const isMe = data.user === myUsername;
         const wrapper = document.createElement('div');
         wrapper.className = `message-wrapper ${isMe ? 'sent' : 'received'}`;
@@ -548,19 +461,12 @@
 
         wrapper.onclick = function(e) {
             e.stopPropagation();
-            document.querySelectorAll('.message-wrapper').forEach(w => {
-                if (w !== wrapper) w.classList.remove('active');
-            });
+            document.querySelectorAll('.message-wrapper').forEach(w => { if (w !== wrapper) w.classList.remove('active'); });
             wrapper.classList.toggle('active');
         };
 
         const timeString = formatTime(data.timestamp || data.createdAt);
-
-        let replyHTML = '';
-        if (data.replyTo) {
-            replyHTML = `<div class="reply-preview-box"><strong>${data.replyTo.user}</strong>: ${data.replyTo.text}</div>`;
-        }
-
+        let replyHTML = data.replyTo ? `<div class="reply-preview-box"><strong>${data.replyTo.user}</strong>: ${data.replyTo.text}</div>` : '';
         let isDeleted = data.text === '🚫 This message was deleted';
 
         let actionsHTML = '';
@@ -584,15 +490,8 @@
 
         let ticksHTML = '';
         if (isMe && !isDeleted) {
-            let tickSymbol = '✓';
-            let tickColor = '#fce4ec';
-            if (data.status === 'read') {
-                tickSymbol = '✓✓';
-                tickColor = '#ffeb3b';
-            } else if (data.status === 'delivered') {
-                tickSymbol = '✓✓';
-                tickColor = '#fce4ec';
-            }
+            let tickSymbol = '✓✓';
+            let tickColor = data.status === 'read' ? '#ffeb3b' : '#fce4ec';
             ticksHTML = `<span class="msg-ticks" data-sender="${data.user}" style="color: ${tickColor}; font-weight: ${data.status === 'read' ? 'bold' : 'normal'};">${tickSymbol}</span>`;
         }
 
@@ -614,9 +513,7 @@
         updateReactionsUI(wrapper, data.reactions);
     }
 
-    function closeAllActions(e) {
-        document.querySelectorAll('.message-wrapper').forEach(w => w.classList.remove('active'));
-    }
+    function closeAllActions() { document.querySelectorAll('.message-wrapper').forEach(w => w.classList.remove('active')); }
 
     function setReply(user, text) {
         selectedReply = { user, text };
@@ -626,35 +523,22 @@
         msgInput.focus();
     }
 
-    function cancelReply() {
-        selectedReply = null;
-        replyBar.style.display = 'none';
-    }
+    function cancelReply() { selectedReply = null; replyBar.style.display = 'none'; }
 
     function editMessage(id, oldText) {
         const newText = prompt("Edit Message:", oldText);
-        if (newText && newText.trim() !== "" && newText !== oldText) {
-            socket.emit('editMessage', { id, text: newText.trim() });
-        }
+        if (newText && newText.trim() !== "" && newText !== oldText) socket.emit('editMessage', { id, text: newText.trim() });
     }
 
-    function deleteEveryone(id) {
-        if (confirm("Delete for Everyone?")) {
-            socket.emit('deleteEveryone', id);
-        }
-    }
-
-    function deleteForMe(id) {
-        const msgEl = document.getElementById(id);
-        if (msgEl) msgEl.remove();
-    }
+    function deleteEveryone(id) { if (confirm("Delete for Everyone?")) socket.emit('deleteEveryone', id); }
+    function deleteForMe(id) { const msgEl = document.getElementById(id); if (msgEl) msgEl.remove(); }
 
     function sendMessage() {
         const text = msgInput.value.trim();
         if (text === "") return;
 
         const msgData = {
-            id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9), // 👈 Unique ID fixed here
+            id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
             user: myUsername,
             text: text,
             replyTo: selectedReply,
@@ -667,16 +551,12 @@
         socket.emit('stopTyping');
     }
 
-    function handleKeyPress(e) {
-        if (e.key === 'Enter') sendMessage();
-    }
+    function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
 
     function handleTyping() {
         socket.emit('typing', myUsername);
         clearTimeout(typingTimeout);
-        typingTimeout = setTimeout(() => {
-            socket.emit('stopTyping');
-        }, 1500);
+        typingTimeout = setTimeout(() => socket.emit('stopTyping'), 1500);
     }
 
     socket.on('displayTyping', (user) => {
@@ -685,13 +565,8 @@
         scrollToBottom();
     });
 
-    socket.on('hideTyping', () => {
-        typingIndicator.style.display = 'none';
-    });
-
-    function scrollToBottom() {
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
+    socket.on('hideTyping', () => { typingIndicator.style.display = 'none'; });
+    function scrollToBottom() { chatBox.scrollTop = chatBox.scrollHeight; }
 </script>
 
 </body>
