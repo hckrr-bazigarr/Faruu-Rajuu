@@ -5,7 +5,9 @@ const mongoose = require('mongoose');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+    maxHttpBufferSize: 1e7 // 10MB limit for image attachments
+});
 
 app.use(express.static(__dirname));
 
@@ -19,6 +21,7 @@ const messageSchema = new mongoose.Schema({
     id: { type: String, unique: true },
     user: String,
     text: String,
+    image: String, // Base64 image support
     replyTo: Object,
     edited: { type: Boolean, default: false },
     status: { type: String, default: 'sent' },
@@ -112,7 +115,7 @@ io.on('connection', async (socket) => {
 
     socket.on('deleteEveryone', async (id) => {
         try {
-            await Message.findOneAndUpdate({ id }, { text: '🚫 This message was deleted', reactions: {} });
+            await Message.findOneAndUpdate({ id }, { text: '🚫 This message was deleted', image: null, reactions: {} });
             io.emit('messageDeletedEveryone', id);
         } catch (err) {
             console.log('Delete error:', err);
