@@ -47,8 +47,9 @@ io.on('connection', async (socket) => {
         broadcastOnlineUsers();
     });
 
+    // --- Fixed History Loading with proper chronological sorting ---
     try {
-        const history = await Message.find().sort({ timestamp: 1 }).limit(200);
+        const history = await Message.find().sort({ timestamp: 1, _id: 1 }).limit(500);
         socket.emit('loadHistory', history);
     } catch (err) {
         console.log('History load error:', err);
