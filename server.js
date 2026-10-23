@@ -5,12 +5,11 @@ const mongoose = require('mongoose');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
-// [🌟 HIGHLIGHT 🌟] START
+
+// Socket.io 10MB payload limit for photos
 const io = new Server(server, {
     maxHttpBufferSize: 10 * 1024 * 1024 
 });
-// [🌟 HIGHLIGHT 🌟] END
 
 app.use(express.static(__dirname));
 
@@ -23,7 +22,7 @@ mongoose.connect(MONGO_URI)
 const messageSchema = new mongoose.Schema({
     id: { type: String, unique: true, required: true },
     user: { type: String, required: true },
-    text: { type: String, required: true },
+    text: { type: String, default: '' },
     image: { type: String, default: '' },
     replyTo: { type: Object, default: null },
     edited: { type: Boolean, default: false },
@@ -53,7 +52,6 @@ io.on('connection', async (socket) => {
         broadcastOnlineUsers();
     });
 
-    // 100% Fresh Primary Read to prevent replication delay on refresh
     try {
         const history = await Message.find().read('primary').sort({ timestamp: 1, _id: 1 }).limit(1000);
         socket.emit('loadHistory', history);
@@ -72,7 +70,7 @@ io.on('connection', async (socket) => {
             const newMessage = new Message({
                 id: data.id,
                 user: data.user,
-                text: data.text,
+                text: data.text || '',
                 image: data.image || '',
                 replyTo: data.replyTo || null,
                 edited: false,
@@ -145,7 +143,6 @@ io.on('connection', async (socket) => {
         socket.broadcast.emit('hideTyping');
     });
 
-    // --- Voice Call Signaling ---
     socket.on('callUser', (data) => {
         socket.broadcast.emit('incomingCall', { signal: data.signalData, from: data.from });
     });
@@ -169,6 +166,6 @@ io.on('connection', async (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
 });
