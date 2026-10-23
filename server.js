@@ -127,6 +127,23 @@ io.on('connection', async (socket) => {
         socket.broadcast.emit('hideTyping');
     });
 
+    // --- WhatsApp Voice Call Signaling ---
+    socket.on('callUser', (data) => {
+        socket.broadcast.emit('incomingCall', { signal: data.signalData, from: data.from });
+    });
+
+    socket.on('answerCall', (data) => {
+        socket.broadcast.emit('callAccepted', data.signal);
+    });
+
+    socket.on('iceCandidate', (data) => {
+        socket.broadcast.emit('iceCandidate', data);
+    });
+
+    socket.on('endCall', () => {
+        socket.broadcast.emit('callEnded');
+    });
+
     socket.on('disconnect', () => {
         delete activeUsers[socket.id];
         broadcastOnlineUsers();
