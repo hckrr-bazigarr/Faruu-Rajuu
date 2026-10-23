@@ -15,10 +15,11 @@
             background-color: #1a0b16;
         }
 
-        /* Passcode Lock Overlay - Exact Working */
-        #passcodeOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #075e54; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; }
-        #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 8px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; }
-        #passcodeOverlay button { margin-top: 15px; padding: 10px 25px; background: #25d366; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        /* Passcode Lock Overlay - Insta Love Theme */
+        #passcodeOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #075e54; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999; color: white; }
+        #passcodeOverlay h2 { text-shadow: 0 2px 4px rgba(0,0,0,0.3); font-weight: 700; margin-bottom: 10px; }
+        #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 8px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; background: rgba(255,255,255,0.9); color: #111; letter-spacing: 2px; }
+        #unlockBtn { margin-top: 15px; padding: 10px 25px; background: #25d366; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
         /* Main Chat Container - Instagram Love Theme */
         .chat-container { 
@@ -34,7 +35,6 @@
             overflow: hidden; 
         }
 
-        /* Subtle Heart Pattern Overlay */
         .chat-container::before {
             content: "💖  💗  💕  💘  ❤️  💕  💖  💗";
             position: absolute;
@@ -48,7 +48,7 @@
             z-index: 1;
         }
         
-        /* Header - Instagram Love Gradient */
+        /* Header */
         .chat-header { 
             background: linear-gradient(90deg, #e1306c, #c13584, #833ab4); 
             color: white; 
@@ -85,15 +85,13 @@
 
         .reply-preview-box { background: rgba(0,0,0,0.25); border-left: 4px solid #ff758c; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 4px; color: #ffd1e8; }
 
-        /* Message Bubbles - Instagram Love Theme */
         .message-box { padding: 6px 10px 4px 10px; border-radius: 12px; position: relative; word-wrap: break-word; font-size: 14px; line-height: 18px; color: #ffffff; z-index: 2; }
         .sent .message-box { background: linear-gradient(135deg, #e1306c, #fd1d1d); border-top-right-radius: 0; box-shadow: 0 2px 6px rgba(225,48,108,0.3); }
         .received .message-box { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border-top-left-radius: 0; border: 1px solid rgba(255,255,255,0.1); }
 
-        /* Shared Images */
         .chat-img { width: 100%; max-width: 230px; border-radius: 8px; margin-top: 4px; margin-bottom: 4px; display: block; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
 
-        /* Action Menu & Emoji Reactions Picker */
+        /* Action Menu & Emoji Reactions */
         .msg-actions { display: none; position: absolute; top: -38px; left: 0; background: #281222; border: 1px solid #ff758c; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.4); padding: 4px 10px; gap: 8px; z-index: 20; align-items: center; }
         .message-wrapper.active .msg-actions { display: flex; }
         .action-btn { font-size: 13px; cursor: pointer; color: #fff; }
@@ -101,7 +99,6 @@
         .reaction-picker span { cursor: pointer; transition: transform 0.1s; }
         .reaction-picker span:hover { transform: scale(1.2); }
 
-        /* Displayed Reactions Badge */
         .msg-reactions { display: flex; gap: 3px; position: absolute; bottom: -10px; right: 10px; background: #281222; border: 1px solid #ff758c; border-radius: 12px; padding: 1px 6px; font-size: 11px; box-shadow: 0 1px 3px rgba(0,0,0,0.3); z-index: 5; }
 
         .msg-meta { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: rgba(255,255,255,0.7); float: right; margin-left: 10px; margin-top: 4px; }
@@ -112,7 +109,7 @@
         .reply-bar { display: none; background: #281222; padding: 6px 12px; border-left: 4px solid #e1306c; font-size: 12px; color: #fff; justify-content: space-between; align-items: center; flex-shrink: 0; z-index: 10; }
         .reply-bar button { background: none; border: none; font-size: 14px; cursor: pointer; color: #aaa; }
 
-        /* Input Area with WhatsApp Style Image Button next to Send Button */
+        /* Input Area */
         .chat-input-area { 
             background: #180514; 
             padding: 8px 10px; 
@@ -126,7 +123,6 @@
         .chat-input-area input[type="text"] { flex: 1; border: none; padding: 10px 14px; border-radius: 20px; outline: none; font-size: 14px; background: rgba(255,255,255,0.1); color: white; }
         .chat-input-area input[type="text"]::placeholder { color: rgba(255,255,255,0.5); }
         
-        /* WhatsApp-style Image Attachment Button placed right next to send button */
         .media-btn { background: rgba(255,255,255,0.1); border: none; color: #ff758c; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 18px; flex-shrink: 0; }
         .send-btn { background: linear-gradient(135deg, #e1306c, #fd1d1d); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 18px; flex-shrink: 0; box-shadow: 0 2px 6px rgba(225,48,108,0.4); }
     </style>
@@ -134,9 +130,9 @@
 <body>
 
 <div id="passcodeOverlay">
-    <h2>🔒 Enter Password</h2>
-    <input type="password" id="passcodeInput" placeholder="ENTER PIN" />
-    <button onclick="checkPasscode()">Unlock</button>
+    <h2>Enter Password</h2>
+    <input type="password" id="passcodeInput" placeholder="ENTER PIN" onkeypress="handlePinKey(event)" autocomplete="off" />
+    <button type="button" id="unlockBtn" onclick="checkPasscode()" ontouchend="checkPasscode()">Unlock</button>
 </div>
 
 <div class="chat-container">
@@ -162,7 +158,6 @@
     <div class="chat-input-area">
         <input type="text" id="msgInput" placeholder="Type a message..." oninput="handleTyping()" onkeypress="handleKeyPress(event)">
         
-        <!-- WhatsApp style Image upload button placed right next to send button -->
         <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
         <button class="media-btn" onclick="document.getElementById('imageInput').click()" title="Attach Photo">🖼️</button>
 
@@ -172,11 +167,25 @@
 
 <script>
     function checkPasscode() {
-        const pin = document.getElementById('passcodeInput').value;
+        const pinInput = document.getElementById('passcodeInput');
+        const overlay = document.getElementById('passcodeOverlay');
+        if (!pinInput) return;
+        
+        const pin = pinInput.value.trim();
         if (pin === "8085") {
-            document.getElementById('passcodeOverlay').style.display = "none";
+            if (overlay) {
+                overlay.style.display = "none";
+                overlay.remove();
+            }
         } else {
-            alert("Wrong Password!");
+            alert("Wrong Password");
+        }
+    }
+
+    function handlePinKey(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            checkPasscode();
         }
     }
 
@@ -384,7 +393,6 @@
         updateReactionsUI(wrapper, data.reactions);
     }
 
-    // Image Upload Handler
     function handleImageUpload(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -444,20 +452,10 @@
 
     function sendMessage() {
         const text = msgInput.value.trim();
-        if (text === "") return;
+        if (text === "" && !selectedReply) return;
 
         const msgData = {
             id: 'msg_' + Date.now(),
             user: myUsername,
             text: text,
-            replyTo: selectedReply,
-            timestamp: new Date().toISOString()
-        };
-
-        socket.emit('chatMessage', msgData);
-        msgInput.value = '';
-        cancelReply();
-        socket.emit('stopTyping');
-    }
-
-    function 
+            replyTo: sel
