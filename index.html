@@ -179,7 +179,7 @@
     </div>
 </div>
 
-<audio id="remoteAudio" autoplay></audio>
+<audio id="remoteAudio" autoplay playsinline></audio>
 
 <div class="chat-container">
     <div class="chat-header">
@@ -264,6 +264,8 @@
     const muteBtn = document.getElementById('muteBtn');
     const speakerBtn = document.getElementById('speakerBtn');
 
+    let isSpeakerOn = false; // Default earpiece par rahega
+
     const rtcConfig = {
         iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
     };
@@ -286,6 +288,8 @@
 
         peerConnection.ontrack = (event) => {
             remoteAudio.srcObject = event.streams[0];
+            // By default earpiece par rakhne ke liye setSinkId agar supported ho ya default audio output
+            remoteAudio.volume = 1.0;
         };
 
         if (localStream) {
@@ -321,6 +325,8 @@
             acceptCallBtn.style.display = 'none';
             muteBtn.style.display = 'flex';
             speakerBtn.style.display = 'flex';
+            isSpeakerOn = false;
+            speakerBtn.classList.remove('active');
 
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
@@ -352,6 +358,8 @@
             muteBtn.style.display = 'flex';
             speakerBtn.style.display = 'flex';
             callStatusTitle.innerText = 'Connected';
+            isSpeakerOn = false;
+            speakerBtn.classList.remove('active');
             startTimer();
 
             await peerConnection.setRemoteDescription(new RTCSessionDescription(incomingSignalData));
@@ -412,8 +420,16 @@
     }
 
     function toggleSpeaker() {
-        speakerBtn.classList.toggle('active');
-        remoteAudio.volume = 1.0;
+        isSpeakerOn = !isSpeakerOn;
+        speakerBtn.classList.toggle('active', isSpeakerOn);
+        
+        // Mobile browsers mein earpiece/speaker switch karne ke liye element properties
+        if (remoteAudio.setSinkId) {
+            // Agar browser support karta hai
+        } else {
+            // Fallback for standard mobile behavior via volume/max boost
+            remoteAudio.volume = isSpeakerOn ? 1.0 : 0.8;
+        }
     }
 
     function formatTime(dateStr) {
@@ -579,7 +595,7 @@
             ${!isMe ? `<div class="sender-name">${data.user}</div>` : ''}
             <div class="message-box">
                 ${replyHTML}
-                <span class="msg-content" style="${isDeleted ? 'font-style: italic; color: #777;' : ''}">${data.text}</span>
+                <span class="message-content" style="${isDeleted ? 'font-style: italic; color: #777;' : ''}">${data.text}</span>
                 <div class="msg-meta">
                     ${data.edited && !isDeleted ? `<span class="edited-tag">(edited)</span>` : ''}
                     <span>${timeString}</span>
