@@ -127,12 +127,9 @@ io.on('connection', async (socket) => {
         socket.broadcast.emit('hideTyping');
     });
 
-    // --- WebRTC Voice Call Signaling Events ---
+    // --- WhatsApp Voice Call Signaling ---
     socket.on('callUser', (data) => {
-        socket.broadcast.emit('incomingCall', {
-            signal: data.signalData,
-            from: data.from
-        });
+        socket.broadcast.emit('incomingCall', { signal: data.signalData, from: data.from });
     });
 
     socket.on('answerCall', (data) => {
@@ -157,4 +154,3 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-            
