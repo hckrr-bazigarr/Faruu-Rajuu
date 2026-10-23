@@ -56,6 +56,7 @@ io.on('connection', async (socket) => {
 
     socket.on('chatMessage', async (data) => {
         try {
+            console.log("Saving message to DB:", data);
             const uniqueNames = [...new Set(Object.values(activeUsers))];
             const otherUsersOnline = uniqueNames.filter(name => name !== data.user);
             
@@ -64,9 +65,10 @@ io.on('connection', async (socket) => {
 
             const newMessage = new Message(data);
             await newMessage.save();
+            console.log("Message saved successfully! ✅");
             io.emit('message', data);
         } catch (err) {
-            console.log('Message save error:', err);
+            console.log('❌ DETAILED MESSAGE SAVE ERROR:', err);
         }
     });
 
