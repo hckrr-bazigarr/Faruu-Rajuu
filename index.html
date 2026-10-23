@@ -1,432 +1,443 @@
-<!DOCTYPE html>  <html lang="en">  
-<head>  
-    <meta charset="UTF-8">  
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">  
-    <title>Bini 💘 Faru</title>  
-    <script src="/socket.io/socket.io.js"></script>  
-    <style>  
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }  html, body {  
-        height: 100%;  
-        width: 100%;  
-        overflow: hidden;  
-        background-color: #efeae2;  
-    }  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bini 💘 Faru</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background-color: #efeae2;
+        }
 
-    /* Passcode Lock Overlay */  
-    #passcodeOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #075e54; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999; color: white; }  
-    #passcodeOverlay h2 { text-shadow: 0 2px 4px rgba(0,0,0,0.3); font-weight: 700; margin-bottom: 10px; }  
-    #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 8px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; background: rgba(255,255,255,0.9); color: #111; letter-spacing: 2px; }  
-    #unlockBtn { margin-top: 15px; padding: 10px 25px; background: #25d366; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; -webkit-tap-highlight-color: transparent; }  
+        /* Passcode Lock Overlay */
+        #passcodeOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #075e54; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999; color: white; }
+        #passcodeOverlay h2 { text-shadow: 0 2px 4px rgba(0,0,0,0.3); font-weight: 700; margin-bottom: 10px; }
+        #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 8px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; background: rgba(255,255,255,0.9); color: #111; letter-spacing: 2px; }
+        #unlockBtn { margin-top: 15px; padding: 10px 25px; background: #25d366; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
-    /* Main Chat Container */  
-    .chat-container {   
-        width: 100%;   
-        max-width: 450px;   
-        height: 100vh;   
-        height: 100dvh;   
-        margin: 0 auto;  
-        background: #efeae2;   
-        display: flex;   
-        flex-direction: column;   
-        position: relative;   
-        overflow: hidden;   
-    }  
-      
-    /* Header */  
-    .chat-header {   
-        background-color: #075e54;   
-        color: white;   
-        padding: 10px 16px;   
-        display: flex;   
-        justify-content: space-between;   
-        align-items: center;   
-        box-shadow: 0 1px 3px rgba(0,0,0,0.2);   
-        z-index: 10;   
-        flex-shrink: 0;   
-    }  
-    .chat-header h2 { font-size: 16px; font-weight: 600; }  
-    .online-status { font-size: 11px; color: #25d366; margin-top: 2px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }  
-    .btn-name { background: #128c7e; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; flex-shrink: 0; font-weight: bold; }  
+        /* Main Chat Container */
+        .chat-container { 
+            width: 100%; 
+            max-width: 450px; 
+            height: 100vh; 
+            height: 100dvh; 
+            margin: 0 auto;
+            background: #efeae2; 
+            display: flex; 
+            flex-direction: column; 
+            position: relative; 
+            overflow: hidden; 
+        }
+        
+        /* Header */
+        .chat-header { 
+            background-color: #075e54; 
+            color: white; 
+            padding: 10px 16px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2); 
+            z-index: 10; 
+            flex-shrink: 0; 
+        }
+        .chat-header h2 { font-size: 16px; font-weight: 600; }
+        .online-status { font-size: 11px; color: #25d366; margin-top: 2px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .btn-name { background: #128c7e; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; flex-shrink: 0; font-weight: bold; }
 
-    /* Messages Area */  
-    .chat-messages {   
-        flex: 1;   
-        min-height: 0;  
-        padding: 12px;   
-        overflow-y: auto;   
-        display: flex;   
-        flex-direction: column;   
-        gap: 8px;   
-        background-color: #efeae2;  
-        -webkit-overflow-scrolling: touch;  
-    }  
-      
-    .message-wrapper { display: flex; flex-direction: column; max-width: 80%; position: relative; cursor: pointer; margin-bottom: 4px; }  
-    .message-wrapper.sent { align-self: flex-end; }  
-    .message-wrapper.received { align-self: flex-start; }  
+        /* Messages Area */
+        .chat-messages { 
+            flex: 1; 
+            min-height: 0;
+            padding: 12px; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+            background-color: #efeae2;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .message-wrapper { display: flex; flex-direction: column; max-width: 80%; position: relative; cursor: pointer; margin-bottom: 4px; }
+        .message-wrapper.sent { align-self: flex-end; }
+        .message-wrapper.received { align-self: flex-start; }
 
-    .sender-name { font-size: 11px; color: #075e54; font-weight: bold; margin-bottom: 2px; margin-left: 4px; }  
+        .sender-name { font-size: 11px; color: #075e54; font-weight: bold; margin-bottom: 2px; margin-left: 4px; }
 
-    .reply-preview-box { background: rgba(0,0,0,0.06); border-left: 4px solid #075e54; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 4px; color: #555; }  
+        .reply-preview-box { background: rgba(0,0,0,0.06); border-left: 4px solid #075e54; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 4px; color: #555; }
 
-    .message-box { padding: 6px 10px 4px 10px; border-radius: 8px; position: relative; word-wrap: break-word; font-size: 14px; line-height: 18px; color: #111b21; }  
-    .sent .message-box { background-color: #d9fdd3; border-top-right-radius: 0; }  
-    .received .message-box { background-color: #ffffff; border-top-left-radius: 0; }  
+        .message-box { padding: 6px 10px 4px 10px; border-radius: 8px; position: relative; word-wrap: break-word; font-size: 14px; line-height: 18px; color: #111b21; }
+        .sent .message-box { background-color: #d9fdd3; border-top-right-radius: 0; }
+        .received .message-box { background-color: #ffffff; border-top-left-radius: 0; }
 
-    /* Action Menu & Emoji Reactions Picker */  
-    .msg-actions { display: none; position: absolute; top: -38px; left: 0; background: #fff; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.25); padding: 4px 10px; gap: 8px; z-index: 20; align-items: center; }  
-    .message-wrapper.active .msg-actions { display: flex; }  
-    .action-btn { font-size: 13px; cursor: pointer; color: #555; }  
-    .reaction-picker { display: flex; gap: 6px; font-size: 15px; border-right: 1px solid #ddd; padding-right: 8px; }  
-    .reaction-picker span { cursor: pointer; transition: transform 0.1s; }  
-    .reaction-picker span:hover { transform: scale(1.2); }  
+        /* Action Menu & Emoji Reactions Picker */
+        .msg-actions { display: none; position: absolute; top: -38px; left: 0; background: #fff; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.25); padding: 4px 10px; gap: 8px; z-index: 20; align-items: center; }
+        .message-wrapper.active .msg-actions { display: flex; }
+        .action-btn { font-size: 13px; cursor: pointer; color: #555; }
+        .reaction-picker { display: flex; gap: 6px; font-size: 15px; border-right: 1px solid #ddd; padding-right: 8px; }
+        .reaction-picker span { cursor: pointer; transition: transform 0.1s; }
+        .reaction-picker span:hover { transform: scale(1.2); }
 
-    /* Displayed Reactions Badge */  
-    .msg-reactions { display: flex; gap: 3px; position: absolute; bottom: -10px; right: 10px; background: #fff; border: 1px solid #ddd; border-radius: 12px; padding: 1px 6px; font-size: 11px; box-shadow: 0 1px 3px rgba(0,0,0,0.15); z-index: 5; }  
+        /* Displayed Reactions Badge */
+        .msg-reactions { display: flex; gap: 3px; position: absolute; bottom: -10px; right: 10px; background: #fff; border: 1px solid #ddd; border-radius: 12px; padding: 1px 6px; font-size: 11px; box-shadow: 0 1px 3px rgba(0,0,0,0.15); z-index: 5; }
 
-    .msg-meta { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: #667781; float: right; margin-left: 10px; margin-top: 4px; }  
-    .edited-tag { font-size: 10px; color: #667781; font-style: italic; }  
+        .msg-meta { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: #667781; float: right; margin-left: 10px; margin-top: 4px; }
+        .edited-tag { font-size: 10px; color: #667781; font-style: italic; }
 
-    .typing-indicator { display: none; align-self: flex-start; background: #ffffff; padding: 6px 12px; border-radius: 8px; font-size: 12px; color: #667781; font-style: italic; box-shadow: 0 1px 1px rgba(0,0,0,0.1); margin-bottom: 4px; }  
+        .typing-indicator { display: none; align-self: flex-start; background: #ffffff; padding: 6px 12px; border-radius: 8px; font-size: 12px; color: #667781; font-style: italic; box-shadow: 0 1px 1px rgba(0,0,0,0.1); margin-bottom: 4px; }
 
-    .reply-bar { display: none; background: #e9edef; padding: 6px 12px; border-left: 4px solid #00a884; font-size: 12px; color: #111b21; justify-content: space-between; align-items: center; flex-shrink: 0; }  
-    .reply-bar button { background: none; border: none; font-size: 14px; cursor: pointer; color: #667781; }  
+        .reply-bar { display: none; background: #e9edef; padding: 6px 12px; border-left: 4px solid #00a884; font-size: 12px; color: #111b21; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .reply-bar button { background: none; border: none; font-size: 14px; cursor: pointer; color: #667781; }
 
-    .chat-input-area {   
-        background: #f0f2f5;   
-        padding: 8px 10px;   
-        display: flex;   
-        align-items: center;   
-        gap: 8px;   
-        flex-shrink: 0;   
-        z-index: 10;  
-        border-top: 1px solid #ddd;  
-    }  
-    .chat-input-area input { flex: 1; border: none; padding: 10px 14px; border-radius: 20px; outline: none; font-size: 14px; background: white; }  
-    .send-btn { background: #00a884; border: none; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 18px; flex-shrink: 0; }  
-</style>
+        .chat-input-area { 
+            background: #f0f2f5; 
+            padding: 8px 10px; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            flex-shrink: 0; 
+            z-index: 10;
+            border-top: 1px solid #ddd;
+        }
+        .chat-input-area input { flex: 1; border: none; padding: 10px 14px; border-radius: 20px; outline: none; font-size: 14px; background: white; }
+        .send-btn { background: #00a884; border: none; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 18px; flex-shrink: 0; }
+    </style>
+</head>
+<body>
 
-</head>  
-<body>  <div id="passcodeOverlay">  
-    <h2>Enter Password</h2>  
-    <input type="password" id="passcodeInput" placeholder="ENTER PIN" onkeypress="handlePinKey(event)" autocomplete="off" />  
-    <button type="button" id="unlockBtn" onclick="checkPasscode()" ontouchend="checkPasscode()">Unlock</button>  
-</div>  <div class="chat-container">  
-    <div class="chat-header">  
-        <div>  
-            <h2>Bini 💖 Faru</h2>  
-            <div class="online-status" id="onlineCount">🟢 Online: ...</div>  
-        </div>  
-        <button class="btn-name" onclick="changeUsername()">CHANGE NAME</button>  
-    </div>  <div class="chat-messages" id="chatBox" onclick="closeAllActions(event)">  
-    <div class="typing-indicator" id="typingIndicator"></div>  
-</div>  
-
-<div class="reply-bar" id="replyBar">  
-    <div>  
-        <strong id="replyUser">Name</strong>: <span id="replyText">Message text...</span>  
-    </div>  
-    <button onclick="cancelReply()">✖</button>  
-</div>  
-
-<div class="chat-input-area">  
-    <input type="text" id="msgInput" placeholder="Type a message..." oninput="handleTyping()" onkeypress="handleKeyPress(event)">  
-    <button class="send-btn" onclick="sendMessage()">➤</button>  
+<div id="passcodeOverlay">
+    <h2>Enter Password</h2>
+    <input type="password" id="passcodeInput" placeholder="ENTER PIN" onkeypress="handlePinKey(event)" autocomplete="off" />
+    <button type="button" id="unlockBtn" onclick="checkPasscode()" ontouchend="checkPasscode()">Unlock</button>
 </div>
 
-</div>  <script>  
-    function checkPasscode() {  
-        const pinInput = document.getElementById('passcodeInput');  
-        const overlay = document.getElementById('passcodeOverlay');  
-        if (!pinInput) return;  
-          
-        const pin = pinInput.value.trim();  
-          
-        if (pin === "8085") {  
-            if (overlay) {  
-                overlay.style.display = "none";  
-                overlay.remove();  
-            }  
-        } else {  
-            alert("Wrong Password");  
-        }  
-    }  
-  
-    function handlePinKey(e) {  
-        if (e.key === 'Enter') {  
-            e.preventDefault();  
-            checkPasscode();  
-        }  
-    }  
-  
-    const socket = io();  
-    let myUsername = localStorage.getItem('chatUsername') || 'User_' + Math.floor(Math.random() * 1000);  
-    localStorage.setItem('chatUsername', myUsername);  
-  
-    socket.emit('userJoined', myUsername);  
-  
-    const chatBox = document.getElementById('chatBox');  
-    const msgInput = document.getElementById('msgInput');  
-    const onlineCount = document.getElementById('onlineCount');  
-    const typingIndicator = document.getElementById('typingIndicator');  
-    const replyBar = document.getElementById('replyBar');  
-  
-    let typingTimeout;  
-    let selectedReply = null;  
-  
-    function formatTime(dateStr) {  
-        const date = dateStr ? new Date(dateStr) : new Date();  
-        return date.toLocaleTimeString('en-IN', {  
-            timeZone: 'Asia/Kolkata',  
-            hour: '2-digit',  
-            minute: '2-digit',  
-            hour12: true  
-        });  
-    }  
-  
-    function changeUsername() {  
-        const newName = prompt("Apna Naya Name Likhein:", myUsername);  
-        if (newName && newName.trim() !== "") {  
-            const oldName = myUsername;  
-            myUsername = newName.trim();  
-            localStorage.setItem('chatUsername', myUsername);  
-            socket.emit('updateUsername', { oldName, newName: myUsername });  
-            location.reload();  
-        }  
-    }  
-  
-    socket.on('onlineUsersList', (usersList) => {  
-        onlineCount.innerText = usersList && usersList.length > 0 ? `🟢 Online: ${usersList.join(', ')}` : `🟢 Online: 0`;  
-        if (usersList && usersList.length > 1) {  
-            socket.emit('markAsRead', myUsername);  
-        }  
-    });  
-  
-    socket.on('loadHistory', (messages) => {  
-        chatBox.querySelectorAll('.message-wrapper').forEach(el => el.remove());  
-        messages.forEach(msg => appendMessage(msg));  
-        scrollToBottom();  
-        socket.emit('markAsRead', myUsername);  
-    });  
-  
-    socket.on('message', (data) => {  
-        appendMessage(data);  
-        scrollToBottom();  
-        if (data.user !== myUsername) {  
-            socket.emit('markAsRead', myUsername);  
-        }  
-    });  
-  
-    socket.on('messageReacted', (data) => {  
-        const msgEl = document.getElementById(data.id);  
-        if (msgEl) {  
-            updateReactionsUI(msgEl, data.reactions);  
-        }  
-    });  
-  
-    socket.on('messagesReadUpdate', () => {  
-        document.querySelectorAll('.msg-ticks').forEach(el => {  
-            if (el.dataset.sender === myUsername) {  
-                el.innerHTML = '<span style="color: #34b7f1; font-weight: bold;">✓✓</span>';  
-            }  
-        });  
-    });  
-  
-    socket.on('messageUpdated', (data) => {  
-        const msgEl = document.getElementById(data.id);  
-        if (msgEl) {  
-            msgEl.querySelector('.msg-content').innerText = data.text;  
-            if (!msgEl.querySelector('.edited-tag')) {  
-                const tag = document.createElement('span');  
-                tag.className = 'edited-tag';  
-                tag.innerText = '(edited)';  
-                msgEl.querySelector('.msg-meta').prepend(tag);  
-            }  
-        }  
-    });  
-  
-    socket.on('messageDeletedEveryone', (id) => {  
-        const msgEl = document.getElementById(id);  
-        if (msgEl) {  
-            msgEl.querySelector('.msg-content').innerText = '🚫 This message was deleted';  
-            msgEl.querySelector('.msg-content').style.fontStyle = 'italic';  
-            msgEl.querySelector('.msg-content').style.color = '#777';  
-            const actions = msgEl.querySelector('.msg-actions');  
-            if (actions) actions.remove();  
-            const reactions = msgEl.querySelector('.msg-reactions');  
-            if (reactions) reactions.remove();  
-        }  
-    });  
-  
-    function sendReaction(id, emoji) {  
-        socket.emit('reactMessage', { id, user: myUsername, emoji });  
-        closeAllActions();  
-    }  
-  
-    function updateReactionsUI(wrapper, reactions) {  
-        let existingBadge = wrapper.querySelector('.msg-reactions');  
-        if (existingBadge) existingBadge.remove();  
-  
-        if (reactions && Object.keys(reactions).length > 0) {  
-            const uniqueEmojis = [...new Set(Object.values(reactions))].join(' ');  
-            const badge = document.createElement('div');  
-            badge.className = 'msg-reactions';  
-            badge.innerHTML = `<span>${uniqueEmojis}</span>`;  
-            wrapper.appendChild(badge);  
-        }  
-    }  
-  
-    function appendMessage(data) {  
-        const isMe = data.user === myUsername;  
-        const wrapper = document.createElement('div');  
-        wrapper.className = `message-wrapper ${isMe ? 'sent' : 'received'}`;  
-        wrapper.id = data.id;  
-  
-        wrapper.onclick = function(e) {  
-            e.stopPropagation();  
-            document.querySelectorAll('.message-wrapper').forEach(w => {  
-                if (w !== wrapper) w.classList.remove('active');  
-            });  
-            wrapper.classList.toggle('active');  
-        };  
-  
-        const timeString = formatTime(data.timestamp || data.createdAt);  
-  
-        let replyHTML = '';  
-        if (data.replyTo) {  
-            replyHTML = `<div class="reply-preview-box"><strong>${data.replyTo.user}</strong>: ${data.replyTo.text}</div>`;  
-        }  
-  
-        let isDeleted = data.text === '🚫 This message was deleted';  
-  
-        let actionsHTML = '';  
-        if (!isDeleted) {  
-            actionsHTML = `  
-                <div class="msg-actions">  
-                    <div class="reaction-picker">  
-                        <span onclick="sendReaction('${data.id}', '❤️')">❤️</span>  
-                        <span onclick="sendReaction('${data.id}', '👍')">👍</span>  
-                        <span onclick="sendReaction('${data.id}', '😂')">😂</span>  
-                        <span onclick="sendReaction('${data.id}', '😮')">😮</span>  
-                        <span onclick="sendReaction('${data.id}', '😢')">😢</span>  
-                    </div>  
-                    <span class="action-btn" onclick="setReply('${data.user}', '${data.text.replace(/'/g, "\\'")}')">↩️</span>  
-                    ${isMe ? `<span class="action-btn" onclick="editMessage('${data.id}', '${data.text.replace(/'/g, "\\'")}')">✏️</span>` : ''}  
-                    ${isMe ? `<span class="action-btn" onclick="deleteEveryone('${data.id}')">🗑️</span>` : ''}  
-                    <span class="action-btn" onclick="deleteForMe('${data.id}')">❌</span>  
-                </div>  
-            `;  
-        }  
-  
-        let ticksHTML = '';  
-        if (isMe && !isDeleted) {  
-            let tickSymbol = '✓';  
-            let tickColor = '#667781';  
-            if (data.status === 'read') {  
-                tickSymbol = '✓✓';  
-                tickColor = '#34b7f1';  
-            } else if (data.status === 'delivered') {  
-                tickSymbol = '✓✓';  
-                tickColor = '#667781';  
-            }  
-            ticksHTML = `<span class="msg-ticks" data-sender="${data.user}" style="color: ${tickColor}; font-weight: ${data.status === 'read' ? 'bold' : 'normal'};">${tickSymbol}</span>`;  
-        }  
-  
-        wrapper.innerHTML = `  
-            ${actionsHTML}  
-            ${!isMe ? `<div class="sender-name">${data.user}</div>` : ''}  
-            <div class="message-box">  
-                ${replyHTML}  
-                <span class="msg-content" style="${isDeleted ? 'font-style: italic; color: #777;' : ''}">${data.text}</span>  
-                <div class="msg-meta">  
-                    ${data.edited && !isDeleted ? `<span class="edited-tag">(edited)</span>` : ''}  
-                    <span>${timeString}</span>  
-                    ${ticksHTML}  
-                </div>  
-            </div>  
-        `;  
-  
-        chatBox.insertBefore(wrapper, typingIndicator);  
-        updateReactionsUI(wrapper, data.reactions);  
-    }  
-  
-    function closeAllActions(e) {  
-        document.querySelectorAll('.message-wrapper').forEach(w => w.classList.remove('active'));  
-    }  
-  
-    function setReply(user, text) {  
-        selectedReply = { user, text };  
-        document.getElementById('replyUser').innerText = user;  
-        document.getElementById('replyText').innerText = text;  
-        replyBar.style.display = 'flex';  
-        msgInput.focus();  
-    }  
-  
-    function cancelReply() {  
-        selectedReply = null;  
-        replyBar.style.display = 'none';  
-    }  
-  
-    function editMessage(id, oldText) {  
-        const newText = prompt("Edit Message:", oldText);  
-        if (newText && newText.trim() !== "" && newText !== oldText) {  
-            socket.emit('editMessage', { id, text: newText.trim() });  
-        }  
-    }  
-  
-    function deleteEveryone(id) {  
-        if (confirm("Delete for Everyone?")) {  
-            socket.emit('deleteEveryone', id);  
-        }  
-    }  
-  
-    function deleteForMe(id) {  
-        const msgEl = document.getElementById(id);  
-        if (msgEl) msgEl.remove();  
-    }  
-  
-    function sendMessage() {  
-        const text = msgInput.value.trim();  
-        if (text === "") return;  
-  
-        const msgData = {  
-            id: 'msg_' + Date.now(),  
-            user: myUsername,  
-            text: text,  
-            replyTo: selectedReply,  
-            timestamp: new Date().toISOString()  
-        };  
-  
-        socket.emit('chatMessage', msgData);  
-        msgInput.value = '';  
-        cancelReply();  
-        socket.emit('stopTyping');  
-    }  
-  
-    function handleKeyPress(e) {  
-        if (e.key === 'Enter') sendMessage();  
-    }  
-  
-    function handleTyping() {  
-        socket.emit('typing', myUsername);  
-        clearTimeout(typingTimeout);  
-        typingTimeout = setTimeout(() => {  
-            socket.emit('stopTyping');  
-        }, 1500);  
-    }  
-  
-    socket.on('displayTyping', (user) => {  
-        typingIndicator.innerText = `${user} is typing...`;  
-        typingIndicator.style.display = 'block';  
-        scrollToBottom();  
-    });  
-  
-    socket.on('hideTyping', () => {  
-        typingIndicator.style.display = 'none';  
-    });  
-  
-    function scrollToBottom() {  
-        chatBox.scrollTop = chatBox.scrollHeight;  
-    }  
-</script>  </body>  
+<div class="chat-container">
+    <div class="chat-header">
+        <div>
+            <h2>Bini 💖 Faru</h2>
+            <div class="online-status" id="onlineCount">🟢 Online: ...</div>
+        </div>
+        <button class="btn-name" onclick="changeUsername()">CHANGE NAME</button>
+    </div>
+
+    <div class="chat-messages" id="chatBox" onclick="closeAllActions(event)">
+        <div class="typing-indicator" id="typingIndicator"></div>
+    </div>
+
+    <div class="reply-bar" id="replyBar">
+        <div>
+            <strong id="replyUser">Name</strong>: <span id="replyText">Message text...</span>
+        </div>
+        <button onclick="cancelReply()">✖</button>
+    </div>
+
+    <div class="chat-input-area">
+        <input type="text" id="msgInput" placeholder="Type a message..." oninput="handleTyping()" onkeypress="handleKeyPress(event)">
+        <button class="send-btn" onclick="sendMessage()">➤</button>
+    </div>
+</div>
+
+<script>
+    function checkPasscode() {
+        const pinInput = document.getElementById('passcodeInput');
+        const overlay = document.getElementById('passcodeOverlay');
+        if (!pinInput) return;
+        
+        const pin = pinInput.value.trim();
+        
+        if (pin === "8085") {
+            if (overlay) {
+                overlay.style.display = "none";
+                overlay.remove();
+            }
+        } else {
+            alert("Wrong Password");
+        }
+    }
+
+    function handlePinKey(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            checkPasscode();
+        }
+    }
+
+    const socket = io();
+    let myUsername = localStorage.getItem('chatUsername') || 'User_' + Math.floor(Math.random() * 1000);
+    localStorage.setItem('chatUsername', myUsername);
+
+    socket.emit('userJoined', myUsername);
+
+    const chatBox = document.getElementById('chatBox');
+    const msgInput = document.getElementById('msgInput');
+    const onlineCount = document.getElementById('onlineCount');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const replyBar = document.getElementById('replyBar');
+
+    let typingTimeout;
+    let selectedReply = null;
+
+    function formatTime(dateStr) {
+        const date = dateStr ? new Date(dateStr) : new Date();
+        return date.toLocaleTimeString('en-IN', {
+            timeZone: 'Asia/Kolkata',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+    }
+
+    function changeUsername() {
+        const newName = prompt("Apna Naya Name Likhein:", myUsername);
+        if (newName && newName.trim() !== "") {
+            const oldName = myUsername;
+            myUsername = newName.trim();
+            localStorage.setItem('chatUsername', myUsername);
+            socket.emit('updateUsername', { oldName, newName: myUsername });
+            location.reload();
+        }
+    }
+
+    socket.on('onlineUsersList', (usersList) => {
+        onlineCount.innerText = usersList && usersList.length > 0 ? `🟢 Online: ${usersList.join(', ')}` : `🟢 Online: 0`;
+        if (usersList && usersList.length > 1) {
+            socket.emit('markAsRead', myUsername);
+        }
+    });
+
+    socket.on('loadHistory', (messages) => {
+        chatBox.querySelectorAll('.message-wrapper').forEach(el => el.remove());
+        messages.forEach(msg => appendMessage(msg));
+        scrollToBottom();
+        socket.emit('markAsRead', myUsername);
+    });
+
+    socket.on('message', (data) => {
+        appendMessage(data);
+        scrollToBottom();
+        if (data.user !== myUsername) {
+            socket.emit('markAsRead', myUsername);
+        }
+    });
+
+    socket.on('messageReacted', (data) => {
+        const msgEl = document.getElementById(data.id);
+        if (msgEl) {
+            updateReactionsUI(msgEl, data.reactions);
+        }
+    });
+
+    socket.on('messagesReadUpdate', () => {
+        document.querySelectorAll('.msg-ticks').forEach(el => {
+            if (el.dataset.sender === myUsername) {
+                el.innerHTML = '<span style="color: #34b7f1; font-weight: bold;">✓✓</span>';
+            }
+        });
+    });
+
+    socket.on('messageUpdated', (data) => {
+        const msgEl = document.getElementById(data.id);
+        if (msgEl) {
+            msgEl.querySelector('.msg-content').innerText = data.text;
+            if (!msgEl.querySelector('.edited-tag')) {
+                const tag = document.createElement('span');
+                tag.className = 'edited-tag';
+                tag.innerText = '(edited)';
+                msgEl.querySelector('.msg-meta').prepend(tag);
+            }
+        }
+    });
+
+    socket.on('messageDeletedEveryone', (id) => {
+        const msgEl = document.getElementById(id);
+        if (msgEl) {
+            msgEl.querySelector('.msg-content').innerText = '🚫 This message was deleted';
+            msgEl.querySelector('.msg-content').style.fontStyle = 'italic';
+            msgEl.querySelector('.msg-content').style.color = '#777';
+            const actions = msgEl.querySelector('.msg-actions');
+            if (actions) actions.remove();
+            const reactions = msgEl.querySelector('.msg-reactions');
+            if (reactions) reactions.remove();
+        }
+    });
+
+    function sendReaction(id, emoji) {
+        socket.emit('reactMessage', { id, user: myUsername, emoji });
+        closeAllActions();
+    }
+
+    function updateReactionsUI(wrapper, reactions) {
+        let existingBadge = wrapper.querySelector('.msg-reactions');
+        if (existingBadge) existingBadge.remove();
+
+        if (reactions && Object.keys(reactions).length > 0) {
+            const uniqueEmojis = [...new Set(Object.values(reactions))].join(' ');
+            const badge = document.createElement('div');
+            badge.className = 'msg-reactions';
+            badge.innerHTML = `<span>${uniqueEmojis}</span>`;
+            wrapper.appendChild(badge);
+        }
+    }
+
+    function appendMessage(data) {
+        const isMe = data.user === myUsername;
+        const wrapper = document.createElement('div');
+        wrapper.className = `message-wrapper ${isMe ? 'sent' : 'received'}`;
+        wrapper.id = data.id;
+
+        wrapper.onclick = function(e) {
+            e.stopPropagation();
+            document.querySelectorAll('.message-wrapper').forEach(w => {
+                if (w !== wrapper) w.classList.remove('active');
+            });
+            wrapper.classList.toggle('active');
+        };
+
+        const timeString = formatTime(data.timestamp || data.createdAt);
+
+        let replyHTML = '';
+        if (data.replyTo) {
+            replyHTML = `<div class="reply-preview-box"><strong>${data.replyTo.user}</strong>: ${data.replyTo.text}</div>`;
+        }
+
+        let isDeleted = data.text === '🚫 This message was deleted';
+
+        let actionsHTML = '';
+        if (!isDeleted) {
+            actionsHTML = `
+                <div class="msg-actions">
+                    <div class="reaction-picker">
+                        <span onclick="sendReaction('${data.id}', '❤️')">❤️</span>
+                        <span onclick="sendReaction('${data.id}', '👍')">👍</span>
+                        <span onclick="sendReaction('${data.id}', '😂')">😂</span>
+                        <span onclick="sendReaction('${data.id}', '😮')">😮</span>
+                        <span onclick="sendReaction('${data.id}', '😢')">😢</span>
+                    </div>
+                    <span class="action-btn" onclick="setReply('${data.user}', '${data.text.replace(/'/g, "\\'")}')">↩️</span>
+                    ${isMe ? `<span class="action-btn" onclick="editMessage('${data.id}', '${data.text.replace(/'/g, "\\'")}')">✏️</span>` : ''}
+                    ${isMe ? `<span class="action-btn" onclick="deleteEveryone('${data.id}')">🗑️</span>` : ''}
+                    <span class="action-btn" onclick="deleteForMe('${data.id}')">❌</span>
+                </div>
+            `;
+        }
+
+        let ticksHTML = '';
+        if (isMe && !isDeleted) {
+            let tickSymbol = '✓';
+            let tickColor = '#667781';
+            if (data.status === 'read') {
+                tickSymbol = '✓✓';
+                tickColor = '#34b7f1';
+            } else if (data.status === 'delivered') {
+                tickSymbol = '✓✓';
+                tickColor = '#667781';
+            }
+            ticksHTML = `<span class="msg-ticks" data-sender="${data.user}" style="color: ${tickColor}; font-weight: ${data.status === 'read' ? 'bold' : 'normal'};">${tickSymbol}</span>`;
+        }
+
+        wrapper.innerHTML = `
+            ${actionsHTML}
+            ${!isMe ? `<div class="sender-name">${data.user}</div>` : ''}
+            <div class="message-box">
+                ${replyHTML}
+                <span class="msg-content" style="${isDeleted ? 'font-style: italic; color: #777;' : ''}">${data.text}</span>
+                <div class="msg-meta">
+                    ${data.edited && !isDeleted ? `<span class="edited-tag">(edited)</span>` : ''}
+                    <span>${timeString}</span>
+                    ${ticksHTML}
+                </div>
+            </div>
+        `;
+
+        chatBox.insertBefore(wrapper, typingIndicator);
+        updateReactionsUI(wrapper, data.reactions);
+    }
+
+    function closeAllActions(e) {
+        document.querySelectorAll('.message-wrapper').forEach(w => w.classList.remove('active'));
+    }
+
+    function setReply(user, text) {
+        selectedReply = { user, text };
+        document.getElementById('replyUser').innerText = user;
+        document.getElementById('replyText').innerText = text;
+        replyBar.style.display = 'flex';
+        msgInput.focus();
+    }
+
+    function cancelReply() {
+        selectedReply = null;
+        replyBar.style.display = 'none';
+    }
+
+    function editMessage(id, oldText) {
+        const newText = prompt("Edit Message:", oldText);
+        if (newText && newText.trim() !== "" && newText !== oldText) {
+            socket.emit('editMessage', { id, text: newText.trim() });
+        }
+    }
+
+    function deleteEveryone(id) {
+        if (confirm("Delete for Everyone?")) {
+            socket.emit('deleteEveryone', id);
+        }
+    }
+
+    function deleteForMe(id) {
+        const msgEl = document.getElementById(id);
+        if (msgEl) msgEl.remove();
+    }
+
+    function sendMessage() {
+        const text = msgInput.value.trim();
+        if (text === "") return;
+
+        const msgData = {
+            id: 'msg_' + Date.now(),
+            user: myUsername,
+            text: text,
+            replyTo: selectedReply,
+            timestamp: new Date().toISOString()
+        };
+
+        socket.emit('chatMessage', msgData);
+        msgInput.value = '';
+        cancelReply();
+        socket.emit('stopTyping');
+    }
+
+    function handleKeyPress(e) {
+        if (e.key === 'Enter') sendMessage();
+    }
+
+    function handleTyping() {
+        socket.emit('typing', myUsername);
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+            socket.emit('stopTyping');
+        }, 1500);
+    }
+
+    socket.on('displayTyping', (user) => {
+        typingIndicator.innerText = `${user} is typing...`;
+        typingIndicator.style.display = 'block';
+        scrollToBottom();
+    });
+
+    socket.on('hideTyping', () => {
+        typingIndicator.style.display = 'none';
+    });
+
+    function scrollToBottom() {
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+</script>
+
+</body>
 </html>
