@@ -457,30 +457,54 @@
             wrapper.appendChild(badge);
         }
     }
-    // [🌟 HIGHLIGHT 🌟]
+    // [🌟 HIGHLIGHT 🌟] - Compressed Image Handler
     function handleImageSelect(event) {
         const file = event.target.files[0];
         if (!file) return;
 
-        if (file.size > 7 * 1024 * 1024) {
-            alert("Photo size 7MB se kam honi chahiye!");
-            return;
-        }
-
         const reader = new FileReader();
         reader.onload = function(e) {
-            const base64Image = e.target.result;
-            const msgData = {
-                id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
-                user: myUsername,
-                text: '',
-                image: base64Image,
-                replyTo: selectedReply,
-                timestamp: new Date().toISOString()
-            };
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                
+                const MAX_WIDTH = 800;
+                const MAX_HEIGHT = 800;
+                
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
 
-            socket.emit('chatMessage', msgData);
-            cancelReply();
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+                const msgData = {
+                    id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
+                    user: myUsername,
+                    text: '',
+                    image: compressedBase64,
+                    replyTo: selectedReply,
+                    timestamp: new Date().toISOString()
+                };
+
+                socket.emit('chatMessage', msgData);
+                cancelReply();
+            };
+            img.src = e.target.result;
         };
         reader.readAsDataURL(file);
         event.target.value = '';
