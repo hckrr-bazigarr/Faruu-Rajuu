@@ -5,7 +5,11 @@ const mongoose = require('mongoose');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+
+// Payload size limit for images
+const io = new Server(server, {
+    maxHttpBufferSize: 1e7 // 10MB limit for image attachments
+});
 
 app.use(express.static(__dirname));
 
@@ -19,10 +23,11 @@ const messageSchema = new mongoose.Schema({
     id: { type: String, unique: true },
     user: String,
     text: String,
+    image: String, // Store Base64 Image string
     replyTo: Object,
     edited: { type: Boolean, default: false },
     status: { type: String, default: 'sent' },
-    reactions: { type: Object, default: {} }, // Reactions storage: { username: emoji }
+    reactions: { type: Object, default: {} },
     timestamp: { type: Date, default: Date.now }
 });
 
@@ -70,13 +75,11 @@ io.on('connection', async (socket) => {
         }
     });
 
-    // Handle Emoji Reactions
     socket.on('reactMessage', async ({ id, user, emoji }) => {
         try {
             const message = await Message.findOne({ id });
             if (message) {
                 if (!message.reactions) message.reactions = {};
-                // Toggle reaction: if same emoji clicked again, remove it
                 if (message.reactions[user] === emoji) {
                     delete message.reactions[user];
                 } else {
@@ -114,7 +117,7 @@ io.on('connection', async (socket) => {
 
     socket.on('deleteEveryone', async (id) => {
         try {
-            await Message.findOneAndUpdate({ id }, { text: '🚫 This message was deleted', reactions: {} });
+            await Message.findOneAndUpdate({ id }, { text: '🚫 This message was deleted', image: null, reactions: {} });
             io.emit('messageDeletedEveryone', id);
         } catch (err) {
             console.log('Delete error:', err);
