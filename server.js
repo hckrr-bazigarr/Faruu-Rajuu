@@ -5,11 +5,7 @@ const mongoose = require('mongoose');
 
 const app = express();
 const server = http.createServer(app);
-
-// Socket.io with 10MB payload size limit for image sharing
-const io = new Server(server, {
-    maxHttpBufferSize: 1e7 
-});
+const io = new Server(server);
 
 app.use(express.static(__dirname));
 
@@ -23,7 +19,6 @@ const messageSchema = new mongoose.Schema({
     id: { type: String, unique: true },
     user: String,
     text: String,
-    image: String, // Base64 Image support
     replyTo: Object,
     edited: { type: Boolean, default: false },
     status: { type: String, default: 'sent' },
@@ -117,7 +112,7 @@ io.on('connection', async (socket) => {
 
     socket.on('deleteEveryone', async (id) => {
         try {
-            await Message.findOneAndUpdate({ id }, { text: '🚫 This message was deleted', image: null, reactions: {} });
+            await Message.findOneAndUpdate({ id }, { text: '🚫 This message was deleted', reactions: {} });
             io.emit('messageDeletedEveryone', id);
         } catch (err) {
             console.log('Delete error:', err);
