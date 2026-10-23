@@ -6,7 +6,6 @@ const mongoose = require('mongoose');
 const app = express();
 const server = http.createServer(app);
 
-// Payload size limit for images
 const io = new Server(server, {
     maxHttpBufferSize: 1e7 // 10MB limit for image attachments
 });
@@ -23,7 +22,7 @@ const messageSchema = new mongoose.Schema({
     id: { type: String, unique: true },
     user: String,
     text: String,
-    image: String, // Store Base64 Image string
+    image: String,
     replyTo: Object,
     edited: { type: Boolean, default: false },
     status: { type: String, default: 'sent' },
@@ -32,7 +31,6 @@ const messageSchema = new mongoose.Schema({
 });
 
 const Message = mongoose.model('Message', messageSchema);
-
 const activeUsers = {};
 
 function broadcastOnlineUsers() {
@@ -41,7 +39,6 @@ function broadcastOnlineUsers() {
 }
 
 io.on('connection', async (socket) => {
-
     socket.on('userJoined', (username) => {
         activeUsers[socket.id] = username;
         broadcastOnlineUsers();
