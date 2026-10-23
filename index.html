@@ -12,23 +12,54 @@
             height: 100%;
             width: 100%;
             overflow: hidden;
-            background-color: #efeae2;
+            background: linear-gradient(135deg, #ffe6eb 0%, #ffc2d1 100%);
         }
 
-        /* Passcode Lock Overlay */
-        #passcodeOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #075e54; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999; color: white; }
-        #passcodeOverlay h2 { text-shadow: 0 2px 4px rgba(0,0,0,0.3); font-weight: 700; margin-bottom: 10px; }
-        #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 8px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; background: rgba(255,255,255,0.9); color: #111; letter-spacing: 2px; }
-        #unlockBtn { margin-top: 15px; padding: 10px 25px; background: #25d366; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        /* Passcode Lock Overlay with Hacker Background */
+        #passcodeOverlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: url('hacker.jpg') no-repeat center center fixed; 
+            background-size: cover; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 99999; 
+            color: white; 
+        }
 
-        /* Main Chat Container */
+        /* Dark overlay layer for perfect readability */
+        #passcodeOverlay::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1;
+        }
+
+        #passcodeOverlay h2, 
+        #passcodeOverlay input, 
+        #passcodeOverlay button {
+            position: relative;
+            z-index: 2;
+        }
+
+        #passcodeOverlay h2 { text-shadow: 0 2px 4px rgba(0,0,0,0.8); font-weight: 700; margin-bottom: 10px; }
+        #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 8px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; background: rgba(255,255,255,0.9); color: #111; letter-spacing: 2px; }
+        #unlockBtn { margin-top: 15px; padding: 10px 25px; background: #d81b60; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+        /* Main Chat Container with Insta Love Theme */
         .chat-container { 
             width: 100%; 
             max-width: 450px; 
             height: 100vh; 
             height: 100dvh; 
             margin: 0 auto;
-            background: #efeae2; 
+            background: linear-gradient(135deg, #ffe6eb 0%, #ffc2d1 100%); 
             display: flex; 
             flex-direction: column; 
             position: relative; 
@@ -37,7 +68,7 @@
         
         /* Header */
         .chat-header { 
-            background-color: #075e54; 
+            background-color: #d81b60; 
             color: white; 
             padding: 10px 16px; 
             display: flex; 
@@ -48,10 +79,10 @@
             flex-shrink: 0; 
         }
         .chat-header h2 { font-size: 16px; font-weight: 600; }
-        .online-status { font-size: 11px; color: #25d366; margin-top: 2px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .online-status { font-size: 11px; color: #ffeb3b; margin-top: 2px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .header-actions { display: flex; align-items: center; gap: 8px; }
-        .call-btn { background: #25d366; color: white; border: none; padding: 6px 10px; border-radius: 50%; font-size: 14px; cursor: pointer; }
-        .btn-name { background: #128c7e; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; flex-shrink: 0; font-weight: bold; }
+        .call-btn { background: #ff4081; color: white; border: none; padding: 6px 10px; border-radius: 50%; font-size: 14px; cursor: pointer; }
+        .btn-name { background: #ad1457; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; flex-shrink: 0; font-weight: bold; }
 
         /* Messages Area */
         .chat-messages { 
@@ -62,7 +93,7 @@
             display: flex; 
             flex-direction: column; 
             gap: 8px; 
-            background-color: #efeae2;
+            background: transparent;
             -webkit-overflow-scrolling: touch;
         }
         
@@ -70,13 +101,13 @@
         .message-wrapper.sent { align-self: flex-end; }
         .message-wrapper.received { align-self: flex-start; }
 
-        .sender-name { font-size: 11px; color: #075e54; font-weight: bold; margin-bottom: 2px; margin-left: 4px; }
+        .sender-name { font-size: 11px; color: #ad1457; font-weight: bold; margin-bottom: 2px; margin-left: 4px; }
 
-        .reply-preview-box { background: rgba(0,0,0,0.06); border-left: 4px solid #075e54; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 4px; color: #555; }
+        .reply-preview-box { background: rgba(255,255,255,0.6); border-left: 4px solid #d81b60; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 4px; color: #555; }
 
-        .message-box { padding: 6px 10px 4px 10px; border-radius: 8px; position: relative; word-wrap: break-word; font-size: 14px; line-height: 18px; color: #111b21; }
-        .sent .message-box { background-color: #d9fdd3; border-top-right-radius: 0; }
-        .received .message-box { background-color: #ffffff; border-top-left-radius: 0; }
+        .message-box { padding: 6px 10px 4px 10px; border-radius: 12px; position: relative; word-wrap: break-word; font-size: 14px; line-height: 18px; color: #111b21; }
+        .sent .message-box { background: linear-gradient(135deg, #ff4081 0%, #f50057 100%); color: #ffffff; border-top-right-radius: 0; }
+        .received .message-box { background-color: #ffffff; border-top-left-radius: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
 
         /* Action Menu & Emoji Reactions Picker */
         .msg-actions { display: none; position: absolute; top: -38px; left: 0; background: #fff; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.25); padding: 4px 10px; gap: 8px; z-index: 20; align-items: center; }
@@ -90,35 +121,36 @@
         .msg-reactions { display: flex; gap: 3px; position: absolute; bottom: -10px; right: 10px; background: #fff; border: 1px solid #ddd; border-radius: 12px; padding: 1px 6px; font-size: 11px; box-shadow: 0 1px 3px rgba(0,0,0,0.15); z-index: 5; }
 
         .msg-meta { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: #667781; float: right; margin-left: 10px; margin-top: 4px; }
-        .edited-tag { font-size: 10px; color: #667781; font-style: italic; }
+        .sent .msg-meta { color: #fce4ec; }
+        .edited-tag { font-size: 10px; font-style: italic; }
 
-        .typing-indicator { display: none; align-self: flex-start; background: #ffffff; padding: 6px 12px; border-radius: 8px; font-size: 12px; color: #667781; font-style: italic; box-shadow: 0 1px 1px rgba(0,0,0,0.1); margin-bottom: 4px; }
+        .typing-indicator { display: none; align-self: flex-start; background: rgba(255,255,255,0.8); padding: 6px 12px; border-radius: 8px; font-size: 12px; color: #d81b60; font-style: italic; box-shadow: 0 1px 1px rgba(0,0,0,0.1); margin-bottom: 4px; }
 
-        .reply-bar { display: none; background: #e9edef; padding: 6px 12px; border-left: 4px solid #00a884; font-size: 12px; color: #111b21; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .reply-bar { display: none; background: #fce4ec; padding: 6px 12px; border-left: 4px solid #d81b60; font-size: 12px; color: #111b21; justify-content: space-between; align-items: center; flex-shrink: 0; }
         .reply-bar button { background: none; border: none; font-size: 14px; cursor: pointer; color: #667781; }
 
         .chat-input-area { 
-            background: #f0f2f5; 
+            background: #fce4ec; 
             padding: 8px 10px; 
             display: flex; 
             align-items: center; 
             gap: 8px; 
             flex-shrink: 0; 
             z-index: 10;
-            border-top: 1px solid #ddd;
+            border-top: 1px solid #f8bbd0;
         }
         .chat-input-area input { flex: 1; border: none; padding: 10px 14px; border-radius: 20px; outline: none; font-size: 14px; background: white; }
-        .send-btn { background: #00a884; border: none; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 18px; flex-shrink: 0; }
+        .send-btn { background: #d81b60; border: none; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 18px; flex-shrink: 0; }
 
         /* Voice Call Modal */
-        #callOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7, 94, 84, 0.96); flex-direction: column; justify-content: space-between; align-items: center; z-index: 999999; color: white; padding: 50px 20px; }
+        #callOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(216, 27, 96, 0.96); flex-direction: column; justify-content: space-between; align-items: center; z-index: 999999; color: white; padding: 50px 20px; }
         .call-user-info { display: flex; flex-direction: column; align-items: center; margin-top: 40px; }
-        .call-avatar { width: 90px; height: 90px; background: #128c7e; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 36px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .call-avatar { width: 90px; height: 90px; background: #ad1457; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 36px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         #callStatusTitle { font-size: 22px; font-weight: 600; margin-bottom: 5px; }
-        #callTimer { font-size: 15px; color: #d0f0c0; margin-top: 5px; display: none; }
+        #callTimer { font-size: 15px; color: #ffeb3b; margin-top: 5px; display: none; }
         .call-controls { display: flex; gap: 25px; align-items: center; margin-bottom: 40px; }
         .control-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 50px; height: 50px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
-        .control-btn.active { background: white; color: #075e54; }
+        .control-btn.active { background: white; color: #d81b60; }
         .btn-call-accept { background: #25d366; color: white; border: none; padding: 14px 28px; border-radius: 35px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .btn-call-reject { background: #ea0038; color: white; border: none; padding: 14px 28px; border-radius: 35px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
     </style>
@@ -157,7 +189,7 @@
         </div>
         <div class="header-actions">
             <button class="call-btn" onclick="startCall()" title="Voice Call">📞</button>
-            <button class="btn-name" onclick="changeUsername()">CHANGE NAME</button>
+            <button class="btn-name" onclick="changeUsername()">NAME</button>
         </div>
     </div>
 
@@ -186,7 +218,7 @@
         
         const pin = pinInput.value.trim();
         
-        if (pin === "7890") {
+        if (pin === "8085") {
             if (overlay) {
                 overlay.style.display = "none";
                 overlay.remove();
@@ -218,13 +250,11 @@
     let typingTimeout;
     let selectedReply = null;
 
-    // --- WhatsApp Style Voice Call Logic with Timer & Speaker/Mute ---
     let localStream;
     let peerConnection;
     let incomingSignalData = null;
     let callTimerInterval;
     let secondsElapsed = 0;
-    let isSpeakerOn = false;
 
     const callOverlay = document.getElementById('callOverlay');
     const callStatusTitle = document.getElementById('callStatusTitle');
@@ -234,16 +264,15 @@
     const muteBtn = document.getElementById('muteBtn');
     const speakerBtn = document.getElementById('speakerBtn');
 
+    let isSpeakerOn = false; // Default earpiece par rahega
+
     const rtcConfig = {
         iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
     };
 
     async function getMicrophone() {
         if (!localStream) {
-            localStream = await navigator.mediaDevices.getUserMedia({ 
-                audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, 
-                video: false 
-            });
+            localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
         }
         return localStream;
     }
@@ -259,7 +288,8 @@
 
         peerConnection.ontrack = (event) => {
             remoteAudio.srcObject = event.streams[0];
-            remoteAudio.volume = isSpeakerOn ? 1.0 : 0.8;
+            // By default earpiece par rakhne ke liye setSinkId agar supported ho ya default audio output
+            remoteAudio.volume = 1.0;
         };
 
         if (localStream) {
@@ -290,14 +320,13 @@
             await getMicrophone();
             createPeerConnection();
 
-            isSpeakerOn = false;
-            speakerBtn.classList.remove('active');
-
             callOverlay.style.display = 'flex';
             callStatusTitle.innerText = 'Ringing...';
             acceptCallBtn.style.display = 'none';
             muteBtn.style.display = 'flex';
             speakerBtn.style.display = 'flex';
+            isSpeakerOn = false;
+            speakerBtn.classList.remove('active');
 
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
@@ -325,13 +354,12 @@
             await getMicrophone();
             createPeerConnection();
 
-            isSpeakerOn = false;
-            speakerBtn.classList.remove('active');
-
             acceptCallBtn.style.display = 'none';
             muteBtn.style.display = 'flex';
             speakerBtn.style.display = 'flex';
             callStatusTitle.innerText = 'Connected';
+            isSpeakerOn = false;
+            speakerBtn.classList.remove('active');
             startTimer();
 
             await peerConnection.setRemoteDescription(new RTCSessionDescription(incomingSignalData));
@@ -372,8 +400,6 @@
     function cleanupCall() {
         stopTimer();
         callOverlay.style.display = 'none';
-        isSpeakerOn = false;
-        speakerBtn.classList.remove('active');
         if (peerConnection) {
             peerConnection.close();
             peerConnection = null;
@@ -396,7 +422,14 @@
     function toggleSpeaker() {
         isSpeakerOn = !isSpeakerOn;
         speakerBtn.classList.toggle('active', isSpeakerOn);
-        remoteAudio.volume = isSpeakerOn ? 1.0 : 0.8;
+        
+        // Mobile browsers mein earpiece/speaker switch karne ke liye element properties
+        if (remoteAudio.setSinkId) {
+            // Agar browser support karta hai
+        } else {
+            // Fallback for standard mobile behavior via volume/max boost
+            remoteAudio.volume = isSpeakerOn ? 1.0 : 0.8;
+        }
     }
 
     function formatTime(dateStr) {
@@ -452,7 +485,7 @@
     socket.on('messagesReadUpdate', () => {
         document.querySelectorAll('.msg-ticks').forEach(el => {
             if (el.dataset.sender === myUsername) {
-                el.innerHTML = '<span style="color: #34b7f1; font-weight: bold;">✓✓</span>';
+                el.innerHTML = '<span style="color: #ffeb3b; font-weight: bold;">✓✓</span>';
             }
         });
     });
@@ -474,7 +507,7 @@
         const msgEl = document.getElementById(id);
         if (msgEl) {
             msgEl.querySelector('.msg-content').innerText = '🚫 This message was deleted';
-            msgEl.querySelector('.msg-content'].style.fontStyle = 'italic';
+            msgEl.querySelector('.msg-content').style.fontStyle = 'italic';
             msgEl.querySelector('.msg-content').style.color = '#777';
             const actions = msgEl.querySelector('.msg-actions');
             if (actions) actions.remove();
@@ -546,13 +579,13 @@
         let ticksHTML = '';
         if (isMe && !isDeleted) {
             let tickSymbol = '✓';
-            let tickColor = '#667781';
+            let tickColor = '#fce4ec';
             if (data.status === 'read') {
                 tickSymbol = '✓✓';
-                tickColor = '#34b7f1';
+                tickColor = '#ffeb3b';
             } else if (data.status === 'delivered') {
                 tickSymbol = '✓✓';
-                tickColor = '#667781';
+                tickColor = '#fce4ec';
             }
             ticksHTML = `<span class="msg-ticks" data-sender="${data.user}" style="color: ${tickColor}; font-weight: ${data.status === 'read' ? 'bold' : 'normal'};">${tickSymbol}</span>`;
         }
@@ -562,7 +595,7 @@
             ${!isMe ? `<div class="sender-name">${data.user}</div>` : ''}
             <div class="message-box">
                 ${replyHTML}
-                <span class="msg-content" style="${isDeleted ? 'font-style: italic; color: #777;' : ''}">${data.text}</span>
+                <span class="message-content" style="${isDeleted ? 'font-style: italic; color: #777;' : ''}">${data.text}</span>
                 <div class="msg-meta">
                     ${data.edited && !isDeleted ? `<span class="edited-tag">(edited)</span>` : ''}
                     <span>${timeString}</span>
