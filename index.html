@@ -132,6 +132,9 @@
             z-index: 10;
             border-top: 1px solid #f8bbd0;
         }
+        /* [🌟 HIGHLIGHT 🌟] */
+        .attach-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #d81b60; padding: 0 4px; flex-shrink: 0; }
+        /* [🌟 HIGHLIGHT 🌟] */
         .chat-input-area input { flex: 1; border: none; padding: 10px 14px; border-radius: 20px; outline: none; font-size: 14px; background: white; }
         .send-btn { background: #d81b60; border: none; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 18px; flex-shrink: 0; }
 
@@ -197,6 +200,10 @@
     </div>
 
     <div class="chat-input-area">
+        <!-- [🌟 HIGHLIGHT 🌟] -->
+        <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
+        <button class="attach-btn" onclick="document.getElementById('imageInput').click()" title="Send Photo">📎</button>
+        <!-- [🌟 HIGHLIGHT 🌟] -->
         <input type="text" id="msgInput" placeholder="Type a message..." oninput="handleTyping()" onkeypress="handleKeyPress(event)">
         <button class="send-btn" onclick="sendMessage()">➤</button>
     </div>
@@ -450,6 +457,35 @@
             wrapper.appendChild(badge);
         }
     }
+    // [🌟 HIGHLIGHT 🌟]
+    function handleImageSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (file.size > 7 * 1024 * 1024) {
+            alert("Photo size 7MB se kam honi chahiye!");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64Image = e.target.result;
+            const msgData = {
+                id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
+                user: myUsername,
+                text: '',
+                image: base64Image,
+                replyTo: selectedReply,
+                timestamp: new Date().toISOString()
+            };
+
+            socket.emit('chatMessage', msgData);
+            cancelReply();
+        };
+        reader.readAsDataURL(file);
+        event.target.value = '';
+    }
+    // [🌟 HIGHLIGHT 🌟]
 
     function appendMessage(data) {
         if (document.getElementById(data.id)) return; // Prevent duplicate appends
@@ -494,12 +530,18 @@
             let tickColor = data.status === 'read' ? '#ffeb3b' : '#fce4ec';
             ticksHTML = `<span class="msg-ticks" data-sender="${data.user}" style="color: ${tickColor}; font-weight: ${data.status === 'read' ? 'bold' : 'normal'};">${tickSymbol}</span>`;
         }
+        // [🌟 HIGHLIGHT 🌟]
+        let imageHTML = data.image ? `<div style="margin-bottom: 4px;"><img src="${data.image}" style="max-width: 100%; border-radius: 8px; max-height: 250px; object-fit: cover; display: block;" /></div>` : '';
+        // [🌟 HIGHLIGHT 🌟]
 
         wrapper.innerHTML = `
             ${actionsHTML}
             ${!isMe ? `<div class="sender-name">${data.user}</div>` : ''}
             <div class="message-box">
                 ${replyHTML}
+                <!-- [🌟 HIGHLIGHT 🌟] -->
+                ${imageHTML}
+                <!-- [🌟 HIGHLIGHT 🌟] -->
                 <span class="msg-content" style="${isDeleted ? 'font-style: italic; color: #777;' : ''}">${data.text}</span>
                 <div class="msg-meta">
                     ${data.edited && !isDeleted ? `<span class="edited-tag">(edited)</span>` : ''}
@@ -541,6 +583,9 @@
             id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
             user: myUsername,
             text: text,
+            // [🌟 HIGHLIGHT 🌟]
+            image: '',
+            // [🌟 HIGHLIGHT 🌟]
             replyTo: selectedReply,
             timestamp: new Date().toISOString()
         };
