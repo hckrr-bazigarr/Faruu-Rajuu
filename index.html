@@ -258,7 +258,7 @@
         const msgEl = document.getElementById(id);
         if (msgEl) {
             msgEl.querySelector('.msg-content').innerText = '🚫 This message was deleted';
-            msgEl.querySelector('.msg-content').style.fontStyle = 'italic';
+            msgEl.querySelector('.msg-content$.style.fontStyle = 'italic';
             msgEl.querySelector('.msg-content').style.color = '#777';
             const actions = msgEl.querySelector('.msg-actions');
             if (actions) actions.remove();
@@ -407,7 +407,7 @@
         };
 
         socket.emit('chatMessage', msgData);
-        msgInput.value = '';
+        msgInput.value = "";
         cancelReply();
         socket.emit('stopTyping');
     }
