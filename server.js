@@ -6,6 +6,11 @@ const mongoose = require('mongoose');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+// [🌟 HIGHLIGHT 🌟] START
+const io = new Server(server, {
+    maxHttpBufferSize: 10 * 1024 * 1024 
+});
+// [🌟 HIGHLIGHT 🌟] END
 
 app.use(express.static(__dirname));
 
