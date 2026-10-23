@@ -15,9 +15,40 @@
             background-color: #efeae2;
         }
 
-        /* Passcode Lock Overlay */
-        #passcodeOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #075e54; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999; color: white; }
-        #passcodeOverlay h2 { text-shadow: 0 2px 4px rgba(0,0,0,0.3); font-weight: 700; margin-bottom: 10px; }
+        /* Passcode Lock Overlay with Hacker Background */
+        #passcodeOverlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: url('hacker.jpg') no-repeat center center fixed; 
+            background-size: cover; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 99999; 
+            color: white; 
+        }
+
+        /* Dark overlay layer for perfect readability */
+        #passcodeOverlay::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1;
+        }
+
+        #passcodeOverlay h2, 
+        #passcodeOverlay input, 
+        #passcodeOverlay button {
+            position: relative;
+            z-index: 2;
+        }
+
+        #passcodeOverlay h2 { text-shadow: 0 2px 4px rgba(0,0,0,0.8); font-weight: 700; margin-bottom: 10px; }
         #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 8px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; background: rgba(255,255,255,0.9); color: #111; letter-spacing: 2px; }
         #unlockBtn { margin-top: 15px; padding: 10px 25px; background: #25d366; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 
@@ -643,4 +674,3 @@
 
 </body>
 </html>
-   
