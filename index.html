@@ -18,7 +18,7 @@
         /* Passcode Lock Overlay - Insta Love Theme Style */
         #passcodeOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #405de6, #833ab4, #fd1d1d, #fcb045); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999; color: white; }
         #passcodeOverlay h2 { text-shadow: 0 2px 4px rgba(0,0,0,0.3); font-weight: 700; margin-bottom: 10px; }
-        #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 20px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; background: rgba(255,255,255,0.9); color: #111; }
+        #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 20px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; background: rgba(255,255,255,0.9); color: #111; letter-spacing: 2px; }
         #passcodeOverlay button { margin-top: 15px; padding: 10px 25px; background: #e1306c; color: white; border: none; border-radius: 20px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
         /* Main Chat Container - Instagram Love Theme BG */
@@ -134,9 +134,9 @@
 <body>
 
 <div id="passcodeOverlay">
-    <h2>🔒 Enter Password</h2>
+    <h2>Enter Password</h2>
     <input type="password" id="passcodeInput" placeholder="ENTER PIN" onkeypress="handlePinKey(event)" />
-    <button onclick="checkPasscode()">Unlock</button>
+    <button type="button" id="unlockBtn" onclick="checkPasscode()">Unlock</button>
 </div>
 
 <div class="chat-container">
@@ -170,11 +170,18 @@
 
 <script>
     function checkPasscode() {
-        const pin = document.getElementById('passcodeInput').value.trim();
+        const pinInput = document.getElementById('passcodeInput');
+        const overlay = document.getElementById('passcodeOverlay');
+        const pin = pinInput.value.trim();
+        
         if (pin === "8085") {
-            document.getElementById('passcodeOverlay').style.cssText = "display: none !important;";
+            if (overlay) {
+                overlay.style.setProperty('display', 'none', 'important');
+                overlay.style.visibility = 'hidden';
+                overlay.remove(); // Direct DOM Node Remove
+            }
         } else {
-            alert("Wrong Passcode! Sahi PIN xxx5 hai.");
+            alert("Wrong Password");
         }
     }
 
@@ -439,15 +446,4 @@
         }
     }
 
-    function deleteEveryone(id) {
-        if (confirm("Delete for Everyone?")) {
-            socket.emit('deleteEveryone', id);
-        }
-    }
-
-    function deleteForMe(id) {
-        const msgEl = document.getElementById(id);
-        if (msgEl) msgEl.remove();
-    }
-
-    function send
+    function deleteE
