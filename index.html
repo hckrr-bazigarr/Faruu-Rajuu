@@ -457,69 +457,63 @@
             wrapper.appendChild(badge);
         }
     }
-        // [🌟 HIGHLIGHT 🌟] - Safe & Robust Image Handler with Mobile Fallback
+        // [🌟 HIGHLIGHT 🌟] - 5MB Limit and Strict Compression Handler
     function handleImageSelect(event) {
         const file = event.target.files[0];
         if (!file) return;
+
+        if (file.size > 5 * 1024 * 1024) {
+            alert("Photo size 5MB se kam honi chahiye!");
+            event.target.value = '';
+            return;
+        }
 
         const reader = new FileReader();
         reader.onload = function(e) {
             const img = new Image();
             img.onload = function() {
-                try {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-                    
-                    const MAX_WIDTH = 800;
-                    const MAX_HEIGHT = 800;
-                    
-                    if (width > height) {
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-                    } else {
-                        if (height > MAX_HEIGHT) {
-                            width *= MAX_HEIGHT / height;
-                            height = MAX_HEIGHT;
-                        }
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                
+                const MAX_WIDTH = 700;
+                const MAX_HEIGHT = 700;
+                
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
                     }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-                    sendImageMessage(compressedBase64);
-                } catch (err) {
-                    // Fallback to original base64 if canvas fails on mobile
-                    sendImageMessage(e.target.result);
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
                 }
-            };
-            img.onerror = function() {
-                // Direct fallback if image loading fails
-                sendImageMessage(e.target.result);
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
+
+                const msgData = {
+                    id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
+                    user: myUsername,
+                    text: '',
+                    image: compressedBase64,
+                    replyTo: selectedReply,
+                    timestamp: new Date().toISOString()
+                };
+
+                socket.emit('chatMessage', msgData);
+                cancelReply();
             };
             img.src = e.target.result;
         };
         reader.readAsDataURL(file);
         event.target.value = '';
-    }
-
-    function sendImageMessage(base64Data) {
-        const msgData = {
-            id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
-            user: myUsername,
-            text: '',
-            image: base64Data,
-            replyTo: selectedReply,
-            timestamp: new Date().toISOString()
-        };
-
-        socket.emit('chatMessage', msgData);
-        cancelReply();
     }
     // [🌟 HIGHLIGHT 🌟]
     function appendMessage(data) {
