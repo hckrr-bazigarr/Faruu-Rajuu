@@ -288,8 +288,7 @@
 
         peerConnection.ontrack = (event) => {
             remoteAudio.srcObject = event.streams[0];
-            // By default earpiece par rakhne ke liye setSinkId agar supported ho ya default audio output
-            remoteAudio.volume = 1.0;
+            remoteAudio.volume = 0.8; // Default earpiece volume
         };
 
         if (localStream) {
@@ -327,6 +326,7 @@
             speakerBtn.style.display = 'flex';
             isSpeakerOn = false;
             speakerBtn.classList.remove('active');
+            remoteAudio.volume = 0.8;
 
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
@@ -360,6 +360,7 @@
             callStatusTitle.innerText = 'Connected';
             isSpeakerOn = false;
             speakerBtn.classList.remove('active');
+            remoteAudio.volume = 0.8;
             startTimer();
 
             await peerConnection.setRemoteDescription(new RTCSessionDescription(incomingSignalData));
@@ -400,6 +401,8 @@
     function cleanupCall() {
         stopTimer();
         callOverlay.style.display = 'none';
+        isSpeakerOn = false;
+        speakerBtn.classList.remove('active');
         if (peerConnection) {
             peerConnection.close();
             peerConnection = null;
@@ -423,12 +426,10 @@
         isSpeakerOn = !isSpeakerOn;
         speakerBtn.classList.toggle('active', isSpeakerOn);
         
-        // Mobile browsers mein earpiece/speaker switch karne ke liye element properties
-        if (remoteAudio.setSinkId) {
-            // Agar browser support karta hai
+        if (isSpeakerOn) {
+            remoteAudio.volume = 1.0; // Loudspeaker mode
         } else {
-            // Fallback for standard mobile behavior via volume/max boost
-            remoteAudio.volume = isSpeakerOn ? 1.0 : 0.8;
+            remoteAudio.volume = 0.8; // Normal earpiece mode
         }
     }
 
@@ -595,7 +596,7 @@
             ${!isMe ? `<div class="sender-name">${data.user}</div>` : ''}
             <div class="message-box">
                 ${replyHTML}
-                <span class="message-content" style="${isDeleted ? 'font-style: italic; color: #777;' : ''}">${data.text}</span>
+                <span class="msg-content" style="${isDeleted ? 'font-style: italic; color: #777;' : ''}">${data.text}</span>
                 <div class="msg-meta">
                     ${data.edited && !isDeleted ? `<span class="edited-tag">(edited)</span>` : ''}
                     <span>${timeString}</span>
@@ -648,7 +649,7 @@
         if (text === "") return;
 
         const msgData = {
-            id: 'msg_' + Date.now(),
+            id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9), // 👈 Unique ID fixed here
             user: myUsername,
             text: text,
             replyTo: selectedReply,
