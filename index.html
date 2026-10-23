@@ -457,7 +457,7 @@
             wrapper.appendChild(badge);
         }
     }
-    // [🌟 HIGHLIGHT 🌟] - Compressed Image Handler
+        // [🌟 HIGHLIGHT 🌟] - Safe & Robust Image Handler with Mobile Fallback
     function handleImageSelect(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -466,51 +466,62 @@
         reader.onload = function(e) {
             const img = new Image();
             img.onload = function() {
-                const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
-                
-                const MAX_WIDTH = 800;
-                const MAX_HEIGHT = 800;
-                
-                if (width > height) {
-                    if (width > MAX_WIDTH) {
-                        height *= MAX_WIDTH / width;
-                        width = MAX_WIDTH;
+                try {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    const MAX_WIDTH = 800;
+                    const MAX_HEIGHT = 800;
+                    
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
                     }
-                } else {
-                    if (height > MAX_HEIGHT) {
-                        width *= MAX_HEIGHT / height;
-                        height = MAX_HEIGHT;
-                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    sendImageMessage(compressedBase64);
+                } catch (err) {
+                    // Fallback to original base64 if canvas fails on mobile
+                    sendImageMessage(e.target.result);
                 }
-
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-
-                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-
-                const msgData = {
-                    id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
-                    user: myUsername,
-                    text: '',
-                    image: compressedBase64,
-                    replyTo: selectedReply,
-                    timestamp: new Date().toISOString()
-                };
-
-                socket.emit('chatMessage', msgData);
-                cancelReply();
+            };
+            img.onerror = function() {
+                // Direct fallback if image loading fails
+                sendImageMessage(e.target.result);
             };
             img.src = e.target.result;
         };
         reader.readAsDataURL(file);
         event.target.value = '';
     }
-    // [🌟 HIGHLIGHT 🌟]
 
+    function sendImageMessage(base64Data) {
+        const msgData = {
+            id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
+            user: myUsername,
+            text: '',
+            image: base64Data,
+            replyTo: selectedReply,
+            timestamp: new Date().toISOString()
+        };
+
+        socket.emit('chatMessage', msgData);
+        cancelReply();
+    }
+    // [🌟 HIGHLIGHT 🌟]
     function appendMessage(data) {
         if (document.getElementById(data.id)) return; // Prevent duplicate appends
 
