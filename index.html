@@ -461,9 +461,14 @@
         }
     });
 
-    socket.on('loadHistory', (messages) => {
+        socket.on('loadHistory', (messages) => {
+        console.log("History received from server:", messages); // 👈 Check karne ke liye ki history mein naya message aa raha hai ya nahi
         chatBox.querySelectorAll('.message-wrapper').forEach(el => el.remove());
-        messages.forEach(msg => appendMessage(msg));
+        
+        if (messages && messages.length > 0) {
+            messages.forEach(msg => appendMessage(msg));
+        }
+        
         scrollToBottom();
         socket.emit('markAsRead', myUsername);
     });
