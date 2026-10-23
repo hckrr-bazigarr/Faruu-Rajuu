@@ -49,6 +49,8 @@
         }
         .chat-header h2 { font-size: 16px; font-weight: 600; }
         .online-status { font-size: 11px; color: #25d366; margin-top: 2px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .header-actions { display: flex; align-items: center; gap: 8px; }
+        .call-btn { background: #25d366; color: white; border: none; padding: 6px 10px; border-radius: 50%; font-size: 14px; cursor: pointer; }
         .btn-name { background: #128c7e; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; flex-shrink: 0; font-weight: bold; }
 
         /* Messages Area */
@@ -107,6 +109,19 @@
         }
         .chat-input-area input { flex: 1; border: none; padding: 10px 14px; border-radius: 20px; outline: none; font-size: 14px; background: white; }
         .send-btn { background: #00a884; border: none; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 18px; flex-shrink: 0; }
+
+        /* WhatsApp Style Voice Call Modal */
+        #callOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7, 94, 84, 0.96); flex-direction: column; justify-content: space-between; align-items: center; z-index: 999999; color: white; padding: 50px 20px; }
+        .call-user-info { display: flex; flex-direction: column; align-items: center; margin-top: 40px; }
+        .call-avatar { width: 90px; height: 90px; background: #128c7e; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 36px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        #callStatusTitle { font-size: 22px; font-weight: 600; margin-bottom: 5px; }
+        #callTimer { font-size: 15px; color: #d0f0c0; margin-top: 5px; display: none; }
+        
+        .call-controls { display: flex; gap: 25px; align-items: center; margin-bottom: 40px; }
+        .control-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 50px; height: 50px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+        .control-btn.active { background: white; color: #075e54; }
+        .btn-call-accept { background: #25d366; color: white; border: none; padding: 14px 28px; border-radius: 35px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .btn-call-reject { background: #ea0038; color: white; border: none; padding: 14px 28px; border-radius: 35px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body>
@@ -117,13 +132,34 @@
     <button type="button" id="unlockBtn" onclick="checkPasscode()" ontouchend="checkPasscode()">Unlock</button>
 </div>
 
+<!-- WhatsApp Style Voice Call Modal -->
+<div id="callOverlay">
+    <div class="call-user-info">
+        <div class="call-avatar">📞</div>
+        <h3 id="callStatusTitle">Calling...</h3>
+        <p id="callTimer">00:00</p>
+    </div>
+    
+    <div class="call-controls">
+        <button id="muteBtn" class="control-btn" onclick="toggleMute()" title="Mute">🎤</button>
+        <button id="speakerBtn" class="control-btn" onclick="toggleSpeaker()" title="Speaker">🔊</button>
+        <button id="acceptCallBtn" class="btn-call-accept" onclick="acceptCall()" style="display:none;">Accept</button>
+        <button id="endCallBtn" class="btn-call-reject" onclick="endCall()">End</button>
+    </div>
+</div>
+
+<audio id="remoteAudio" autoplay></audio>
+
 <div class="chat-container">
     <div class="chat-header">
         <div>
             <h2>Bini 💖 Faru</h2>
             <div class="online-status" id="onlineCount">🟢 Online: ...</div>
         </div>
-        <button class="btn-name" onclick="changeUsername()">CHANGE NAME</button>
+        <div class="header-actions">
+            <button class="call-btn" onclick="startCall()" title="Voice Call">📞</button>
+            <button class="btn-name" onclick="changeUsername()">CHANGE NAME</button>
+        </div>
     </div>
 
     <div class="chat-messages" id="chatBox" onclick="closeAllActions(event)">
@@ -151,7 +187,7 @@
         
         const pin = pinInput.value.trim();
         
-        if (pin === "8085") {
+        if (pin === "1234") {
             if (overlay) {
                 overlay.style.display = "none";
                 overlay.remove();
@@ -182,6 +218,178 @@
 
     let typingTimeout;
     let selectedReply = null;
+
+    // --- WhatsApp Style Voice Call Logic with Timer & Speaker/Mute ---
+    let localStream;
+    let peerConnection;
+    let incomingSignalData = null;
+    let callTimerInterval;
+    let secondsElapsed = 0;
+
+    const callOverlay = document.getElementById('callOverlay');
+    const callStatusTitle = document.getElementById('callStatusTitle');
+    const callTimer = document.getElementById('callTimer');
+    const acceptCallBtn = document.getElementById('acceptCallBtn');
+    const remoteAudio = document.getElementById('remoteAudio');
+    const muteBtn = document.getElementById('muteBtn');
+    const speakerBtn = document.getElementById('speakerBtn');
+
+    const rtcConfig = {
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+    };
+
+    async function getMicrophone() {
+        if (!localStream) {
+            localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        }
+        return localStream;
+    }
+
+    function createPeerConnection() {
+        peerConnection = new RTCPeerConnection(rtcConfig);
+
+        peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                socket.emit('iceCandidate', event.candidate);
+            }
+        };
+
+        peerConnection.ontrack = (event) => {
+            remoteAudio.srcObject = event.streams[0];
+        };
+
+        if (localStream) {
+            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+        }
+    }
+
+    function startTimer() {
+        secondsElapsed = 0;
+        callTimer.style.display = 'block';
+        callTimer.innerText = "00:00";
+        clearInterval(callTimerInterval);
+        callTimerInterval = setInterval(() => {
+            secondsElapsed++;
+            let mins = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+            let secs = (secondsElapsed % 60).toString().padStart(2, '0');
+            callTimer.innerText = `${mins}:${secs}`;
+        }, 1000);
+    }
+
+    function stopTimer() {
+        clearInterval(callTimerInterval);
+        callTimer.style.display = 'none';
+    }
+
+    async function startCall() {
+        try {
+            await getMicrophone();
+            createPeerConnection();
+
+            callOverlay.style.display = 'flex';
+            callStatusTitle.innerText = 'Ringing...';
+            acceptCallBtn.style.display = 'none';
+            muteBtn.style.display = 'flex';
+            speakerBtn.style.display = 'flex';
+
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+
+            socket.emit('callUser', {
+                signalData: offer,
+                from: myUsername
+            });
+        } catch (err) {
+            alert('Microphone permission is required for voice calling!');
+        }
+    }
+
+    socket.on('incomingCall', (data) => {
+        incomingSignalData = data.signal;
+        callOverlay.style.display = 'flex';
+        callStatusTitle.innerText = `Incoming Call from ${data.from}`;
+        acceptCallBtn.style.display = 'inline-block';
+        muteBtn.style.display = 'none';
+        speakerBtn.style.display = 'none';
+    });
+
+    async function acceptCall() {
+        try {
+            await getMicrophone();
+            createPeerConnection();
+
+            acceptCallBtn.style.display = 'none';
+            muteBtn.style.display = 'flex';
+            speakerBtn.style.display = 'flex';
+            callStatusTitle.innerText = 'Connected';
+            startTimer();
+
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(incomingSignalData));
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+
+            socket.emit('answerCall', { signal: answer });
+        } catch (err) {
+            alert('Microphone access failed!');
+        }
+    }
+
+    socket.on('callAccepted', async (signal) => {
+        callStatusTitle.innerText = 'Connected';
+        startTimer();
+        if (peerConnection) {
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(signal));
+        }
+    });
+
+    socket.on('iceCandidate', async (candidate) => {
+        if (peerConnection) {
+            try {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+            } catch (e) {}
+        }
+    });
+
+    socket.on('callEnded', () => {
+        cleanupCall();
+    });
+
+    function endCall() {
+        socket.emit('endCall');
+        cleanupCall();
+    }
+
+    function cleanupCall() {
+        stopTimer();
+        callOverlay.style.display = 'none';
+        if (peerConnection) {
+            peerConnection.close();
+            peerConnection = null;
+        }
+        if (localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+            localStream = null;
+        }
+    }
+
+    function toggleMute() {
+        if (localStream) {
+            const audioTrack = localStream.getAudioTracks()[0];
+            audioTrack.enabled = !audioTrack.enabled;
+            muteBtn.classList.toggle('active', !audioTrack.enabled);
+            muteBtn.innerText = audioTrack.enabled ? '🎤' : '🔇';
+        }
+    }
+
+    function toggleSpeaker() {
+        // Mobile browsers automatically route voice calls, but this toggles speaker mode UI/hint
+        speakerBtn.classList.toggle('active');
+        if (remoteAudio.style.volume) {
+            remoteAudio.volume = 1.0;
+        } else {
+            remoteAudio.volume = 1.0;
+        }
+    }
 
     function formatTime(dateStr) {
         const date = dateStr ? new Date(dateStr) : new Date();
@@ -258,7 +466,7 @@
         const msgEl = document.getElementById(id);
         if (msgEl) {
             msgEl.querySelector('.msg-content').innerText = '🚫 This message was deleted';
-            msgEl.querySelector('.msg-content').style.fontStyle = 'italic';
+            msgEl.querySelector('.msg-content$.style.fontStyle = 'italic';
             msgEl.querySelector('.msg-content').style.color = '#777';
             const actions = msgEl.querySelector('.msg-actions');
             if (actions) actions.remove();
