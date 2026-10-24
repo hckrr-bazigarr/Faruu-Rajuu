@@ -15,7 +15,6 @@
             background: linear-gradient(135deg, #ffe6eb 0%, #ffc2d1 100%);
         }
 
-        /* Passcode Lock Overlay with Hacker Background */
         #passcodeOverlay { 
             position: fixed; 
             top: 0; 
@@ -51,7 +50,6 @@
         #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 8px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; background: rgba(255,255,255,0.9); color: #111; letter-spacing: 2px; }
         #unlockBtn { margin-top: 15px; padding: 10px 25px; background: #d81b60; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
 
-        /* Main Chat Container */
         .chat-container { 
             width: 100%; 
             max-width: 450px; 
@@ -132,13 +130,10 @@
             z-index: 10;
             border-top: 1px solid #f8bbd0;
         }
-        /* [🌟 HIGHLIGHT 🌟] */
         .attach-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #d81b60; padding: 0 4px; flex-shrink: 0; }
-        /* [🌟 HIGHLIGHT 🌟] */
         .chat-input-area input { flex: 1; border: none; padding: 10px 14px; border-radius: 20px; outline: none; font-size: 14px; background: white; }
         .send-btn { background: #d81b60; border: none; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 18px; flex-shrink: 0; }
 
-        /* Voice Call Modal */
         #callOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(216, 27, 96, 0.96); flex-direction: column; justify-content: space-between; align-items: center; z-index: 999999; color: white; padding: 50px 20px; }
         .call-user-info { display: flex; flex-direction: column; align-items: center; margin-top: 40px; }
         .call-avatar { width: 90px; height: 90px; background: #ad1457; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 36px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
@@ -174,8 +169,6 @@
     </div>
 </div>
 
-<audio id="remoteAudio" autoplay playsinline></audio>
-
 <div class="chat-container">
     <div class="chat-header">
         <div>
@@ -200,10 +193,8 @@
     </div>
 
     <div class="chat-input-area">
-        <!-- [🌟 HIGHLIGHT 🌟] -->
         <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
         <button class="attach-btn" onclick="document.getElementById('imageInput').click()" title="Send Photo">📎</button>
-        <!-- [🌟 HIGHLIGHT 🌟] -->
         <input type="text" id="msgInput" placeholder="Type a message..." oninput="handleTyping()" onkeypress="handleKeyPress(event)">
         <button class="send-btn" onclick="sendMessage()">➤</button>
     </div>
@@ -214,7 +205,7 @@
         const pinInput = document.getElementById('passcodeInput');
         const overlay = document.getElementById('passcodeOverlay');
         if (!pinInput) return;
-        if (pinInput.value.trim() === "7890") {
+        if (pinInput.value.trim() === "8085") {
             if (overlay) { overlay.style.display = "none"; overlay.remove(); }
         } else {
             alert("Wrong Password");
@@ -242,12 +233,12 @@
     let localStream, peerConnection, incomingSignalData;
     let callTimerInterval, secondsElapsed = 0;
     let isSpeakerOn = false;
+    let isCallConnected = false;
 
     const callOverlay = document.getElementById('callOverlay');
     const callStatusTitle = document.getElementById('callStatusTitle');
     const callTimer = document.getElementById('callTimer');
     const acceptCallBtn = document.getElementById('acceptCallBtn');
-    const remoteAudio = document.getElementById('remoteAudio');
     const muteBtn = document.getElementById('muteBtn');
     const speakerBtn = document.getElementById('speakerBtn');
 
@@ -260,7 +251,6 @@
         return localStream;
     }
 
-    // [🌟 HIGHLIGHT 🌟] START - LOUDSPEAKER & EARPIECE FIX ROUTING
     const remoteAudio = document.createElement('audio');
     remoteAudio.autoplay = true;
     remoteAudio.playsInline = true;
@@ -276,7 +266,6 @@
         
         peerConnection.ontrack = (e) => { 
             remoteAudio.srcObject = e.streams[0]; 
-            // Default low volume to simulate normal earpiece level (prevents loud speaker blast)
             remoteAudio.volume = 0.35; 
         };
 
@@ -289,15 +278,15 @@
         isSpeakerOn = !isSpeakerOn;
         speakerBtn.classList.toggle('active', isSpeakerOn);
         if (isSpeakerOn) {
-            remoteAudio.volume = 1.0; // Full Loudspeaker
+            remoteAudio.volume = 1.0; 
         } else {
-            remoteAudio.volume = 0.35; // Normal Earpiece volume level
+            remoteAudio.volume = 0.35; 
         }
     }
-    // [🌟 HIGHLIGHT 🌟] END
 
     function startTimer() {
         secondsElapsed = 0;
+        isCallConnected = true;
         callTimer.style.display = 'block';
         callTimer.innerText = "00:00";
         clearInterval(callTimerInterval);
@@ -309,9 +298,11 @@
         }, 1000);
     }
 
-    function stopTimer() { clearInterval(callTimerInterval); callTimer.style.display = 'none'; }
+    function stopTimer() { 
+        clearInterval(callTimerInterval); 
+        callTimer.style.display = 'none'; 
+    }
 
-            // [🌟 HIGHLIGHT 🌟] START - Earpiece Default & Call Duration Fixes
     async function startCall() {
         try {
             await getMicrophone();
@@ -324,7 +315,7 @@
             isSpeakerOn = false;
             isCallConnected = false;
             speakerBtn.classList.remove('active');
-            remoteAudio.volume = 0.6; // Normal earpiece volume
+            remoteAudio.volume = 0.35;
 
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
@@ -352,7 +343,7 @@
             callStatusTitle.innerText = 'Connected';
             isSpeakerOn = false;
             speakerBtn.classList.remove('active');
-            remoteAudio.volume = 0.6; // Force normal earpiece volume on pickup
+            remoteAudio.volume = 0.35;
             startTimer();
 
             await peerConnection.setRemoteDescription(new RTCSessionDescription(incomingSignalData));
@@ -373,15 +364,14 @@
     });
 
     socket.on('callEnded', () => {
-        cleanupCall();
+        cleanupCall(false);
     });
 
     function endCall() { 
         socket.emit('endCall'); 
-        cleanupCall(); 
+        cleanupCall(true); 
     }
 
-    // [🌟 HIGHLIGHT 🌟] START - CALL DURATION CHAT MESSAGE FIX
     function cleanupCall(isInitiator) {
         let durationText = "";
         if (isCallConnected) {
@@ -425,7 +415,6 @@
         isCallConnected = false;
         secondsElapsed = 0;
     }
-    // [🌟 HIGHLIGHT 🌟] END
 
     function toggleMute() {
         if (localStream) {
@@ -435,14 +424,6 @@
             muteBtn.innerText = track.enabled ? '🎤' : '🔇';
         }
     }
-
-    function toggleSpeaker() {
-        isSpeakerOn = !isSpeakerOn;
-        speakerBtn.classList.toggle('active', isSpeakerOn);
-        // Toggle between earpiece (0.6) and loudspeaker max volume (1.0)
-        remoteAudio.volume = isSpeakerOn ? 1.0 : 0.6;
-    }
-    // [🌟 HIGHLIGHT 🌟] END
 
     function formatTime(dateStr) {
         const date = dateStr ? new Date(dateStr) : new Date();
@@ -465,7 +446,6 @@
         if (users && users.length > 1) socket.emit('markAsRead', myUsername);
     });
 
-    // Robust History Load Handler
     socket.on('loadHistory', (messages) => {
         chatBox.querySelectorAll('.message-wrapper').forEach(el => el.remove());
         if (messages && messages.length > 0) {
@@ -509,9 +489,11 @@
         const msgEl = document.getElementById(id);
         if (msgEl) {
             const content = msgEl.querySelector('.msg-content');
-            content.innerText = '🚫 This message was deleted';
-            content.style.fontStyle = 'italic';
-            content.style.color = '#777';
+            if (content) {
+                content.innerText = '🚫 This message was deleted';
+                content.style.fontStyle = 'italic';
+                content.style.color = '#777';
+            }
             const actions = msgEl.querySelector('.msg-actions');
             if (actions) actions.remove();
             const reactions = msgEl.querySelector('.msg-reactions');
@@ -535,7 +517,7 @@
             wrapper.appendChild(badge);
         }
     }
-        // [🌟 HIGHLIGHT 🌟] - 5MB Limit and Strict Compression Handler
+
     function handleImageSelect(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -593,9 +575,9 @@
         reader.readAsDataURL(file);
         event.target.value = '';
     }
-    // [🌟 HIGHLIGHT 🌟]
+
     function appendMessage(data) {
-        if (document.getElementById(data.id)) return; // Prevent duplicate appends
+        if (document.getElementById(data.id)) return;
 
         const isMe = data.user === myUsername;
         const wrapper = document.createElement('div');
@@ -623,8 +605,8 @@
                         <span onclick="sendReaction('${data.id}', '😮')">😮</span>
                         <span onclick="sendReaction('${data.id}', '😢')">😢</span>
                     </div>
-                    <span class="action-btn" onclick="setReply('${data.user}', '${data.text.replace(/'/g, "\\'")}')">↩️</span>
-                    ${isMe ? `<span class="action-btn" onclick="editMessage('${data.id}', '${data.text.replace(/'/g, "\\'")}')">✏️</span>` : ''}
+                    <span class="action-btn" onclick="setReply('${data.user}', '${data.text ? data.text.replace(/'/g, "\\'") : 'Photo'}')">↩️</span>
+                    ${isMe ? `<span class="action-btn" onclick="editMessage('${data.id}', '${data.text ? data.text.replace(/'/g, "\\'") : ''}')">✏️</span>` : ''}
                     ${isMe ? `<span class="action-btn" onclick="deleteEveryone('${data.id}')">🗑️</span>` : ''}
                     <span class="action-btn" onclick="deleteForMe('${data.id}')">❌</span>
                 </div>
@@ -637,19 +619,17 @@
             let tickColor = data.status === 'read' ? '#ffeb3b' : '#fce4ec';
             ticksHTML = `<span class="msg-ticks" data-sender="${data.user}" style="color: ${tickColor}; font-weight: ${data.status === 'read' ? 'bold' : 'normal'};">${tickSymbol}</span>`;
         }
-        // [🌟 HIGHLIGHT 🌟]
+
         let imageHTML = data.image ? `<div style="margin-bottom: 4px;"><img src="${data.image}" style="max-width: 100%; border-radius: 8px; max-height: 250px; object-fit: cover; display: block;" /></div>` : '';
-        // [🌟 HIGHLIGHT 🌟]
+        let textHTML = data.text ? `<span class="msg-content" style="${isDeleted ? 'font-style: italic; color: #777;' : ''}">${data.text}</span>` : '';
 
         wrapper.innerHTML = `
             ${actionsHTML}
             ${!isMe ? `<div class="sender-name">${data.user}</div>` : ''}
             <div class="message-box">
                 ${replyHTML}
-                <!-- [🌟 HIGHLIGHT 🌟] -->
                 ${imageHTML}
-                <!-- [🌟 HIGHLIGHT 🌟] -->
-                <span class="msg-content" style="${isDeleted ? 'font-style: italic; color: #777;' : ''}">${data.text}</span>
+                ${textHTML}
                 <div class="msg-meta">
                     ${data.edited && !isDeleted ? `<span class="edited-tag">(edited)</span>` : ''}
                     <span>${timeString}</span>
@@ -690,9 +670,7 @@
             id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
             user: myUsername,
             text: text,
-            // [🌟 HIGHLIGHT 🌟]
             image: '',
-            // [🌟 HIGHLIGHT 🌟]
             replyTo: selectedReply,
             timestamp: new Date().toISOString()
         };
