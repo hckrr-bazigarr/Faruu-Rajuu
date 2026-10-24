@@ -231,7 +231,7 @@
 
     socket.emit('userJoined', myUsername);
 
-    /* [🌟 HIGHLIGHT 🌟] START - Days Together Logic */
+    /* [🌟 HIGHLIGHT 🌟] START - Smart Days Together Logic */
     function updateLoveCounter() {
         let startDateStr = localStorage.getItem('loveStartDate');
         if (!startDateStr) {
@@ -245,9 +245,12 @@
         const diffTime = Math.abs(today - startDate);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
+        // Automatic partner name detection based on username
+        let partnerName = (myUsername.toLowerCase().includes('faru')) ? 'Bini' : 'Faru';
+
         const counterEl = document.getElementById('loveCounter');
         if (counterEl) {
-            counterEl.innerHTML = `⏳ ${diffDays} Days Together ❤️`;
+            counterEl.innerHTML = `⏳ ${diffDays} Days Together with ${partnerName} ❤️`;
         }
     }
 
