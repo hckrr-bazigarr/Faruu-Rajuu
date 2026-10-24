@@ -282,7 +282,7 @@
 
     function stopTimer() { clearInterval(callTimerInterval); callTimer.style.display = 'none'; }
 
-    // [🌟 HIGHLIGHT 🌟] START - Enhanced Voice Call & Duration Message Handler
+            // [🌟 HIGHLIGHT 🌟] START - Earpiece Default & Call Duration Fixes
     async function startCall() {
         try {
             await getMicrophone();
@@ -295,7 +295,7 @@
             isSpeakerOn = false;
             isCallConnected = false;
             speakerBtn.classList.remove('active');
-            remoteAudio.volume = 1.0;
+            remoteAudio.volume = 0.6; // Normal earpiece volume
 
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
@@ -323,7 +323,7 @@
             callStatusTitle.innerText = 'Connected';
             isSpeakerOn = false;
             speakerBtn.classList.remove('active');
-            remoteAudio.volume = 1.0;
+            remoteAudio.volume = 0.6; // Force normal earpiece volume on pickup
             startTimer();
 
             await peerConnection.setRemoteDescription(new RTCSessionDescription(incomingSignalData));
@@ -344,15 +344,15 @@
     });
 
     socket.on('callEnded', () => {
-        cleanupCall(true);
+        cleanupCall();
     });
 
     function endCall() { 
         socket.emit('endCall'); 
-        cleanupCall(false); 
+        cleanupCall(); 
     }
 
-    function cleanupCall(remoteEnded) {
+    function cleanupCall() {
         let durationText = "";
         if (isCallConnected && secondsElapsed > 0) {
             let mins = Math.floor(secondsElapsed / 60);
@@ -362,8 +362,6 @@
             } else {
                 durationText = `📞 Voice Call (${secs} sec)`;
             }
-        } else {
-            durationText = `📞 Missed / Cancelled Call`;
         }
 
         stopTimer();
@@ -380,7 +378,7 @@
             localStream = null; 
         }
 
-        if (isCallConnected) {
+        if (isCallConnected && durationText !== "") {
             const callMsgData = {
                 id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
                 user: myUsername,
@@ -408,12 +406,8 @@
     function toggleSpeaker() {
         isSpeakerOn = !isSpeakerOn;
         speakerBtn.classList.toggle('active', isSpeakerOn);
-        // Force audio routing toggle if supported by setSinkId or standard audio output
-        if (typeof remoteAudio.setSinkId === 'function') {
-            // Can be used if specific speaker/earpiece sink is needed
-        }
-        // Increase/decrease gain simulation via volume or routing
-        remoteAudio.volume = isSpeakerOn ? 1.0 : 0.8;
+        // Toggle between earpiece (0.6) and loudspeaker max volume (1.0)
+        remoteAudio.volume = isSpeakerOn ? 1.0 : 0.6;
     }
     // [🌟 HIGHLIGHT 🌟] END
 
