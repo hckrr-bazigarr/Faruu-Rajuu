@@ -8,14 +8,12 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         
-        /* [🌟 HIGHLIGHT 🌟] START - Dark Purple & Romantic Heart Theme */
         html, body {
             height: 100%;
             width: 100%;
             overflow: hidden;
-            background: radial-gradient(circle at center, #2e0836 0%, #15031b 100%);
+            background: linear-gradient(135deg, #ffe6eb 0%, #ffc2d1 100%);
         }
-        /* [🌟 HIGHLIGHT 🌟] END */
 
         #passcodeOverlay { 
             position: fixed; 
@@ -94,18 +92,16 @@
             -webkit-overflow-scrolling: touch;
         }
         
-        /* [🌟 HIGHLIGHT 🌟] START - Instagram DM Message Bubbles & Round Avatars */
         .message-wrapper { display: flex; flex-direction: column; max-width: 80%; position: relative; cursor: pointer; margin-bottom: 4px; }
         .message-wrapper.sent { align-self: flex-end; }
-        .message-wrapper.received { align-self: flex-start; margin-left: 32px; }
+        .message-wrapper.received { align-self: flex-start; }
 
-        .msg-row { display: flex; align-items: flex-end; gap: 8px; position: relative; }
-        .msg-avatar { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; position: absolute; left: -32px; bottom: 2px; background: #ad1457; display: flex; justify-content: center; align-items: center; font-size: 10px; color: white; overflow: hidden; }
+        .sender-name { font-size: 11px; color: #ad1457; font-weight: bold; margin-bottom: 2px; margin-left: 4px; }
+        .reply-preview-box { background: rgba(255,255,255,0.6); border-left: 4px solid #d81b60; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 4px; color: #555; }
 
-        .message-box { padding: 8px 12px; border-radius: 18px; position: relative; word-wrap: break-word; font-size: 14px; line-height: 18px; color: #ffffff; }
-        .sent .message-box { background: linear-gradient(135deg, #ff4081 0%, #d81b60 100%); border-bottom-right-radius: 4px; }
-        .received .message-box { background-color: #3b1448; border-bottom-left-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
-        /* [🌟 HIGHLIGHT 🌟] END */
+        .message-box { padding: 6px 10px 4px 10px; border-radius: 12px; position: relative; word-wrap: break-word; font-size: 14px; line-height: 18px; color: #111b21; }
+        .sent .message-box { background: linear-gradient(135deg, #ff4081 0%, #f50057 100%); color: #ffffff; border-top-right-radius: 0; }
+        .received .message-box { background-color: #ffffff; border-top-left-radius: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
 
         .msg-actions { display: none; position: absolute; top: -38px; left: 0; background: #fff; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.25); padding: 4px 10px; gap: 8px; z-index: 20; align-items: center; }
         .message-wrapper.active .msg-actions { display: flex; }
@@ -182,10 +178,6 @@
         <div class="header-actions">
             <button class="call-btn" onclick="startCall()" title="Voice Call">📞</button>
             <button class="btn-name" onclick="changeUsername()">NAME</button>
-            <!-- [🌟 HIGHLIGHT 🌟] START - Gallery Profile Photo Button -->
-            <input type="file" id="profilePicInput" accept="image/*" style="display: none;" onchange="handleProfilePicSelect(event)">
-            <button class="btn-photo" onclick="document.getElementById('profilePicInput').click()" title="Select Profile Photo">PHOTO</button>
-            <!-- [🌟 HIGHLIGHT 🌟] END -->
         </div>
     </div>
 
@@ -228,23 +220,7 @@
     let myUsername = localStorage.getItem('chatUsername') || 'User_' + Math.floor(Math.random() * 1000);
     localStorage.setItem('chatUsername', myUsername);
 
-    /* [🌟 HIGHLIGHT 🌟] START - Unique User Profile Picture Sync */
-    let myProfilePic = localStorage.getItem('chatProfilePic') || '';
-    
-    socket.emit('userJoined', { username: myUsername, profilePic: myProfilePic });
-    
-    const userProfiles = {};
-
-    socket.on('userProfilesList', (profiles) => {
-        Object.assign(userProfiles, profiles);
-        document.querySelectorAll('.msg-avatar-img').forEach(img => {
-            const user = img.dataset.user;
-            if (userProfiles[user]) {
-                img.src = userProfiles[user];
-            }
-        });
-    });
-    /* [🌟 HIGHLIGHT 🌟] END */
+    socket.emit('userJoined', myUsername);
 
     const chatBox = document.getElementById('chatBox');
     const msgInput = document.getElementById('msgInput');
@@ -464,51 +440,7 @@
             location.reload();
         }
     }
-    /* [🌟 HIGHLIGHT 🌟] START - Ultra-Safe Profile Photo Compression (Prevents Server Crash) */
-    function handleProfilePicSelect(event) {
-        const file = event.target.files[0];
-        if (!file) return;
 
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
-                
-                // Max size 100px taaki base64 string bohot choti bane aur payload error na aaye
-                const MAX_SIZE = 100;
-                if (width > height) {
-                    if (width > MAX_SIZE) {
-                        height *= MAX_SIZE / width;
-                        width = MAX_SIZE;
-                    }
-                } else {
-                    if (height > MAX_SIZE) {
-                        width *= MAX_SIZE / height;
-                        height = MAX_SIZE;
-                    }
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-
-                myProfilePic = canvas.toDataURL('image/jpeg', 0.4);
-                localStorage.setItem('chatProfilePic', myProfilePic);
-                
-                socket.emit('updateProfilePhoto', { username: myUsername, profilePic: myProfilePic });
-                alert("Profile photo successfully update ho gayi!");
-                location.reload();
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-        event.target.value = '';
-    }
-    /* [🌟 HIGHLIGHT 🌟] END */
     socket.on('onlineUsersList', (users) => {
         onlineCount.innerText = users && users.length > 0 ? `🟢 Online: ${users.join(', ')}` : `🟢 Online: 0`;
         if (users && users.length > 1) socket.emit('markAsRead', myUsername);
@@ -644,7 +576,6 @@
         event.target.value = '';
     }
 
-    /* [🌟 HIGHLIGHT 🌟] START - Append Message with Individual User Profile Avatar */
     function appendMessage(data) {
         if (document.getElementById(data.id)) return;
 
@@ -692,22 +623,17 @@
         let imageHTML = data.image ? `<div style="margin-bottom: 4px;"><img src="${data.image}" style="max-width: 100%; border-radius: 8px; max-height: 250px; object-fit: cover; display: block;" /></div>` : '';
         let textHTML = data.text ? `<span class="msg-content" style="${isDeleted ? 'font-style: italic; color: #777;' : ''}">${data.text}</span>` : '';
 
-        let avatarUrl = userProfiles[data.user] || '';
-        let avatarHTML = !isMe ? `<div class="msg-avatar">${avatarUrl ? `<img src="${avatarUrl}" class="msg-avatar-img" data-user="${data.user}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />` : data.user.charAt(0).toUpperCase()}</div>` : '';
-
         wrapper.innerHTML = `
             ${actionsHTML}
-            <div class="msg-row">
-                ${avatarHTML}
-                <div class="message-box">
-                    ${replyHTML}
-                    ${imageHTML}
-                    ${textHTML}
-                    <div class="msg-meta">
-                        ${data.edited && !isDeleted ? `<span class="edited-tag">(edited)</span>` : ''}
-                        <span>${timeString}</span>
-                        ${ticksHTML}
-                    </div>
+            ${!isMe ? `<div class="sender-name">${data.user}</div>` : ''}
+            <div class="message-box">
+                ${replyHTML}
+                ${imageHTML}
+                ${textHTML}
+                <div class="msg-meta">
+                    ${data.edited && !isDeleted ? `<span class="edited-tag">(edited)</span>` : ''}
+                    <span>${timeString}</span>
+                    ${ticksHTML}
                 </div>
             </div>
         `;
@@ -715,7 +641,6 @@
         chatBox.insertBefore(wrapper, typingIndicator);
         updateReactionsUI(wrapper, data.reactions);
     }
-    /* [🌟 HIGHLIGHT 🌟] END */
 
     function closeAllActions() { document.querySelectorAll('.message-wrapper').forEach(w => w.classList.remove('active')); }
 
