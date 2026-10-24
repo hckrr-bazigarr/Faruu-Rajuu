@@ -464,16 +464,10 @@
             location.reload();
         }
     }
-    /* [🌟 HIGHLIGHT 🌟] START - Gallery Profile Photo Selection Handler */
+    /* [🌟 HIGHLIGHT 🌟] START - Ultra-Safe Profile Photo Compression (Prevents Server Crash) */
     function handleProfilePicSelect(event) {
         const file = event.target.files[0];
         if (!file) return;
-
-        if (file.size > 5 * 1024 * 1024) {
-            alert("Photo size 5MB se kam honi chahiye!");
-            event.target.value = '';
-            return;
-        }
 
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -483,18 +477,17 @@
                 let width = img.width;
                 let height = img.height;
                 
-                const MAX_WIDTH = 200;
-                const MAX_HEIGHT = 200;
-                
+                // Max size 100px taaki base64 string bohot choti bane aur payload error na aaye
+                const MAX_SIZE = 100;
                 if (width > height) {
-                    if (width > MAX_WIDTH) {
-                        height *= MAX_WIDTH / width;
-                        width = MAX_WIDTH;
+                    if (width > MAX_SIZE) {
+                        height *= MAX_SIZE / width;
+                        width = MAX_SIZE;
                     }
                 } else {
-                    if (height > MAX_HEIGHT) {
-                        width *= MAX_HEIGHT / height;
-                        height = MAX_HEIGHT;
+                    if (height > MAX_SIZE) {
+                        width *= MAX_SIZE / height;
+                        height = MAX_SIZE;
                     }
                 }
 
@@ -503,7 +496,7 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
 
-                myProfilePic = canvas.toDataURL('image/jpeg', 0.6);
+                myProfilePic = canvas.toDataURL('image/jpeg', 0.4);
                 localStorage.setItem('chatProfilePic', myProfilePic);
                 
                 socket.emit('updateProfilePhoto', { username: myUsername, profilePic: myProfilePic });
@@ -516,7 +509,6 @@
         event.target.value = '';
     }
     /* [🌟 HIGHLIGHT 🌟] END */
-
     socket.on('onlineUsersList', (users) => {
         onlineCount.innerText = users && users.length > 0 ? `🟢 Online: ${users.join(', ')}` : `🟢 Online: 0`;
         if (users && users.length > 1) socket.emit('markAsRead', myUsername);
