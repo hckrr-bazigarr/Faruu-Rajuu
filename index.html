@@ -260,12 +260,41 @@
         return localStream;
     }
 
+    // [🌟 HIGHLIGHT 🌟] START - LOUDSPEAKER & EARPIECE FIX ROUTING
+    const remoteAudio = document.createElement('audio');
+    remoteAudio.autoplay = true;
+    remoteAudio.playsInline = true;
+    document.body.appendChild(remoteAudio);
+
     function createPeerConnection() {
+        if (peerConnection) return;
         peerConnection = new RTCPeerConnection(rtcConfig);
-        peerConnection.onicecandidate = (e) => { if (e.candidate) socket.emit('iceCandidate', e.candidate); };
-        peerConnection.ontrack = (e) => { remoteAudio.srcObject = e.streams[0]; remoteAudio.volume = 0.8; };
-        if (localStream) { localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream)); }
+        
+        peerConnection.onicecandidate = (e) => { 
+            if (e.candidate) socket.emit('iceCandidate', e.candidate); 
+        };
+        
+        peerConnection.ontrack = (e) => { 
+            remoteAudio.srcObject = e.streams[0]; 
+            // Default low volume to simulate normal earpiece level (prevents loud speaker blast)
+            remoteAudio.volume = 0.35; 
+        };
+
+        if (localStream) { 
+            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream)); 
+        }
     }
+
+    function toggleSpeaker() {
+        isSpeakerOn = !isSpeakerOn;
+        speakerBtn.classList.toggle('active', isSpeakerOn);
+        if (isSpeakerOn) {
+            remoteAudio.volume = 1.0; // Full Loudspeaker
+        } else {
+            remoteAudio.volume = 0.35; // Normal Earpiece volume level
+        }
+    }
+    // [🌟 HIGHLIGHT 🌟] END
 
     function startTimer() {
         secondsElapsed = 0;
@@ -352,9 +381,10 @@
         cleanupCall(); 
     }
 
-    function cleanupCall() {
+    // [🌟 HIGHLIGHT 🌟] START - CALL DURATION CHAT MESSAGE FIX
+    function cleanupCall(isInitiator) {
         let durationText = "";
-        if (isCallConnected && secondsElapsed > 0) {
+        if (isCallConnected) {
             let mins = Math.floor(secondsElapsed / 60);
             let secs = secondsElapsed % 60;
             if (mins > 0) {
@@ -362,6 +392,8 @@
             } else {
                 durationText = `📞 Voice Call (${secs} sec)`;
             }
+        } else {
+            durationText = `📞 Missed / Cancelled Call`;
         }
 
         stopTimer();
@@ -378,7 +410,7 @@
             localStream = null; 
         }
 
-        if (isCallConnected && durationText !== "") {
+        if (isCallConnected && isInitiator && durationText !== "") {
             const callMsgData = {
                 id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
                 user: myUsername,
@@ -393,6 +425,7 @@
         isCallConnected = false;
         secondsElapsed = 0;
     }
+    // [🌟 HIGHLIGHT 🌟] END
 
     function toggleMute() {
         if (localStream) {
