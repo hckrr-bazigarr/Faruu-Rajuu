@@ -50,6 +50,47 @@
         #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 8px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; background: rgba(255,255,255,0.9); color: #111; letter-spacing: 2px; }
         #unlockBtn { margin-top: 15px; padding: 10px 25px; background: #d81b60; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
 
+        /* [🌟 HIGHLIGHT 🌟] START - Special Note Popup Modal Style */
+        #noteModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 99998;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .note-card {
+            background: #fff;
+            width: 100%;
+            max-width: 320px;
+            padding: 24px 20px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 2px solid #f8bbd0;
+            animation: popIn 0.3s ease-out;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .note-card h3 { color: #d81b60; font-size: 18px; margin-bottom: 12px; }
+        .note-card p { color: #333; font-size: 15px; line-height: 22px; margin-bottom: 20px; word-break: break-word; }
+        .note-card button {
+            background: #d81b60;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(216, 27, 96, 0.3);
+        }
+        /* [🌟 HIGHLIGHT 🌟] END */
+
         .chat-container { 
             width: 100%; 
             max-width: 450px; 
@@ -77,14 +118,16 @@
         .chat-header h2 { font-size: 16px; font-weight: 600; }
         .online-status { font-size: 11px; color: #ffeb3b; margin-top: 2px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        /* [🌟 HIGHLIGHT 🌟] START - Days Together Counter Style */
         .love-counter { font-size: 11px; color: #ffebee; margin-top: 3px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 4px; }
         .love-counter:hover { text-decoration: underline; }
-        /* [🌟 HIGHLIGHT 🌟] END */
 
-        .header-actions { display: flex; align-items: center; gap: 8px; }
+        .header-actions { display: flex; align-items: center; gap: 6px; }
         .call-btn { background: #ff4081; color: white; border: none; padding: 6px 10px; border-radius: 50%; font-size: 14px; cursor: pointer; }
         .btn-name { background: #ad1457; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; flex-shrink: 0; font-weight: bold; }
+        
+        /* [🌟 HIGHLIGHT 🌟] START - Note Button Style */
+        .btn-note { background: #ad1457; color: white; border: none; padding: 6px 8px; border-radius: 6px; font-size: 10px; cursor: pointer; flex-shrink: 0; font-weight: bold; }
+        /* [🌟 HIGHLIGHT 🌟] END */
 
         .chat-messages { 
             flex: 1; 
@@ -160,6 +203,16 @@
     <button type="button" id="unlockBtn" onclick="checkPasscode()">Unlock</button>
 </div>
 
+<!-- [🌟 HIGHLIGHT 🌟] START - Special Note Modal HTML -->
+<div id="noteModal">
+    <div class="note-card">
+        <h3>💖 Special Love Note 💖</h3>
+        <p id="noteModalText">Loading note...</p>
+        <button onclick="closeNoteModal()">Got it ❤️</button>
+    </div>
+</div>
+<!-- [🌟 HIGHLIGHT 🌟] END -->
+
 <div id="callOverlay">
     <div class="call-user-info">
         <div class="call-avatar">📞</div>
@@ -180,12 +233,13 @@
         <div>
             <h2>Bini 💖 Faru</h2>
             <div class="online-status" id="onlineCount">🟢 Online: ...</div>
-            <!-- [🌟 HIGHLIGHT 🌟] START - Days Together Element in Header -->
             <div class="love-counter" id="loveCounter" onclick="resetLoveDate()" title="Click to change start date">⏳ Loading days...</div>
-            <!-- [🌟 HIGHLIGHT 🌟] END -->
         </div>
         <div class="header-actions">
             <button class="call-btn" onclick="startCall()" title="Voice Call">📞</button>
+            <!-- [🌟 HIGHLIGHT 🌟] START - Note Button -->
+            <button class="btn-note" onclick="setSpecialNote()" title="Set Special Note">NOTE</button>
+            <!-- [🌟 HIGHLIGHT 🌟] END -->
             <button class="btn-name" onclick="changeUsername()">NAME</button>
         </div>
     </div>
@@ -216,6 +270,7 @@
         if (!pinInput) return;
         if (pinInput.value.trim() === "7890") {
             if (overlay) { overlay.style.display = "none"; overlay.remove(); }
+            checkAndShowSpecialNote(); // Check note on unlock
         } else {
             alert("Wrong Password");
         }
@@ -245,7 +300,6 @@
         const diffTime = Math.abs(today - startDate);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-        // Automatic partner name detection based on username
         let partnerName = (myUsername.toLowerCase().includes('faru')) ? 'Bini' : 'Faru';
 
         const counterEl = document.getElementById('loveCounter');
@@ -262,8 +316,36 @@
         }
     }
 
-    setInterval(updateLoveCounter, 1000 * 60 * 60); // Update every hour
+    setInterval(updateLoveCounter, 1000 * 60 * 60); 
     window.addEventListener('DOMContentLoaded', updateLoveCounter);
+    /* [🌟 HIGHLIGHT 🌟] END */
+
+    /* [🌟 HIGHLIGHT 🌟] START - Special Note Feature Logic */
+    function setSpecialNote() {
+        const currentNote = localStorage.getItem('specialLoveNote') || "";
+        const newNote = prompt("Apna Naya Special Note / Greeting Likhein:", currentNote);
+        if (newNote !== null) {
+            localStorage.setItem('specialLoveNote', newNote.trim());
+            localStorage.setItem('noteShownState', 'false'); // Mark as unread so it pops up
+            alert("Special Note set successfully! Ye ab ek baar popup mein dikhega.");
+        }
+    }
+
+    function checkAndShowSpecialNote() {
+        const note = localStorage.getItem('specialLoveNote');
+        const shownState = localStorage.getItem('noteShownState');
+        
+        // Agar note set hai aur abhi tak popup nahi dikhaya gaya
+        if (note && note.trim() !== "" && shownState !== 'true') {
+            document.getElementById('noteModalText').innerText = note;
+            document.getElementById('noteModal').style.display = 'flex';
+        }
+    }
+
+    function closeNoteModal() {
+        document.getElementById('noteModal').style.display = 'none';
+        localStorage.setItem('noteShownState', 'true'); // Mark as shown so it doesn't repeat
+    }
     /* [🌟 HIGHLIGHT 🌟] END */
 
     const chatBox = document.getElementById('chatBox');
