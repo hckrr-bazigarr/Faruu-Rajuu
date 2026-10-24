@@ -76,6 +76,12 @@
         }
         .chat-header h2 { font-size: 16px; font-weight: 600; }
         .online-status { font-size: 11px; color: #ffeb3b; margin-top: 2px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* [🌟 HIGHLIGHT 🌟] START - Days Together Counter Style */
+        .love-counter { font-size: 11px; color: #ffebee; margin-top: 3px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        .love-counter:hover { text-decoration: underline; }
+        /* [🌟 HIGHLIGHT 🌟] END */
+
         .header-actions { display: flex; align-items: center; gap: 8px; }
         .call-btn { background: #ff4081; color: white; border: none; padding: 6px 10px; border-radius: 50%; font-size: 14px; cursor: pointer; }
         .btn-name { background: #ad1457; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; flex-shrink: 0; font-weight: bold; }
@@ -174,6 +180,9 @@
         <div>
             <h2>Bini 💖 Faru</h2>
             <div class="online-status" id="onlineCount">🟢 Online: ...</div>
+            <!-- [🌟 HIGHLIGHT 🌟] START - Days Together Element in Header -->
+            <div class="love-counter" id="loveCounter" onclick="resetLoveDate()" title="Click to change start date">⏳ Loading days...</div>
+            <!-- [🌟 HIGHLIGHT 🌟] END -->
         </div>
         <div class="header-actions">
             <button class="call-btn" onclick="startCall()" title="Voice Call">📞</button>
@@ -221,6 +230,38 @@
     localStorage.setItem('chatUsername', myUsername);
 
     socket.emit('userJoined', myUsername);
+
+    /* [🌟 HIGHLIGHT 🌟] START - Days Together Logic */
+    function updateLoveCounter() {
+        let startDateStr = localStorage.getItem('loveStartDate');
+        if (!startDateStr) {
+            startDateStr = prompt("Enter your relationship start date (YYYY-MM-DD):", "2024-01-01");
+            if (!startDateStr) startDateStr = "2024-01-01";
+            localStorage.setItem('loveStartDate', startDateStr);
+        }
+
+        const startDate = new Date(startDateStr);
+        const today = new Date();
+        const diffTime = Math.abs(today - startDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        const counterEl = document.getElementById('loveCounter');
+        if (counterEl) {
+            counterEl.innerHTML = `⏳ ${diffDays} Days Together ❤️`;
+        }
+    }
+
+    function resetLoveDate() {
+        const newDate = prompt("Change relationship start date (YYYY-MM-DD):", localStorage.getItem('loveStartDate') || "2024-01-01");
+        if (newDate) {
+            localStorage.setItem('loveStartDate', newDate);
+            updateLoveCounter();
+        }
+    }
+
+    setInterval(updateLoveCounter, 1000 * 60 * 60); // Update every hour
+    window.addEventListener('DOMContentLoaded', updateLoveCounter);
+    /* [🌟 HIGHLIGHT 🌟] END */
 
     const chatBox = document.getElementById('chatBox');
     const msgInput = document.getElementById('msgInput');
