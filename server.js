@@ -35,22 +35,49 @@ const Message = mongoose.model('Message', messageSchema);
 
 const activeUsers = {};
 
-function broadcastOnlineUsers() {
+/* [🌟 HIGHLIGHT 🌟] START - Multi-user Profile Photos Storage */
+const userProfiles = {};
+
+function broadcastData() {
     const uniqueNames = [...new Set(Object.values(activeUsers))];
     io.emit('onlineUsersList', uniqueNames);
+    io.emit('userProfilesList', userProfiles);
 }
+/* [🌟 HIGHLIGHT 🌟] END */
 
 io.on('connection', async (socket) => {
 
-    socket.on('userJoined', (username) => {
+     /* [🌟 HIGHLIGHT 🌟] START - User Join & Unique Profile Pic Handler */
+    socket.on('userJoined', (data) => {
+        const username = typeof data === 'string' ? data : data.username;
+        const profilePic = typeof data === 'object' && data.profilePic ? data.profilePic : '';
+        
         activeUsers[socket.id] = username;
-        broadcastOnlineUsers();
+        if (profilePic) {
+            userProfiles[username] = profilePic;
+        }
+        broadcastData();
     });
 
-    socket.on('updateUsername', ({ oldName, newName }) => {
-        activeUsers[socket.id] = newName;
-        broadcastOnlineUsers();
+    socket.on('updateProfilePhoto', ({ username, profilePic }) => {
+        if (username && profilePic) {
+            userProfiles[username] = profilePic;
+            broadcastData();
+        }
     });
+
+    socket.on('updateUsername', ({ oldName, newName, profilePic }) => {
+        delete activeUsers[socket.id];
+        activeUsers[socket.id] = newName;
+        if (oldName && oldName !== newName) {
+            delete userProfiles[oldName];
+        }
+        if (profilePic) {
+            userProfiles[newName] = profilePic;
+        }
+        broadcastData();
+    });
+    /* [🌟 HIGHLIGHT 🌟] END */
 
     try {
         const history = await Message.find().read('primary').sort({ timestamp: 1, _id: 1 }).limit(1000);
