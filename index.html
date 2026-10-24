@@ -282,6 +282,7 @@
 
     function stopTimer() { clearInterval(callTimerInterval); callTimer.style.display = 'none'; }
 
+    // [🌟 HIGHLIGHT 🌟] START - Enhanced Voice Call & Duration Message Handler
     async function startCall() {
         try {
             await getMicrophone();
@@ -292,8 +293,9 @@
             muteBtn.style.display = 'flex';
             speakerBtn.style.display = 'flex';
             isSpeakerOn = false;
+            isCallConnected = false;
             speakerBtn.classList.remove('active');
-            remoteAudio.volume = 0.8;
+            remoteAudio.volume = 1.0;
 
             const offer = await peerConnection.createOffer();
             await peerConnection.setLocalDescription(offer);
@@ -308,6 +310,7 @@
         acceptCallBtn.style.display = 'inline-block';
         muteBtn.style.display = 'none';
         speakerBtn.style.display = 'none';
+        isCallConnected = false;
     });
 
     async function acceptCall() {
@@ -320,7 +323,7 @@
             callStatusTitle.innerText = 'Connected';
             isSpeakerOn = false;
             speakerBtn.classList.remove('active');
-            remoteAudio.volume = 0.8;
+            remoteAudio.volume = 1.0;
             startTimer();
 
             await peerConnection.setRemoteDescription(new RTCSessionDescription(incomingSignalData));
@@ -340,15 +343,57 @@
         if (peerConnection) { try { await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)); } catch (e) {} }
     });
 
-    socket.on('callEnded', () => cleanupCall());
-    function endCall() { socket.emit('endCall'); cleanupCall(); }
-    function cleanupCall() {
+    socket.on('callEnded', () => {
+        cleanupCall(true);
+    });
+
+    function endCall() { 
+        socket.emit('endCall'); 
+        cleanupCall(false); 
+    }
+
+    function cleanupCall(remoteEnded) {
+        let durationText = "";
+        if (isCallConnected && secondsElapsed > 0) {
+            let mins = Math.floor(secondsElapsed / 60);
+            let secs = secondsElapsed % 60;
+            if (mins > 0) {
+                durationText = `📞 Voice Call (${mins} min ${secs} sec)`;
+            } else {
+                durationText = `📞 Voice Call (${secs} sec)`;
+            }
+        } else {
+            durationText = `📞 Missed / Cancelled Call`;
+        }
+
         stopTimer();
         callOverlay.style.display = 'none';
         isSpeakerOn = false;
         speakerBtn.classList.remove('active');
-        if (peerConnection) { peerConnection.close(); peerConnection = null; }
-        if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+
+        if (peerConnection) { 
+            peerConnection.close(); 
+            peerConnection = null; 
+        }
+        if (localStream) { 
+            localStream.getTracks().forEach(t => t.stop()); 
+            localStream = null; 
+        }
+
+        if (isCallConnected) {
+            const callMsgData = {
+                id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
+                user: myUsername,
+                text: durationText,
+                image: '',
+                replyTo: null,
+                timestamp: new Date().toISOString()
+            };
+            socket.emit('chatMessage', callMsgData);
+        }
+
+        isCallConnected = false;
+        secondsElapsed = 0;
     }
 
     function toggleMute() {
@@ -363,8 +408,14 @@
     function toggleSpeaker() {
         isSpeakerOn = !isSpeakerOn;
         speakerBtn.classList.toggle('active', isSpeakerOn);
+        // Force audio routing toggle if supported by setSinkId or standard audio output
+        if (typeof remoteAudio.setSinkId === 'function') {
+            // Can be used if specific speaker/earpiece sink is needed
+        }
+        // Increase/decrease gain simulation via volume or routing
         remoteAudio.volume = isSpeakerOn ? 1.0 : 0.8;
     }
+    // [🌟 HIGHLIGHT 🌟] END
 
     function formatTime(dateStr) {
         const date = dateStr ? new Date(dateStr) : new Date();
