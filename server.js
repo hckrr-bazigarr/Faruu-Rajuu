@@ -33,6 +33,16 @@ const messageSchema = new mongoose.Schema({
 
 const Message = mongoose.model('Message', messageSchema);
 
+// [🌟 HIGHLIGHT 🌟] Special Note Schema for Database Sync
+const specialNoteSchema = new mongoose.Schema({
+    id: { type: String, default: 'current_note', unique: true },
+    note: { type: String, default: '' },
+    author: { type: String, default: '' },
+    seenBy: { type: [String], default: [] }
+});
+
+const SpecialNote = mongoose.model('SpecialNote', specialNoteSchema);
+
 const activeUsers = {};
 
 function broadcastOnlineUsers() {
@@ -50,6 +60,46 @@ io.on('connection', async (socket) => {
     socket.on('updateUsername', ({ oldName, newName }) => {
         activeUsers[socket.id] = newName;
         broadcastOnlineUsers();
+    });
+
+    // [🌟 HIGHLIGHT 🌟] Check note when user connects/unlocks
+    socket.on('getSpecialNote', async (username) => {
+        try {
+            let noteDoc = await SpecialNote.findOne({ id: 'current_note' });
+            if (noteDoc && noteDoc.note) {
+                if (noteDoc.author !== username && !noteDoc.seenBy.includes(username)) {
+                    socket.emit('showSpecialNote', { note: noteDoc.note, author: noteDoc.author });
+                }
+            }
+        } catch (err) {
+            console.log('Get note error:', err);
+        }
+    });
+
+    // [🌟 HIGHLIGHT 🌟] Set new note & reset seenBy
+    socket.on('setSpecialNote', async ({ note, author }) => {
+        try {
+            await SpecialNote.findOneAndUpdate(
+                { id: 'current_note' },
+                { note: note, author: author, seenBy: [] },
+                { upsert: true, new: true }
+            );
+            socket.broadcast.emit('notifyNewNote', { note, author });
+        } catch (err) {
+            console.log('Set note error:', err);
+        }
+    });
+
+    // [🌟 HIGHLIGHT 🌟] Mark note as seen for user
+    socket.on('markNoteAsSeen', async (username) => {
+        try {
+            await SpecialNote.findOneAndUpdate(
+                { id: 'current_note' },
+                { $addToSet: { seenBy: username } }
+            );
+        } catch (err) {
+            console.log('Mark seen error:', err);
+        }
     });
 
     try {
@@ -169,3 +219,4 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
 });
+                                               
