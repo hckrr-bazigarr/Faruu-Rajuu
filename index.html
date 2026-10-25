@@ -270,7 +270,9 @@
         if (!pinInput) return;
         if (pinInput.value.trim() === "7890") {
             if (overlay) { overlay.style.display = "none"; overlay.remove(); }
-            checkAndShowSpecialNote(); // Check note on unlock
+            
+            // [🌟 HIGHLIGHT 🌟] Fetch note from server once unlocked
+            socket.emit('getSpecialNote', myUsername);
         } else {
             alert("Wrong Password");
         }
@@ -285,6 +287,35 @@
     localStorage.setItem('chatUsername', myUsername);
 
     socket.emit('userJoined', myUsername);
+
+    // [🌟 HIGHLIGHT 🌟] Real-time listeners for database synced notes
+    socket.on('showSpecialNote', (data) => {
+        if (data && data.note && data.author !== myUsername) {
+            document.getElementById('noteModalText').innerText = data.note;
+            document.getElementById('noteModal').style.display = 'flex';
+        }
+    });
+
+    socket.on('notifyNewNote', (data) => {
+        if (data && data.note && data.author !== myUsername) {
+            document.getElementById('noteModalText').innerText = data.note;
+            document.getElementById('noteModal').style.display = 'flex';
+        }
+    });
+
+    function setSpecialNote() {
+        const newNote = prompt("New Special Note:", "");
+        if (newNote !== null && newNote.trim() !== "") {
+            const noteText = newNote.trim();
+            socket.emit('setSpecialNote', { note: noteText, author: myUsername });
+            alert("Special Love Note set successfully!");
+        }
+    }
+
+    function closeNoteModal() {
+        document.getElementById('noteModal').style.display = 'none';
+        socket.emit('markNoteAsSeen', myUsername);
+    }
 
     /* [🌟 HIGHLIGHT 🌟] START - Smart Days Together Logic */
     function updateLoveCounter() {
@@ -318,36 +349,6 @@
 
     setInterval(updateLoveCounter, 1000 * 60 * 60); 
     window.addEventListener('DOMContentLoaded', updateLoveCounter);
-    /* [🌟 HIGHLIGHT 🌟] END */
-
-    /* [🌟 HIGHLIGHT 🌟] START - Special Note Feature Logic (Smart Partner Filter) */
-    function setSpecialNote() {
-        const currentNote = localStorage.getItem('specialLoveNote') || "";
-        const newNote = prompt("New Special Note:", currentNote);
-        if (newNote !== null && newNote.trim() !== "") {
-            localStorage.setItem('specialLoveNote', newNote.trim());
-            localStorage.setItem('noteAuthor', myUsername); // Note likhne wale ka naam save karo
-            localStorage.setItem('noteShownState', 'false'); // Partner ke liye unread mark karo
-            alert("Special Love Note set successfully!");
-        }
-    }
-
-    function checkAndShowSpecialNote() {
-        const note = localStorage.getItem('specialLoveNote');
-        const shownState = localStorage.getItem('noteShownState');
-        const author = localStorage.getItem('noteAuthor');
-        
-        // Popup tabhi aayega jab note ho, unread ho, AUR current user wo na ho jisne note likha hai!
-        if (note && note.trim() !== "" && shownState !== 'true' && author !== myUsername) {
-            document.getElementById('noteModalText').innerText = note;
-            document.getElementById('noteModal').style.display = 'flex';
-        }
-    }
-
-    function closeNoteModal() {
-        document.getElementById('noteModal').style.display = 'none';
-        localStorage.setItem('noteShownState', 'true'); // Read hone ke baad mark as shown
-    }
     /* [🌟 HIGHLIGHT 🌟] END */
 
     const chatBox = document.getElementById('chatBox');
@@ -695,7 +696,7 @@
                     timestamp: new Date().toISOString()
                 };
 
-                    socket.emit('chatMessage', msgData);
+                socket.emit('chatMessage', msgData);
                 cancelReply();
             };
             img.src = e.target.result;
