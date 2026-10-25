@@ -290,7 +290,7 @@
     function updateLoveCounter() {
         let startDateStr = localStorage.getItem('loveStartDate');
         if (!startDateStr) {
-            startDateStr = prompt("Enter your relationship starting date (YEAR-MM-DD):", "2024-01-01");
+            startDateStr = prompt("Enter your relationship starting date (YEAR-MONTH-DATE):", "2026-01-01");
             if (!startDateStr) startDateStr = "2024-01-01";
             localStorage.setItem('loveStartDate', startDateStr);
         }
@@ -309,7 +309,7 @@
     }
 
     function resetLoveDate() {
-        const newDate = prompt("Change relationship start date (YEAR-MM-DD):", localStorage.getItem('loveStartDate') || "2024-01-01");
+        const newDate = prompt("Change relationship start date (YEAR-MONTH-DATE):", localStorage.getItem('loveStartDate') || "2026-01-01");
         if (newDate) {
             localStorage.setItem('loveStartDate', newDate);
             updateLoveCounter();
@@ -328,7 +328,7 @@
             localStorage.setItem('specialLoveNote', newNote.trim());
             localStorage.setItem('noteAuthor', myUsername); // Note likhne wale ka naam save karo
             localStorage.setItem('noteShownState', 'false'); // Partner ke liye unread mark karo
-            alert("Special Note set successfully!");
+            alert("Special Love Note set successfully!");
         }
     }
 
