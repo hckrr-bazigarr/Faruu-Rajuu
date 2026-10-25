@@ -320,23 +320,25 @@
     window.addEventListener('DOMContentLoaded', updateLoveCounter);
     /* [🌟 HIGHLIGHT 🌟] END */
 
-    /* [🌟 HIGHLIGHT 🌟] START - Special Note Feature Logic */
+    /* [🌟 HIGHLIGHT 🌟] START - Special Note Feature Logic (Smart Partner Filter) */
     function setSpecialNote() {
         const currentNote = localStorage.getItem('specialLoveNote') || "";
         const newNote = prompt("Apna Naya Special Note / Greeting Likhein:", currentNote);
-        if (newNote !== null) {
+        if (newNote !== null && newNote.trim() !== "") {
             localStorage.setItem('specialLoveNote', newNote.trim());
-            localStorage.setItem('noteShownState', 'false'); // Mark as unread so it pops up
-            alert("Special Note set successfully! Ye ab ek baar popup mein dikhega.");
+            localStorage.setItem('noteAuthor', myUsername); // Note likhne wale ka naam save karo
+            localStorage.setItem('noteShownState', 'false'); // Partner ke liye unread mark karo
+            alert("Special Note set successfully! Ye ab sirf aapke partner ko ek baar popup mein dikhega.");
         }
     }
 
     function checkAndShowSpecialNote() {
         const note = localStorage.getItem('specialLoveNote');
         const shownState = localStorage.getItem('noteShownState');
+        const author = localStorage.getItem('noteAuthor');
         
-        // Agar note set hai aur abhi tak popup nahi dikhaya gaya
-        if (note && note.trim() !== "" && shownState !== 'true') {
+        // Popup tabhi aayega jab note ho, unread ho, AUR current user wo na ho jisne note likha hai!
+        if (note && note.trim() !== "" && shownState !== 'true' && author !== myUsername) {
             document.getElementById('noteModalText').innerText = note;
             document.getElementById('noteModal').style.display = 'flex';
         }
@@ -344,7 +346,7 @@
 
     function closeNoteModal() {
         document.getElementById('noteModal').style.display = 'none';
-        localStorage.setItem('noteShownState', 'true'); // Mark as shown so it doesn't repeat
+        localStorage.setItem('noteShownState', 'true'); // Read hone ke baad mark as shown
     }
     /* [🌟 HIGHLIGHT 🌟] END */
 
@@ -693,7 +695,7 @@
                     timestamp: new Date().toISOString()
                 };
 
-                socket.emit('chatMessage', msgData);
+                    socket.emit('chatMessage', msgData);
                 cancelReply();
             };
             img.src = e.target.result;
