@@ -55,7 +55,6 @@ io.on('connection', async (socket) => {
         broadcastOnlineUsers();
 
         try {
-            // Jaise hi koi doosra user online aaye, uske aane se pehle ke 'sent' messages ko 'delivered' kar do
             await Message.updateMany(
                 { user: { $ne: username }, status: 'sent' },
                 { status: 'delivered' }
@@ -161,7 +160,7 @@ io.on('connection', async (socket) => {
         }
     });
 
-    // STRICT WHATSAPP SEEN LOGIC: Sirf tabhi read hoga jab doosra user (jine message nahi bheja) chat kholega
+    // SEEN LOGIC: Jab doosra user chat kholega, toh uske alawa baki sabhi messages ko 'read' mark kar do
     socket.on('markAsRead', async (readerUsername) => {
         try {
             await Message.updateMany(
