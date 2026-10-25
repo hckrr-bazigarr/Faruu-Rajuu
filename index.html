@@ -50,7 +50,6 @@
         #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 8px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; background: rgba(255,255,255,0.9); color: #111; letter-spacing: 2px; }
         #unlockBtn { margin-top: 15px; padding: 10px 25px; background: #d81b60; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
 
-        /* [🌟 HIGHLIGHT 🌟] START - Special Note Popup Modal Style */
         #noteModal {
             display: none;
             position: fixed;
@@ -89,7 +88,6 @@
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(216, 27, 96, 0.3);
         }
-        /* [🌟 HIGHLIGHT 🌟] END */
 
         .chat-container { 
             width: 100%; 
@@ -124,10 +122,7 @@
         .header-actions { display: flex; align-items: center; gap: 6px; }
         .call-btn { background: #ff4081; color: white; border: none; padding: 6px 10px; border-radius: 50%; font-size: 14px; cursor: pointer; }
         .btn-name { background: #ad1457; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; flex-shrink: 0; font-weight: bold; }
-        
-        /* [🌟 HIGHLIGHT 🌟] START - Note Button Style */
         .btn-note { background: #ad1457; color: white; border: none; padding: 6px 8px; border-radius: 6px; font-size: 10px; cursor: pointer; flex-shrink: 0; font-weight: bold; }
-        /* [🌟 HIGHLIGHT 🌟] END */
 
         .chat-messages { 
             flex: 1; 
@@ -203,7 +198,6 @@
     <button type="button" id="unlockBtn" onclick="checkPasscode()">Unlock</button>
 </div>
 
-<!-- [🌟 HIGHLIGHT 🌟] START - Special Note Modal HTML -->
 <div id="noteModal">
     <div class="note-card">
         <h3>💖 Special Love Note 💖</h3>
@@ -211,7 +205,6 @@
         <button onclick="closeNoteModal()">Got it ❤️</button>
     </div>
 </div>
-<!-- [🌟 HIGHLIGHT 🌟] END -->
 
 <div id="callOverlay">
     <div class="call-user-info">
@@ -237,9 +230,7 @@
         </div>
         <div class="header-actions">
             <button class="call-btn" onclick="startCall()" title="Voice Call">📞</button>
-            <!-- [🌟 HIGHLIGHT 🌟] START - Note Button -->
             <button class="btn-note" onclick="setSpecialNote()" title="Set Special Note">NOTE</button>
-            <!-- [🌟 HIGHLIGHT 🌟] END -->
             <button class="btn-name" onclick="changeUsername()">NAME</button>
         </div>
     </div>
@@ -270,9 +261,10 @@
         if (!pinInput) return;
         if (pinInput.value.trim() === "7890") {
             if (overlay) { overlay.style.display = "none"; overlay.remove(); }
-            
-            // [🌟 HIGHLIGHT 🌟] Fetch note from server once unlocked
             socket.emit('getSpecialNote', myUsername);
+            
+            // Jaise hi unlock karke chat khulegi, tabhi markAsRead bhejenge taaki message 'read' (seen) ho
+            socket.emit('markAsRead', myUsername);
         } else {
             alert("Wrong Password");
         }
@@ -288,7 +280,6 @@
 
     socket.emit('userJoined', myUsername);
 
-    // [🌟 HIGHLIGHT 🌟] Real-time listeners for database synced notes
     socket.on('showSpecialNote', (data) => {
         if (data && data.note && data.author !== myUsername) {
             document.getElementById('noteModalText').innerText = data.note;
@@ -317,7 +308,6 @@
         socket.emit('markNoteAsSeen', myUsername);
     }
 
-    /* [🌟 HIGHLIGHT 🌟] START - Smart Days Together Logic */
     function updateLoveCounter() {
         let startDateStr = localStorage.getItem('loveStartDate');
         if (!startDateStr) {
@@ -349,7 +339,6 @@
 
     setInterval(updateLoveCounter, 1000 * 60 * 60); 
     window.addEventListener('DOMContentLoaded', updateLoveCounter);
-    /* [🌟 HIGHLIGHT 🌟] END */
 
     const chatBox = document.getElementById('chatBox');
     const msgInput = document.getElementById('msgInput');
@@ -572,7 +561,6 @@
 
     socket.on('onlineUsersList', (users) => {
         onlineCount.innerText = users && users.length > 0 ? `🟢 Online: ${users.join(', ')}` : `🟢 Online: 0`;
-        if (users && users.length > 1) socket.emit('markAsRead', myUsername);
     });
 
     socket.on('loadHistory', (messages) => {
@@ -581,13 +569,11 @@
             messages.forEach(msg => appendMessage(msg));
         }
         scrollToBottom();
-        socket.emit('markAsRead', myUsername);
     });
 
     socket.on('message', (data) => {
         appendMessage(data);
         scrollToBottom();
-        if (data.user !== myUsername) socket.emit('markAsRead', myUsername);
     });
 
     socket.on('messageReacted', (data) => {
@@ -595,9 +581,26 @@
         if (msgEl) updateReactionsUI(msgEl, data.reactions);
     });
 
+    // Jab delivered status update ho (jaise hi dusra user online aaye)
+    socket.on('messagesStatusUpdate', () => {
+        document.querySelectorAll('.msg-ticks').forEach(el => {
+            if (el.dataset.sender === myUsername && el.dataset.status === 'sent') {
+                el.dataset.status = 'delivered';
+                el.innerHTML = '✓✓';
+                el.style.color = '#fce4ec';
+            }
+        });
+    });
+
+    // Jab dusra user chat read kare (Seen)
     socket.on('messagesReadUpdate', () => {
         document.querySelectorAll('.msg-ticks').forEach(el => {
-            if (el.dataset.sender === myUsername) el.innerHTML = '<span style="color: #ffeb3b; font-weight: bold;">✓✓</span>';
+            if (el.dataset.sender === myUsername) {
+                el.dataset.status = 'read';
+                el.innerHTML = '✓✓';
+                el.style.color = '#ffeb3b';
+                el.style.fontWeight = 'bold';
+            }
         });
     });
 
@@ -744,9 +747,10 @@
 
         let ticksHTML = '';
         if (isMe && !isDeleted) {
-            let tickSymbol = '✓✓';
-            let tickColor = data.status === 'read' ? '#ffeb3b' : '#fce4ec';
-            ticksHTML = `<span class="msg-ticks" data-sender="${data.user}" style="color: ${tickColor}; font-weight: ${data.status === 'read' ? 'bold' : 'normal'};">${tickSymbol}</span>`;
+            let tickSymbol = (data.status === 'sent') ? '✓' : '✓✓';
+            let tickColor = (data.status === 'read') ? '#ffeb3b' : '#fce4ec';
+            let fontWeight = (data.status === 'read') ? 'bold' : 'normal';
+            ticksHTML = `<span class="msg-ticks" data-sender="${data.user}" data-status="${data.status}" style="color: ${tickColor}; font-weight: ${fontWeight};">${tickSymbol}</span>`;
         }
 
         let imageHTML = data.image ? `<div style="margin-bottom: 4px;"><img src="${data.image}" style="max-width: 100%; border-radius: 8px; max-height: 250px; object-fit: cover; display: block;" /></div>` : '';
