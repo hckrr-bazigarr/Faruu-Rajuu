@@ -55,11 +55,13 @@ io.on('connection', async (socket) => {
         broadcastOnlineUsers();
 
         try {
-            await Message.updateMany(
+            const result = await Message.updateMany(
                 { user: { $ne: username }, status: 'sent' },
                 { status: 'delivered' }
             );
-            io.emit('messagesStatusUpdate');
+            if (result.modifiedCount > 0) {
+                io.emit('messagesStatusUpdate');
+            }
         } catch (err) {
             console.log('Update delivered status error:', err);
         }
@@ -160,14 +162,18 @@ io.on('connection', async (socket) => {
         }
     });
 
-    // SEEN LOGIC: Jab doosra user chat kholega, toh uske alawa baki sabhi messages ko 'read' mark kar do
+    // STRICT SEEN LOGIC: Sirf tabhi read mark hoga aur update jayega jab doosra user unread messages padhega
     socket.on('markAsRead', async (readerUsername) => {
         try {
-            await Message.updateMany(
-                { user: { $ne: readerUsername }, status: { $ne: 'read' } },
-                { status: 'read' }
-            );
-            io.emit('messagesReadUpdate');
+            const unreadCount = await Message.countDocuments({ user: { $ne: readerUsername }, status: { $ne: 'read' } });
+            if (unreadCount > 0) {
+                await Message.updateMany(
+                    { user: { $ne: readerUsername }, status: { $ne: 'read' } },
+                    { status: 'read' }
+                );
+                // Bhej do ki is reader ne messages read kar liye hain
+                io.emit('messagesReadUpdate', { reader: readerUsername });
+            }
         } catch (err) {
             console.log('Mark read error:', err);
         }
