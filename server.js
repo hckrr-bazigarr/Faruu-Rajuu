@@ -6,7 +6,6 @@ const mongoose = require('mongoose');
 const app = express();
 const server = http.createServer(app);
 
-// Socket.io 10MB payload limit for photos
 const io = new Server(server, {
     maxHttpBufferSize: 10 * 1024 * 1024 
 });
@@ -26,7 +25,7 @@ const messageSchema = new mongoose.Schema({
     image: { type: String, default: '' },
     replyTo: { type: Object, default: null },
     edited: { type: Boolean, default: false },
-    status: { type: String, default: 'sent' }, // 'sent' (1 tick), 'delivered' (2 ticks), 'read' (blue/yellow ticks)
+    status: { type: String, default: 'sent' }, // 'sent', 'delivered', 'read'
     reactions: { type: Object, default: {} },
     timestamp: { type: Date, default: Date.now }
 });
@@ -55,8 +54,8 @@ io.on('connection', async (socket) => {
         activeUsers[socket.id] = username;
         broadcastOnlineUsers();
 
-        // Jaise hi koi user online aaye, uske aane se pehle ke 'sent' messages ko 'delivered' kar do agar wo dusra user hai
         try {
+            // Jaise hi koi doosra user online aaye, uske aane se pehle ke 'sent' messages ko 'delivered' kar do
             await Message.updateMany(
                 { user: { $ne: username }, status: 'sent' },
                 { status: 'delivered' }
@@ -119,10 +118,8 @@ io.on('connection', async (socket) => {
     socket.on('chatMessage', async (data) => {
         try {
             const uniqueNames = [...new Set(Object.values(activeUsers))];
-            // Check karo ki sender ke alawa koi aur user online hai ya nahi
             const otherUsersOnline = uniqueNames.filter(name => name !== data.user);
             
-            // Agar dusra user online hai toh 'delivered' (2 ticks), nahi toh 'sent' (1 tick)
             data.status = otherUsersOnline.length > 0 ? 'delivered' : 'sent';
             data.reactions = {};
 
@@ -164,7 +161,7 @@ io.on('connection', async (socket) => {
         }
     });
 
-    // Sirf tabhi 'read' hoga jab dusra user chat kholega aur explicitly markAsRead trigger karega
+    // STRICT WHATSAPP SEEN LOGIC: Sirf tabhi read hoga jab doosra user (jine message nahi bheja) chat kholega
     socket.on('markAsRead', async (readerUsername) => {
         try {
             await Message.updateMany(
