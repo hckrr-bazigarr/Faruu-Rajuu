@@ -41,4 +41,6 @@ A lightweight, modern, and feature-rich real-time live chat application inspired
    ```bash
    git clone [https://github.com/rajib02-bot/Faruu-Rajuu.git](https://github.com/rajib02-bot/Faruu-Rajuu.git)
    cd Faruu-Rajuu
+   npm install
+   node server.js
    
