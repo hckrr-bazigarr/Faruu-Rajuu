@@ -26,14 +26,13 @@ const messageSchema = new mongoose.Schema({
     image: { type: String, default: '' },
     replyTo: { type: Object, default: null },
     edited: { type: Boolean, default: false },
-    status: { type: String, default: 'sent' },
+    status: { type: String, default: 'sent' }, // 'sent' (1 tick), 'delivered' (2 ticks), 'read' (blue/yellow ticks)
     reactions: { type: Object, default: {} },
     timestamp: { type: Date, default: Date.now }
 });
 
 const Message = mongoose.model('Message', messageSchema);
 
-// [🌟 HIGHLIGHT 🌟] Special Note Schema for Database Sync
 const specialNoteSchema = new mongoose.Schema({
     id: { type: String, default: 'current_note', unique: true },
     note: { type: String, default: '' },
@@ -52,9 +51,20 @@ function broadcastOnlineUsers() {
 
 io.on('connection', async (socket) => {
 
-    socket.on('userJoined', (username) => {
+    socket.on('userJoined', async (username) => {
         activeUsers[socket.id] = username;
         broadcastOnlineUsers();
+
+        // Jaise hi koi user online aaye, uske aane se pehle ke 'sent' messages ko 'delivered' kar do agar wo dusra user hai
+        try {
+            await Message.updateMany(
+                { user: { $ne: username }, status: 'sent' },
+                { status: 'delivered' }
+            );
+            io.emit('messagesStatusUpdate');
+        } catch (err) {
+            console.log('Update delivered status error:', err);
+        }
     });
 
     socket.on('updateUsername', ({ oldName, newName }) => {
@@ -62,7 +72,6 @@ io.on('connection', async (socket) => {
         broadcastOnlineUsers();
     });
 
-    // [🌟 HIGHLIGHT 🌟] Check note when user connects/unlocks
     socket.on('getSpecialNote', async (username) => {
         try {
             let noteDoc = await SpecialNote.findOne({ id: 'current_note' });
@@ -76,7 +85,6 @@ io.on('connection', async (socket) => {
         }
     });
 
-    // [🌟 HIGHLIGHT 🌟] Set new note & reset seenBy
     socket.on('setSpecialNote', async ({ note, author }) => {
         try {
             await SpecialNote.findOneAndUpdate(
@@ -90,7 +98,6 @@ io.on('connection', async (socket) => {
         }
     });
 
-    // [🌟 HIGHLIGHT 🌟] Mark note as seen for user
     socket.on('markNoteAsSeen', async (username) => {
         try {
             await SpecialNote.findOneAndUpdate(
@@ -112,8 +119,10 @@ io.on('connection', async (socket) => {
     socket.on('chatMessage', async (data) => {
         try {
             const uniqueNames = [...new Set(Object.values(activeUsers))];
+            // Check karo ki sender ke alawa koi aur user online hai ya nahi
             const otherUsersOnline = uniqueNames.filter(name => name !== data.user);
             
+            // Agar dusra user online hai toh 'delivered' (2 ticks), nahi toh 'sent' (1 tick)
             data.status = otherUsersOnline.length > 0 ? 'delivered' : 'sent';
             data.reactions = {};
 
@@ -155,6 +164,7 @@ io.on('connection', async (socket) => {
         }
     });
 
+    // Sirf tabhi 'read' hoga jab dusra user chat kholega aur explicitly markAsRead trigger karega
     socket.on('markAsRead', async (readerUsername) => {
         try {
             await Message.updateMany(
@@ -219,4 +229,3 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
 });
-                                               
