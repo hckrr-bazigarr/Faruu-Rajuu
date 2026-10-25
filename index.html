@@ -263,7 +263,8 @@
             if (overlay) { overlay.style.display = "none"; overlay.remove(); }
             socket.emit('getSpecialNote', myUsername);
             
-            // NOTE: Yahan se markAsRead hata diya hai taaki khud refresh karne par message seen na ho!
+            // Jaise hi passcode unlock karke chat khulegi, markAsRead bhejenge taaki samne wale ke messages read ho jayein
+            socket.emit('markAsRead', myUsername);
         } else {
             alert("Wrong Password");
         }
@@ -561,7 +562,7 @@
     socket.on('onlineUsersList', (users) => {
         onlineCount.innerText = users && users.length > 0 ? `🟢 Online: ${users.join(', ')}` : `🟢 Online: 0`;
         
-        // Agar doosra user online hai aur humne chat khol rakhi hai, toh markAsRead bhej do
+        // Jaise hi doosra user online ho aur chat khuli ho, markAsRead bhej do
         if (users && users.length > 1) {
             socket.emit('markAsRead', myUsername);
         }
@@ -578,7 +579,7 @@
     socket.on('message', (data) => {
         appendMessage(data);
         scrollToBottom();
-        // Agar message kisi aur ne bheja hai aur hum chat par hain, toh read mark kar do
+        // Agar message kisi aur ne bheja hai, toh turant read mark kar do
         if (data.user !== myUsername) {
             socket.emit('markAsRead', myUsername);
         }
@@ -599,6 +600,7 @@
         });
     });
 
+    // SEEN UPDATE: Ab yahan se saare sent messages yellow double tick ho jayenge
     socket.on('messagesReadUpdate', () => {
         document.querySelectorAll('.msg-ticks').forEach(el => {
             if (el.dataset.sender === myUsername) {
