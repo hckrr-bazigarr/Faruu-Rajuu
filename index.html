@@ -290,7 +290,7 @@
     function updateLoveCounter() {
         let startDateStr = localStorage.getItem('loveStartDate');
         if (!startDateStr) {
-            startDateStr = prompt("Enter your relationship start date (YYYY-MM-DD):", "2024-01-01");
+            startDateStr = prompt("Enter your relationship starting date (YEAR-MM-DD):", "2024-01-01");
             if (!startDateStr) startDateStr = "2024-01-01";
             localStorage.setItem('loveStartDate', startDateStr);
         }
@@ -304,12 +304,12 @@
 
         const counterEl = document.getElementById('loveCounter');
         if (counterEl) {
-            counterEl.innerHTML = `⏳ ${diffDays} Days Together with ${partnerName} ❤️`;
+            counterEl.innerHTML = `⏳ ${diffDays} Days Together with ${partnerName} 💞`;
         }
     }
 
     function resetLoveDate() {
-        const newDate = prompt("Change relationship start date (YYYY-MM-DD):", localStorage.getItem('loveStartDate') || "2024-01-01");
+        const newDate = prompt("Change relationship start date (YEAR-MM-DD):", localStorage.getItem('loveStartDate') || "2024-01-01");
         if (newDate) {
             localStorage.setItem('loveStartDate', newDate);
             updateLoveCounter();
@@ -323,12 +323,12 @@
     /* [🌟 HIGHLIGHT 🌟] START - Special Note Feature Logic (Smart Partner Filter) */
     function setSpecialNote() {
         const currentNote = localStorage.getItem('specialLoveNote') || "";
-        const newNote = prompt("Apna Naya Special Note / Greeting Likhein:", currentNote);
+        const newNote = prompt("New Special Note:", currentNote);
         if (newNote !== null && newNote.trim() !== "") {
             localStorage.setItem('specialLoveNote', newNote.trim());
             localStorage.setItem('noteAuthor', myUsername); // Note likhne wale ka naam save karo
             localStorage.setItem('noteShownState', 'false'); // Partner ke liye unread mark karo
-            alert("Special Note set successfully! Ye ab sirf aapke partner ko ek baar popup mein dikhega.");
+            alert("Special Note set successfully!");
         }
     }
 
