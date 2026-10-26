@@ -135,6 +135,23 @@
             background: transparent;
             -webkit-overflow-scrolling: touch;
         }
+
+        .date-divider {
+            text-align: center;
+            margin: 10px 0;
+            z-index: 5;
+        }
+        .date-divider span {
+            background-color: rgba(255, 255, 255, 0.85);
+            color: #555;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
         
         .message-wrapper { display: flex; flex-direction: column; max-width: 80%; position: relative; cursor: pointer; margin-bottom: 4px; }
         .message-wrapper.sent { align-self: flex-end; }
@@ -262,8 +279,6 @@
         if (pinInput.value.trim() === "7890") {
             if (overlay) { overlay.style.display = "none"; overlay.remove(); }
             socket.emit('getSpecialNote', myUsername);
-            
-            // Jab tu passcode unlock karega, markAsRead bhejenge taaki samne wale ke messages read ho jayein
             socket.emit('markAsRead', myUsername);
         } else {
             alert("Wrong Password");
@@ -520,12 +535,10 @@
 
         if (isCallConnected && isInitiator && durationText !== "") {
             const callMsgData = {
-                id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
                 user: myUsername,
                 text: durationText,
                 image: '',
-                replyTo: null,
-                timestamp: new Date().toISOString()
+                replyTo: null
             };
             socket.emit('chatMessage', callMsgData);
         }
@@ -548,6 +561,19 @@
         return date.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
     }
 
+    function getDateLabel(dateStr) {
+        const date = dateStr ? new Date(dateStr) : new Date();
+        const today = new Date();
+        
+        const isToday = date.getDate() === today.getDate() &&
+                        date.getMonth() === today.getMonth() &&
+                        date.getFullYear() === today.getFullYear();
+                        
+        if (isToday) return "TODAY";
+        
+        return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
+    }
+
     function changeUsername() {
         const newName = prompt("Apna Naya Name Likhein:", myUsername);
         if (newName && newName.trim() !== "") {
@@ -563,8 +589,11 @@
         onlineCount.innerText = users && users.length > 0 ? `🟢 Online: ${users.join(', ')}` : `🟢 Online: 0`;
     });
 
+    let lastRenderedDate = null;
+
     socket.on('loadHistory', (messages) => {
-        chatBox.querySelectorAll('.message-wrapper').forEach(el => el.remove());
+        chatBox.querySelectorAll('.message-wrapper, .date-divider').forEach(el => el.remove());
+        lastRenderedDate = null;
         if (messages && messages.length > 0) {
             messages.forEach(msg => appendMessage(msg));
         }
@@ -574,7 +603,6 @@
     socket.on('message', (data) => {
         appendMessage(data);
         scrollToBottom();
-        // Agar message kisi aur ne bheja hai, toh read mark kar do
         if (data.user !== myUsername) {
             socket.emit('markAsRead', myUsername);
         }
@@ -595,7 +623,6 @@
         });
     });
 
-    // STRICT CHECK: Sirf tabhi yellow hoga jab SAMNE WALE ne read kiya ho (data.reader !== myUsername)
     socket.on('messagesReadUpdate', (data) => {
         if (!data || data.reader !== myUsername) {
             document.querySelectorAll('.msg-ticks').forEach(el => {
@@ -696,12 +723,10 @@
                 const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
 
                 const msgData = {
-                    id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
                     user: myUsername,
                     text: '',
                     image: compressedBase64,
-                    replyTo: selectedReply,
-                    timestamp: new Date().toISOString()
+                    replyTo: selectedReply
                 };
 
                 socket.emit('chatMessage', msgData);
@@ -715,6 +740,15 @@
 
     function appendMessage(data) {
         if (document.getElementById(data.id)) return;
+
+        const msgDateLabel = getDateLabel(data.timestamp || data.createdAt);
+        if (msgDateLabel !== lastRenderedDate) {
+            lastRenderedDate = msgDateLabel;
+            const divider = document.createElement('div');
+            divider.className = 'date-divider';
+            divider.innerHTML = `<span>${msgDateLabel}</span>`;
+            chatBox.insertBefore(divider, typingIndicator);
+        }
 
         const isMe = data.user === myUsername;
         const wrapper = document.createElement('div');
@@ -805,12 +839,10 @@
         if (text === "") return;
 
         const msgData = {
-            id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
             user: myUsername,
             text: text,
             image: '',
-            replyTo: selectedReply,
-            timestamp: new Date().toISOString()
+            replyTo: selectedReply
         };
 
         socket.emit('chatMessage', msgData);
