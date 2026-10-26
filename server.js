@@ -109,8 +109,9 @@ io.on('connection', async (socket) => {
         }
     });
 
+    // STRICT HISTORY SORTING FIX: Timestamp aur _id dono se ascending sort taaki latest msg hamesha last mein aaye
     try {
-        const history = await Message.find().read('primary').sort({ timestamp: 1, _id: 1 }).limit(1000);
+        const history = await Message.find().read('primary').sort({ timestamp: 1, _id: 1 }).limit(2000);
         socket.emit('loadHistory', history);
     } catch (err) {
         console.log('History load error:', err);
