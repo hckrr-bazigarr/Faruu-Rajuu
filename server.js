@@ -121,23 +121,23 @@ io.on('connection', async (socket) => {
             const uniqueNames = [...new Set(Object.values(activeUsers))];
             const otherUsersOnline = uniqueNames.filter(name => name !== data.user);
             
-            data.status = otherUsersOnline.length > 0 ? 'delivered' : 'sent';
-            data.reactions = {};
+            const msgStatus = otherUsersOnline.length > 0 ? 'delivered' : 'sent';
+            const uniqueMsgId = 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11) + '_' + Math.random().toString(36).substring(2, 7);
 
             const newMessage = new Message({
-                id: data.id,
+                id: uniqueMsgId,
                 user: data.user,
                 text: data.text || '',
                 image: data.image || '',
                 replyTo: data.replyTo || null,
                 edited: false,
-                status: data.status,
+                status: msgStatus,
                 reactions: {},
-                timestamp: data.timestamp ? new Date(data.timestamp) : new Date()
+                timestamp: new Date()
             });
 
             await newMessage.save();
-            io.emit('message', data);
+            io.emit('message', newMessage);
         } catch (err) {
             console.log('❌ MESSAGE SAVE ERROR:', err);
         }
@@ -162,7 +162,6 @@ io.on('connection', async (socket) => {
         }
     });
 
-    // STRICT SEEN LOGIC: Sirf tabhi read mark hoga aur update jayega jab doosra user unread messages padhega
     socket.on('markAsRead', async (readerUsername) => {
         try {
             const unreadCount = await Message.countDocuments({ user: { $ne: readerUsername }, status: { $ne: 'read' } });
@@ -171,7 +170,6 @@ io.on('connection', async (socket) => {
                     { user: { $ne: readerUsername }, status: { $ne: 'read' } },
                     { status: 'read' }
                 );
-                // Bhej do ki is reader ne messages read kar liye hain
                 io.emit('messagesReadUpdate', { reader: readerUsername });
             }
         } catch (err) {
