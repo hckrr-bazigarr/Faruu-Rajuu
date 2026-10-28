@@ -276,7 +276,7 @@
         const pinInput = document.getElementById('passcodeInput');
         const overlay = document.getElementById('passcodeOverlay');
         if (!pinInput) return;
-        if (pinInput.value.trim() === "7890") {
+        if (pinInput.value.trim() === "1011") {
             if (overlay) { overlay.style.display = "none"; overlay.remove(); }
             socket.emit('getSpecialNote', myUsername);
             socket.emit('markAsRead', myUsername);
