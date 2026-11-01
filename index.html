@@ -276,7 +276,7 @@
         const pinInput = document.getElementById('passcodeInput');
         const overlay = document.getElementById('passcodeOverlay');
         if (!pinInput) return;
-        if (pinInput.value.trim() === "1011") {
+        if (pinInput.value.trim() === "7890") {
             if (overlay) { overlay.style.display = "none"; overlay.remove(); }
             socket.emit('getSpecialNote', myUsername);
             socket.emit('markAsRead', myUsername);
@@ -739,6 +739,7 @@
     }
 
     function appendMessage(data) {
+        if (!data || !data.id) return;
         if (document.getElementById(data.id)) return;
 
         const msgDateLabel = getDateLabel(data.timestamp || data.createdAt);
