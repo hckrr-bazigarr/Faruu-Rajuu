@@ -109,10 +109,23 @@ io.on('connection', async (socket) => {
         }
     });
 
-    // ALL MESSAGES LOAD FIX: Saare messages bina kisi limit ke load honge taaki purane messages upar scroll karne par hamesha dikhen
+    // WHATSAPP STYLE HYBRID LOAD: 
+    // 1. Pehle fatak se last ke 70 messages bhej do taaki app instant khule.
+    // 2. Turant baad background mein saare purane messages bhi bhej do taaki upar scroll karne par sab mil jaye!
     try {
-        const history = await Message.find().read('primary').sort({ timestamp: 1, _id: 1 });
-        socket.emit('loadHistory', history);
+        const allMessages = await Message.find().read('primary').sort({ timestamp: 1, _id: 1 });
+        
+        if (allMessages.length > 70) {
+            const recentMessages = allMessages.slice(-70);
+            socket.emit('loadHistory', recentMessages);
+            
+            // Background sync baki messages ke liye
+            setTimeout(() => {
+                socket.emit('loadHistory', allMessages);
+            }, 800);
+        } else {
+            socket.emit('loadHistory', allMessages);
+        }
     } catch (err) {
         console.log('History load error:', err);
     }
