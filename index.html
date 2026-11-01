@@ -38,7 +38,7 @@
             justify-content: center; align-items: center; padding: 20px;
         }
         .note-card, .scratch-card {
-            background: #fff; width: 100%; max-width: 320px; padding: 24px 20px;
+            background: #fff; width: 100%; max-width: 340px; padding: 24px 20px;
             border-radius: 16px; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.3);
             border: 2px solid #f8bbd0; animation: popIn 0.3s ease-out;
         }
@@ -54,14 +54,16 @@
             box-shadow: 0 4px 10px rgba(216, 27, 96, 0.3);
         }
 
-        /* SCRATCH CANVAS CONTAINER */
+        /* SCRATCH CARD CONTAINER - Bada aur Scrollable */
         .scratch-container {
-            position: relative; width: 260px; height: 120px; margin: 0 auto 20px auto;
-            border-radius: 12px; overflow: hidden; background: #ffebee;
+            position: relative; width: 290px; height: 180px; margin: 0 auto 20px auto;
+            border-radius: 12px; overflow-y: auto; overflow-x: hidden; background: #ffebee;
             display: flex; align-items: center; justify-content: center; border: 2px dashed #d81b60;
+            padding: 10px;
+            -webkit-overflow-scrolling: touch;
         }
-        .scratch-text { font-size: 16px; font-weight: bold; color: #d81b60; padding: 10px; word-break: break-word; }
-        canvas#scratchCanvas { position: absolute; top: 0; left: 0; cursor: pointer; touch-action: none; }
+        .scratch-text { font-size: 15px; font-weight: 500; color: #d81b60; padding: 15px; word-break: break-word; line-height: 22px; text-align: center; }
+        canvas#scratchCanvas { position: absolute; top: 0; left: 0; cursor: pointer; touch-action: none; z-index: 5; }
 
         .chat-container { 
             width: 100%; max-width: 450px; height: 100vh; height: 100dvh; margin: 0 auto;
@@ -165,7 +167,7 @@
         <h3>🎁 Secret Scratch Card 🎁</h3>
         <div class="scratch-container">
             <div class="scratch-text" id="scratchModalText">Loading...</div>
-            <canvas id="scratchCanvas" width="260" height="120"></canvas>
+            <canvas id="scratchCanvas" width="270" height="160"></canvas>
         </div>
         <button onclick="closeScratchModal()">Close ❤️</button>
     </div>
@@ -225,7 +227,7 @@
         const pinInput = document.getElementById('passcodeInput');
         const overlay = document.getElementById('passcodeOverlay');
         if (!pinInput) return;
-        if (pinInput.value.trim() === "1011") {
+        if (pinInput.value.trim() === "7890") {
             if (overlay) { overlay.style.display = "none"; overlay.remove(); }
             socket.emit('getSpecialNote', myUsername);
             socket.emit('markAsRead', myUsername);
@@ -322,7 +324,7 @@
             
             ctx.globalCompositeOperation = 'destination-out';
             ctx.beginPath();
-            ctx.arc(x, y, 20, 0, Math.PI * 2, false);
+            ctx.arc(x, y, 22, 0, Math.PI * 2, false);
             ctx.fill();
         }
 
