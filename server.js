@@ -109,12 +109,9 @@ io.on('connection', async (socket) => {
         }
     });
 
-    // INSTANT LOAD FIX: Passcode khulte hi shuru mein latest 200 messages load honge taaki koi delay na ho[span_2](start_span)[span_2](end_span)
+    // ALL MESSAGES LOAD FIX: Saare messages bina kisi limit ke load honge taaki purane messages upar scroll karne par hamesha dikhen
     try {
-        const totalMessages = await Message.countDocuments();
-        const skipCount = totalMessages > 200 ? totalMessages - 200 : 0;
-        
-        const history = await Message.find().read('primary').sort({ timestamp: 1, _id: 1 }).skip(skipCount);
+        const history = await Message.find().read('primary').sort({ timestamp: 1, _id: 1 });
         socket.emit('loadHistory', history);
     } catch (err) {
         console.log('History load error:', err);
