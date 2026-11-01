@@ -25,7 +25,7 @@ const messageSchema = new mongoose.Schema({
     image: { type: String, default: '' },
     replyTo: { type: Object, default: null },
     edited: { type: Boolean, default: false },
-    status: { type: String, default: 'sent' }, // 'sent', 'delivered', 'read'
+    status: { type: String, default: 'sent' },
     reactions: { type: Object, default: {} },
     timestamp: { type: Date, default: Date.now }
 });
@@ -38,8 +38,16 @@ const specialNoteSchema = new mongoose.Schema({
     author: { type: String, default: '' },
     seenBy: { type: [String], default: [] }
 });
-
 const SpecialNote = mongoose.model('SpecialNote', specialNoteSchema);
+
+// SCRATCH CARD SCHEMA
+const scratchCardSchema = new mongoose.Schema({
+    id: { type: String, default: 'current_scratch', unique: true },
+    message: { type: String, default: '' },
+    author: { type: String, default: '' },
+    scratchedBy: { type: [String], default: [] }
+});
+const ScratchCard = mongoose.model('ScratchCard', scratchCardSchema);
 
 const activeUsers = {};
 
@@ -80,6 +88,14 @@ io.on('connection', async (socket) => {
                     socket.emit('showSpecialNote', { note: noteDoc.note, author: noteDoc.author });
                 }
             }
+
+            // Check Scratch Card
+            let scratchDoc = await ScratchCard.findOne({ id: 'current_scratch' });
+            if (scratchDoc && scratchDoc.message) {
+                if (scratchDoc.author !== username && !scratchDoc.scratchedBy.includes(username)) {
+                    socket.emit('showScratchCard', { message: scratchDoc.message, author: scratchDoc.author });
+                }
+            }
         } catch (err) {
             console.log('Get note error:', err);
         }
@@ -109,17 +125,37 @@ io.on('connection', async (socket) => {
         }
     });
 
-    // WHATSAPP STYLE HYBRID LOAD: 
-    // 1. Pehle fatak se last ke 70 messages bhej do taaki app instant khule.
-    // 2. Turant baad background mein saare purane messages bhi bhej do taaki upar scroll karne par sab mil jaye!
+    // SCRATCH CARD EVENTS
+    socket.on('setScratchCard', async ({ message, author }) => {
+        try {
+            await ScratchCard.findOneAndUpdate(
+                { id: 'current_scratch' },
+                { message: message, author: author, scratchedBy: [] },
+                { upsert: true, new: true }
+            );
+            socket.broadcast.emit('notifyNewScratchCard', { message, author });
+        } catch (err) {
+            console.log('Set scratch error:', err);
+        }
+    });
+
+    socket.on('markScratchAsSeen', async (username) => {
+        try {
+            await ScratchCard.findOneAndUpdate(
+                { id: 'current_scratch' },
+                { $addToSet: { scratchedBy: username } }
+            );
+        } catch (err) {
+            console.log('Mark scratch seen error:', err);
+        }
+    });
+
     try {
         const allMessages = await Message.find().read('primary').sort({ timestamp: 1, _id: 1 });
         
         if (allMessages.length > 70) {
             const recentMessages = allMessages.slice(-70);
             socket.emit('loadHistory', recentMessages);
-            
-            // Background sync baki messages ke liye
             setTimeout(() => {
                 socket.emit('loadHistory', allMessages);
             }, 800);
