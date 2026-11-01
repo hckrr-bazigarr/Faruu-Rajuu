@@ -17,140 +17,84 @@
 
         #passcodeOverlay { 
             position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
+            top: 0; left: 0; width: 100%; height: 100%; 
             background: url('hacker.jpg') no-repeat center center fixed; 
             background-size: cover; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            z-index: 99999; 
-            color: white; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            z-index: 99999; color: white; 
         }
-
         #passcodeOverlay::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 1;
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); z-index: 1;
         }
-
-        #passcodeOverlay h2, 
-        #passcodeOverlay input, 
-        #passcodeOverlay button {
-            position: relative;
-            z-index: 2;
-        }
-
+        #passcodeOverlay h2, #passcodeOverlay input, #passcodeOverlay button { position: relative; z-index: 2; }
         #passcodeOverlay h2 { text-shadow: 0 2px 4px rgba(0,0,0,0.8); font-weight: 700; margin-bottom: 10px; }
         #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 8px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; background: rgba(255,255,255,0.9); color: #111; letter-spacing: 2px; }
         #unlockBtn { margin-top: 15px; padding: 10px 25px; background: #d81b60; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
 
-        #noteModal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 99998;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+        #noteModal, #scratchModal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); z-index: 99998;
+            justify-content: center; align-items: center; padding: 20px;
         }
-        .note-card {
-            background: #fff;
-            width: 100%;
-            max-width: 320px;
-            padding: 24px 20px;
-            border-radius: 16px;
-            text-align: center;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-            border: 2px solid #f8bbd0;
-            animation: popIn 0.3s ease-out;
+        .note-card, .scratch-card {
+            background: #fff; width: 100%; max-width: 320px; padding: 24px 20px;
+            border-radius: 16px; text-align: center; box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 2px solid #f8bbd0; animation: popIn 0.3s ease-out;
         }
         @keyframes popIn {
             0% { transform: scale(0.8); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
-        .note-card h3 { color: #d81b60; font-size: 18px; margin-bottom: 12px; }
-        .note-card p { color: #333; font-size: 15px; line-height: 22px; margin-bottom: 20px; word-break: break-word; }
-        .note-card button {
-            background: #d81b60;
-            color: white;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 25px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
+        .note-card h3, .scratch-card h3 { color: #d81b60; font-size: 18px; margin-bottom: 12px; }
+        .note-card p, .scratch-card p { color: #333; font-size: 15px; line-height: 22px; margin-bottom: 20px; word-break: break-word; }
+        .note-card button, .scratch-card button {
+            background: #d81b60; color: white; border: none; padding: 10px 24px;
+            border-radius: 25px; font-size: 14px; font-weight: bold; cursor: pointer;
             box-shadow: 0 4px 10px rgba(216, 27, 96, 0.3);
         }
 
+        /* SCRATCH CANVAS CONTAINER */
+        .scratch-container {
+            position: relative; width: 260px; height: 120px; margin: 0 auto 20px auto;
+            border-radius: 12px; overflow: hidden; background: #ffebee;
+            display: flex; align-items: center; justify-content: center; border: 2px dashed #d81b60;
+        }
+        .scratch-text { font-size: 16px; font-weight: bold; color: #d81b60; padding: 10px; word-break: break-word; }
+        canvas#scratchCanvas { position: absolute; top: 0; left: 0; cursor: pointer; touch-action: none; }
+
         .chat-container { 
-            width: 100%; 
-            max-width: 450px; 
-            height: 100vh; 
-            height: 100dvh; 
-            margin: 0 auto;
+            width: 100%; max-width: 450px; height: 100vh; height: 100dvh; margin: 0 auto;
             background: linear-gradient(135deg, #ffe6eb 0%, #ffc2d1 100%); 
-            display: flex; 
-            flex-direction: column; 
-            position: relative; 
-            overflow: hidden; 
+            display: flex; flex-direction: column; position: relative; overflow: hidden; 
         }
         
         .chat-header { 
-            background-color: #d81b60; 
-            color: white; 
-            padding: 10px 16px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2); 
-            z-index: 10; 
-            flex-shrink: 0; 
+            background-color: #d81b60; color: white; padding: 10px 14px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2); z-index: 10; flex-shrink: 0; 
         }
-        .chat-header h2 { font-size: 16px; font-weight: 600; }
-        .online-status { font-size: 11px; color: #ffeb3b; margin-top: 2px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        
+        .chat-header h2 { font-size: 15px; font-weight: 600; }
+        .online-status { font-size: 11px; color: #ffeb3b; margin-top: 2px; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .love-counter { font-size: 11px; color: #ffebee; margin-top: 3px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 4px; }
-        .love-counter:hover { text-decoration: underline; }
 
-        .header-actions { display: flex; align-items: center; gap: 6px; }
-        .call-btn { background: #ff4081; color: white; border: none; padding: 6px 10px; border-radius: 50%; font-size: 14px; cursor: pointer; }
-        .btn-name { background: #ad1457; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; flex-shrink: 0; font-weight: bold; }
-        .btn-note { background: #ad1457; color: white; border: none; padding: 6px 8px; border-radius: 6px; font-size: 10px; cursor: pointer; flex-shrink: 0; font-weight: bold; }
+        .header-actions { display: flex; align-items: center; gap: 4px; }
+        .call-btn { background: #ff4081; color: white; border: none; padding: 6px 9px; border-radius: 50%; font-size: 13px; cursor: pointer; }
+        .btn-name { background: #ad1457; color: white; border: none; padding: 5px 8px; border-radius: 6px; font-size: 10px; cursor: pointer; font-weight: bold; }
+        .btn-note { background: #ad1457; color: white; border: none; padding: 5px 7px; border-radius: 6px; font-size: 9px; cursor: pointer; font-weight: bold; }
+        .btn-scratch { background: #ff8f00; color: white; border: none; padding: 5px 7px; border-radius: 6px; font-size: 9px; cursor: pointer; font-weight: bold; }
 
         .chat-messages { 
-            flex: 1; 
-            min-height: 0;
-            padding: 12px; 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 8px; 
-            background: transparent;
+            flex: 1; min-height: 0; padding: 12px; overflow-y: auto; 
+            display: flex; flex-direction: column; gap: 8px; background: transparent;
             -webkit-overflow-scrolling: touch;
         }
 
-        .date-divider {
-            text-align: center;
-            margin: 10px 0;
-            z-index: 5;
-        }
+        .date-divider { text-align: center; margin: 10px 0; z-index: 5; }
         .date-divider span {
-            background-color: rgba(255, 255, 255, 0.85);
-            color: #555;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 6px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            background-color: rgba(255, 255, 255, 0.85); color: #555; font-size: 11px; font-weight: 600;
+            padding: 4px 10px; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            text-transform: uppercase; letter-spacing: 0.5px;
         }
         
         .message-wrapper { display: flex; flex-direction: column; max-width: 80%; position: relative; cursor: pointer; margin-bottom: 4px; }
@@ -182,14 +126,7 @@
         .reply-bar button { background: none; border: none; font-size: 14px; cursor: pointer; color: #667781; }
 
         .chat-input-area { 
-            background: #fce4ec; 
-            padding: 8px 10px; 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            flex-shrink: 0; 
-            z-index: 10;
-            border-top: 1px solid #f8bbd0;
+            background: #fce4ec; padding: 8px 10px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; z-index: 10; border-top: 1px solid #f8bbd0;
         }
         .attach-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #d81b60; padding: 0 4px; flex-shrink: 0; }
         .chat-input-area input { flex: 1; border: none; padding: 10px 14px; border-radius: 20px; outline: none; font-size: 14px; background: white; }
@@ -223,6 +160,17 @@
     </div>
 </div>
 
+<div id="scratchModal">
+    <div class="scratch-card">
+        <h3>🎁 Secret Scratch Card 🎁</h3>
+        <div class="scratch-container">
+            <div class="scratch-text" id="scratchModalText">Loading...</div>
+            <canvas id="scratchCanvas" width="260" height="120"></canvas>
+        </div>
+        <button onclick="closeScratchModal()">Close ❤️</button>
+    </div>
+</div>
+
 <div id="callOverlay">
     <div class="call-user-info">
         <div class="call-avatar">📞</div>
@@ -247,6 +195,7 @@
         </div>
         <div class="header-actions">
             <button class="call-btn" onclick="startCall()" title="Voice Call">📞</button>
+            <button class="btn-scratch" onclick="setScratchCard()" title="Set Scratch Card">SCRATCH</button>
             <button class="btn-note" onclick="setSpecialNote()" title="Set Special Note">NOTE</button>
             <button class="btn-name" onclick="changeUsername()">NAME</button>
         </div>
@@ -295,6 +244,7 @@
 
     socket.emit('userJoined', myUsername);
 
+    // SPECIAL NOTE LISTENERS
     socket.on('showSpecialNote', (data) => {
         if (data && data.note && data.author !== myUsername) {
             document.getElementById('noteModalText').innerText = data.note;
@@ -310,17 +260,84 @@
     });
 
     function setSpecialNote() {
-        const newNote = prompt("New Special Note:", "");
+        const newNote = prompt("New Special Love Note:", "");
         if (newNote !== null && newNote.trim() !== "") {
             const noteText = newNote.trim();
             socket.emit('setSpecialNote', { note: noteText, author: myUsername });
-            alert("Special Love Note set successfully!");
+            alert("Special Love Note set successfully! ❤️");
         }
     }
 
     function closeNoteModal() {
         document.getElementById('noteModal').style.display = 'none';
         socket.emit('markNoteAsSeen', myUsername);
+    }
+
+    // SCRATCH CARD LISTENERS & CANVAS LOGIC
+    socket.on('showScratchCard', (data) => {
+        if (data && data.message && data.author !== myUsername) {
+            initScratchCard(data.message);
+        }
+    });
+
+    socket.on('notifyNewScratchCard', (data) => {
+        if (data && data.message && data.author !== myUsername) {
+            initScratchCard(data.message);
+        }
+    });
+
+    function setScratchCard() {
+        const newScratch = prompt("Enter Secret Scratch Card Message:", "");
+        if (newScratch !== null && newScratch.trim() !== "") {
+            const scratchText = newScratch.trim();
+            socket.emit('setScratchCard', { message: scratchText, author: myUsername });
+            alert("Secret Scratch Card set successfully! 🎁");
+        }
+    }
+
+    function initScratchCard(msg) {
+        document.getElementById('scratchModalText').innerText = msg;
+        document.getElementById('scratchModal').style.display = 'flex';
+        
+        const canvas = document.getElementById('scratchCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Draw silver scratch layer
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.fillStyle = '#b0bec5';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = '#37474f';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('✨ Scratch Here ✨', canvas.width / 2, canvas.height / 2 + 5);
+
+        let isDrawing = false;
+
+        function scratch(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - rect.left;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+            
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(x, y, 20, 0, Math.PI * 2, false);
+            ctx.fill();
+        }
+
+        canvas.onmousedown = () => isDrawing = true;
+        canvas.onmousemove = scratch;
+        window.onmouseup = () => isDrawing = false;
+
+        canvas.ontouchstart = () => isDrawing = true;
+        canvas.ontouchmove = scratch;
+        canvas.ontouchend = () => isDrawing = false;
+    }
+
+    function closeScratchModal() {
+        document.getElementById('scratchModal').style.display = 'none';
+        socket.emit('markScratchAsSeen', myUsername);
     }
 
     function updateLoveCounter() {
@@ -410,11 +427,7 @@
     function toggleSpeaker() {
         isSpeakerOn = !isSpeakerOn;
         speakerBtn.classList.toggle('active', isSpeakerOn);
-        if (isSpeakerOn) {
-            remoteAudio.volume = 1.0; 
-        } else {
-            remoteAudio.volume = 0.35; 
-        }
+        remoteAudio.volume = isSpeakerOn ? 1.0 : 0.35;
     }
 
     function startTimer() {
@@ -496,9 +509,7 @@
         if (peerConnection) { try { await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)); } catch (e) {} }
     });
 
-    socket.on('callEnded', () => {
-        cleanupCall(false);
-    });
+    socket.on('callEnded', () => { cleanupCall(false); });
 
     function endCall() { 
         socket.emit('endCall'); 
@@ -510,11 +521,7 @@
         if (isCallConnected) {
             let mins = Math.floor(secondsElapsed / 60);
             let secs = secondsElapsed % 60;
-            if (mins > 0) {
-                durationText = `📞 Voice Call (${mins} min ${secs} sec)`;
-            } else {
-                durationText = `📞 Voice Call (${secs} sec)`;
-            }
+            durationText = mins > 0 ? `📞 Voice Call (${mins} min ${secs} sec)` : `📞 Voice Call (${secs} sec)`;
         } else {
             durationText = `📞 Missed / Cancelled Call`;
         }
@@ -524,23 +531,11 @@
         isSpeakerOn = false;
         speakerBtn.classList.remove('active');
 
-        if (peerConnection) { 
-            peerConnection.close(); 
-            peerConnection = null; 
-        }
-        if (localStream) { 
-            localStream.getTracks().forEach(t => t.stop()); 
-            localStream = null; 
-        }
+        if (peerConnection) { peerConnection.close(); peerConnection = null; }
+        if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
 
         if (isCallConnected && isInitiator && durationText !== "") {
-            const callMsgData = {
-                user: myUsername,
-                text: durationText,
-                image: '',
-                replyTo: null
-            };
-            socket.emit('chatMessage', callMsgData);
+            socket.emit('chatMessage', { user: myUsername, text: durationText, image: '', replyTo: null });
         }
 
         isCallConnected = false;
@@ -564,23 +559,17 @@
     function getDateLabel(dateStr) {
         const date = dateStr ? new Date(dateStr) : new Date();
         const today = new Date();
-        
-        const isToday = date.getDate() === today.getDate() &&
-                        date.getMonth() === today.getMonth() &&
-                        date.getFullYear() === today.getFullYear();
-                        
+        const isToday = date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
         if (isToday) return "TODAY";
-        
         return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
     }
 
     function changeUsername() {
         const newName = prompt("Apna Naya Name Likhein:", myUsername);
         if (newName && newName.trim() !== "") {
-            const oldName = myUsername;
             myUsername = newName.trim();
             localStorage.setItem('chatUsername', myUsername);
-            socket.emit('updateUsername', { oldName, newName: myUsername });
+            socket.emit('updateUsername', { oldName: myUsername, newName: myUsername });
             location.reload();
         }
     }
@@ -699,20 +688,13 @@
                 const canvas = document.createElement('canvas');
                 let width = img.width;
                 let height = img.height;
-                
                 const MAX_WIDTH = 700;
                 const MAX_HEIGHT = 700;
                 
                 if (width > height) {
-                    if (width > MAX_WIDTH) {
-                        height *= MAX_WIDTH / width;
-                        width = MAX_WIDTH;
-                    }
+                    if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
                 } else {
-                    if (height > MAX_HEIGHT) {
-                        width *= MAX_HEIGHT / height;
-                        height = MAX_HEIGHT;
-                    }
+                    if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
                 }
 
                 canvas.width = width;
@@ -721,15 +703,7 @@
                 ctx.drawImage(img, 0, 0, width, height);
 
                 const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
-
-                const msgData = {
-                    user: myUsername,
-                    text: '',
-                    image: compressedBase64,
-                    replyTo: selectedReply
-                };
-
-                socket.emit('chatMessage', msgData);
+                socket.emit('chatMessage', { user: myUsername, text: '', image: compressedBase64, replyTo: selectedReply });
                 cancelReply();
             };
             img.src = e.target.result;
@@ -838,15 +812,7 @@
     function sendMessage() {
         const text = msgInput.value.trim();
         if (text === "") return;
-
-        const msgData = {
-            user: myUsername,
-            text: text,
-            image: '',
-            replyTo: selectedReply
-        };
-
-        socket.emit('chatMessage', msgData);
+        socket.emit('chatMessage', { user: myUsername, text: text, image: '', replyTo: selectedReply });
         msgInput.value = '';
         cancelReply();
         socket.emit('stopTyping');
