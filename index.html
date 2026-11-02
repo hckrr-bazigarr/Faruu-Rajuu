@@ -32,18 +32,20 @@
         #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 8px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; background: rgba(255,255,255,0.9); color: #111; letter-spacing: 2px; }
         #unlockBtn { margin-top: 15px; padding: 10px 25px; background: #d81b60; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
 
-        /* 🌟 HEART BURST ANIMATION STYLES */
-        .burst-heart {
+        /* 🌟 ACCESS GRANTED VIDEO OVERLAY STYLES */
+        #videoOverlay {
+            display: none;
             position: fixed;
-            font-size: 24px;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
             z-index: 100000;
-            animation: burstAnim 1.2s ease-out forwards;
-            pointer-events: none;
-            user-select: none;
+            justify-content: center;
+            align-items: center;
         }
-        @keyframes burstAnim {
-            0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
-            100% { transform: translate(var(--dx), var(--dy)) scale(1.6); opacity: 0; }
+        #videoOverlay video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         #noteModal, #scratchModal {
@@ -171,6 +173,13 @@
     </div>
 </div>
 
+<!-- 🌟 VIDEO OVERLAY WITH SOUND -->
+<div id="videoOverlay">
+    <video id="unlockVideo" playsinline>
+        <source src="unlock.mp4" type="video/mp4">
+    </video>
+</div>
+
 <div id="noteModal">
     <div class="note-card">
         <h3>💖 Special Love Note 💖</h3>
@@ -243,58 +252,39 @@
     function checkPasscode() {
         const pinInput = document.getElementById('passcodeInput');
         const overlay = document.getElementById('passcodeOverlay');
+        const videoOverlay = document.getElementById('videoOverlay');
+        const unlockVideo = document.getElementById('unlockVideo');
         if (!pinInput) return;
         
-        if (pinInput.value.trim() === "1011") {
-            // 🌟 Trigger Heart Burst Animation
-            playHeartBurstAnimation();
+        if (pinInput.value.trim() === "7890") {
+            if (overlay) overlay.style.display = "none";
+            videoOverlay.style.display = "flex";
+            
+            // Play video with sound enabled
+            unlockVideo.muted = false;
+            unlockVideo.play().catch(e => {
+                console.log("Autoplay error:", e);
+                finishUnlock();
+            });
 
-            // Smooth fade out and open chat after animation
-            setTimeout(() => {
-                if (overlay) { 
-                    overlay.style.transition = "opacity 0.5s ease";
-                    overlay.style.opacity = "0";
-                    setTimeout(() => {
-                        overlay.style.display = "none"; 
-                        overlay.remove();
-                    }, 500);
-                }
-                socket.emit('getSpecialNote', myUsername);
-                socket.emit('markAsRead', myUsername);
-            }, 800);
+            // When video finishes, enter the chat
+            unlockVideo.onended = function() {
+                finishUnlock();
+            };
 
         } else {
             alert("Wrong Password");
         }
     }
 
-    // 🌟 Heart Burst Animation Logic
-    function playHeartBurstAnimation() {
-        const hearts = ['❤️', '💖', '💘', '💕', '💓', '✨'];
-        const centerX = window.innerWidth / 2;
-        const centerY = window.innerHeight / 2;
-
-        for (let i = 0; i < 25; i++) {
-            const heart = document.createElement('div');
-            heart.className = 'burst-heart';
-            heart.innerText = hearts[Math.floor(Math.random() * hearts.length)];
-            
-            const angle = Math.random() * Math.PI * 2;
-            const distance = 100 + Math.random() * 200;
-            const dx = Math.cos(angle) * distance;
-            const dy = Math.sin(angle) * distance;
-
-            heart.style.left = centerX + 'px';
-            heart.style.top = centerY + 'px';
-            heart.style.setProperty('--dx', dx + 'px');
-            heart.style.setProperty('--dy', dy + 'px');
-
-            document.body.appendChild(heart);
-
-            setTimeout(() => {
-                heart.remove();
-            }, 1200);
-        }
+    function finishUnlock() {
+        const videoOverlay = document.getElementById('videoOverlay');
+        const overlay = document.getElementById('passcodeOverlay');
+        if (videoOverlay) videoOverlay.style.display = "none";
+        if (overlay) overlay.remove();
+        
+        socket.emit('getSpecialNote', myUsername);
+        socket.emit('markAsRead', myUsername);
     }
 
     function handlePinKey(e) {
