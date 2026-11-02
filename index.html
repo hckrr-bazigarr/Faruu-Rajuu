@@ -27,10 +27,24 @@
             content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.6); z-index: 1;
         }
-        #passcodeOverlay h2, #passcodeOverlay input, #passcodeOverlay button { position: relative; z-index: 2; }
+        #passcodeOverlay h2, #passcodeOverlay input, #passcodeOverlay button, #passcodeOverlay .overlay-text { position: relative; z-index: 2; }
         #passcodeOverlay h2 { text-shadow: 0 2px 4px rgba(0,0,0,0.8); font-weight: 700; margin-bottom: 10px; }
         #passcodeOverlay input { padding: 12px; font-size: 18px; border-radius: 8px; border: none; text-align: center; width: 200px; margin-top: 15px; outline: none; background: rgba(255,255,255,0.9); color: #111; letter-spacing: 2px; }
         #unlockBtn { margin-top: 15px; padding: 10px 25px; background: #d81b60; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+
+        /* 🌟 HEART BURST ANIMATION STYLES */
+        .burst-heart {
+            position: fixed;
+            font-size: 24px;
+            z-index: 100000;
+            animation: burstAnim 1.2s ease-out forwards;
+            pointer-events: none;
+            user-select: none;
+        }
+        @keyframes burstAnim {
+            0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+            100% { transform: translate(var(--dx), var(--dy)) scale(1.6); opacity: 0; }
+        }
 
         #noteModal, #scratchModal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -54,7 +68,6 @@
             box-shadow: 0 4px 10px rgba(216, 27, 96, 0.3);
         }
 
-        /* SCRATCH CARD CONTAINER - Bada aur Scrollable */
         .scratch-container {
             position: relative; width: 290px; height: 180px; margin: 0 auto 20px auto;
             border-radius: 12px; overflow-y: auto; overflow-x: hidden; background: #ffebee;
@@ -152,8 +165,6 @@
     <h2>Enter Password</h2>
     <input type="password" id="passcodeInput" placeholder="ENTER PIN" onkeypress="handlePinKey(event)" autocomplete="off" />
     <button type="button" id="unlockBtn" onclick="checkPasscode()">Unlock</button>
-    
-    <!-- 👇 YE RAHI WAHI LINE JO TUNE BOLI THI, UNLOCK BUTTON KE NICHE BLACK JAGAH PAR -->
     <div class="overlay-text" style="margin-top: 20px; text-align: center; padding: 0 20px;">
         <p style="font-size: 14px; color: #ff80ab; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.9); margin-bottom: 6px;">System Hacked by Love... Enter PIN to Proceed! 💻💘</p>
         <p style="font-size: 13px; color: #ffffff; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.9);">Ek hi dil hai, aur uski chabi sirf tumhare paas hai! 🔐💖</p>
@@ -233,12 +244,56 @@
         const pinInput = document.getElementById('passcodeInput');
         const overlay = document.getElementById('passcodeOverlay');
         if (!pinInput) return;
-        if (pinInput.value.trim() === "1011") {
-            if (overlay) { overlay.style.display = "none"; overlay.remove(); }
-            socket.emit('getSpecialNote', myUsername);
-            socket.emit('markAsRead', myUsername);
+        
+        if (pinInput.value.trim() === "7890") {
+            // 🌟 Trigger Heart Burst Animation
+            playHeartBurstAnimation();
+
+            // Smooth fade out and open chat after animation
+            setTimeout(() => {
+                if (overlay) { 
+                    overlay.style.transition = "opacity 0.5s ease";
+                    overlay.style.opacity = "0";
+                    setTimeout(() => {
+                        overlay.style.display = "none"; 
+                        overlay.remove();
+                    }, 500);
+                }
+                socket.emit('getSpecialNote', myUsername);
+                socket.emit('markAsRead', myUsername);
+            }, 800);
+
         } else {
             alert("Wrong Password");
+        }
+    }
+
+    // 🌟 Heart Burst Animation Logic
+    function playHeartBurstAnimation() {
+        const hearts = ['❤️', '💖', '💘', '💕', '💓', '✨'];
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+
+        for (let i = 0; i < 25; i++) {
+            const heart = document.createElement('div');
+            heart.className = 'burst-heart';
+            heart.innerText = hearts[Math.floor(Math.random() * hearts.length)];
+            
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 100 + Math.random() * 200;
+            const dx = Math.cos(angle) * distance;
+            const dy = Math.sin(angle) * distance;
+
+            heart.style.left = centerX + 'px';
+            heart.style.top = centerY + 'px';
+            heart.style.setProperty('--dx', dx + 'px');
+            heart.style.setProperty('--dy', dy + 'px');
+
+            document.body.appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 1200);
         }
     }
 
@@ -252,7 +307,6 @@
 
     socket.emit('userJoined', myUsername);
 
-    // SPECIAL NOTE LISTENERS
     socket.on('showSpecialNote', (data) => {
         if (data && data.note && data.author !== myUsername) {
             document.getElementById('noteModalText').innerText = data.note;
@@ -281,7 +335,6 @@
         socket.emit('markNoteAsSeen', myUsername);
     }
 
-    // SCRATCH CARD LISTENERS & CANVAS LOGIC
     socket.on('showScratchCard', (data) => {
         if (data && data.message && data.author !== myUsername) {
             initScratchCard(data.message);
@@ -310,7 +363,6 @@
         const canvas = document.getElementById('scratchCanvas');
         const ctx = canvas.getContext('2d');
         
-        // Draw silver scratch layer
         ctx.globalCompositeOperation = 'source-over';
         ctx.fillStyle = '#b0bec5';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
