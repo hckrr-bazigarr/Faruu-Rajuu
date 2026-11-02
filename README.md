@@ -1,46 +1,48 @@
-# 💬  Real-Time Web Chat Application
+# 💖 Real-Time Secret Love Chat App 🔒
 
-A lightweight, modern, and feature-rich real-time live chat application inspired by WhatsApp. Built with **Node.js, Express, Socket.io, and MongoDB**, this application delivers instant messaging with live status indicators, privacy passcode lock, and interactive emoji reactions.
-
----
-
-## 🔥 Key Features
-
-* **🔒 Passcode Protection:** Secure access with an overlay PIN system.
-* **⚡ Real-Time Messaging:** Instant message delivery and updates powered by Socket.io.
-* **👍 Emoji Reactions:** React to messages with quick emojis (❤️, 👍, 😂, 😮, 😢) in real-time.
-* **✓✓ WhatsApp-style Status Ticks:** Single grey tick (sent), double grey tick (delivered), and double blue tick (read).
-* **💬 Message Actions:** Reply to specific messages, edit sent messages, and delete messages (for everyone or for yourself).
-* **🟢 Live Online Users:** Real-time online user status and custom username updates.
-* **✍️ Typing Indicators:** Real-time "typing..." notifications when a user is composing a message.
-* **🕒 IST Timestamping:** Accurate time formatting tailored to Indian Standard Time (Asia/Kolkata).
-* **📱 Responsive & PWA/APK Ready:** Mobile-first design optimized for desktop, mobile browsers, and WebView/APK wrappers.
+Ek secure, hacker-themed real-time chat aur romantic web application jo speziell Bini aur Faru ke liye banayi gayi hai. Isme high-security passcode lock, live voice calling, secret love notes, aur interactive scratch cards jaise faadu features hain.
 
 ---
 
-## 🛠️ Tech Stack
+## ✨ Key Features
 
-* **Frontend:** HTML5, CSS3, JavaScript (Vanilla ES6)
-* **Backend:** Node.js, Express.js
-* **Real-Time Engine:** Socket.io
-* **Database:** MongoDB Atlas (Mongoose ORM)
-* **Deployment:** Render
+- **🔐 Hacker Passcode Overlay:** 
+  - Background mein hacker-style visual aur romantic lines (*"System Hacked by Love..."* aur *"Ek hi dil hai..."*).
+  - Correct PIN (`7890`) daalte hi ek cinematic **Heart Burst Animation** play hota hai aur smooth fade-out ke sath chat unlock hoti hai.
+- **💬 Real-Time Messaging & Persistence:** 
+  - Socket.io aur MongoDB ke zariye instant real-time messaging, delivery/read ticks (✓✓), aur message history persistence.
+- **📞 Voice Calling System:** 
+  - WebRTC peer-to-peer audio calling with Speaker toggle, Mute/Unmute controls, aur call duration timer jo automatically chat mein log hota hai.
+- **❤️ Message Reactions & Actions:** 
+  - Emojis ke sath messages par react karna (`❤️`, `👍`, `😂`, etc.).
+  - Messages ko Reply karna, Edit karna, aur Delete karna (Delete for Everyone / Delete for Me).
+- **🖼️ Image Sharing & Compression:** 
+  - Client-side canvas compression ke sath fast photo sharing.
+- **💌 Special Love Note:** 
+  - Secret love notes set karne aur receive karne ke liye popup modal system.
+- **🎁 Secret Scratch Card:** 
+  - Interactive canvas-based scratch card jisme scratch karke secret message reveal hota hai.
+- **⏳ Days Together Counter:** 
+  - Relationship start date track karne aur live days count dikhane ka feature.
+- **🟢 Online Presence & Custom Names:** 
+  - Live online user status aur custom username configuration.
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Tech Stack
 
-### Prerequisites
-* Node.js (v14 or higher)
-* npm
-* MongoDB Atlas connection URI
+- **Frontend:** HTML5, CSS3, JavaScript (Vanilla, Mobile-Optimized)
+- **Backend:** Node.js, Express.js
+- **Real-Time Communication:** Socket.io (WebSockets & WebRTC Signaling)
+- **Database:** MongoDB (Message persistence & user states)
+- **Hosting / Deployment:** Render Cloud Platform
 
-### Installation
+---
 
-1. **Clone the repository:**
+## 🛠️ Local Setup & Installation
+
+1. Repository clone karein:
    ```bash
-   git clone [https://github.com/rajib02-bot/Faruu-Rajuu.git](https://github.com/rajib02-bot/Faruu-Rajuu.git)
-   cd Faruu-Rajuu
-   npm install
-   node server.js
+   git clone [https://github.com/your-username/bazigar-chat.git](https://github.com/your-username/bazigar-chat.git)
+   cd bazigar-chat
    
