@@ -43,6 +43,6 @@ Ek secure, hacker-themed real-time chat aur romantic web application jo speziell
 
 1. Repository clone karein:
    ```bash
-   git clone [https://github.com/your-username/bazigar-chat.git](https://github.com/your-username/bazigar-chat.git)
+   git clone https://github.com/Hckrr-BaziGarr/bazigar-chat.git
    cd bazigar-chat
    
