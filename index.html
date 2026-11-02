@@ -152,6 +152,12 @@
     <h2>Enter Password</h2>
     <input type="password" id="passcodeInput" placeholder="ENTER PIN" onkeypress="handlePinKey(event)" autocomplete="off" />
     <button type="button" id="unlockBtn" onclick="checkPasscode()">Unlock</button>
+    
+    <!-- 👇 YE RAHI WAHI LINE JO TUNE BOLI THI, UNLOCK BUTTON KE NICHE BLACK JAGAH PAR -->
+    <div class="overlay-text" style="margin-top: 20px; text-align: center; padding: 0 20px;">
+        <p style="font-size: 14px; color: #ff80ab; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.9); margin-bottom: 6px;">System Hacked by Love... Enter PIN to Proceed! 💻💘</p>
+        <p style="font-size: 13px; color: #ffffff; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.9);">Ek hi dil hai, aur uski chabi sirf tumhare paas hai! 🔐💖</p>
+    </div>
 </div>
 
 <div id="noteModal">
