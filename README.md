@@ -1,4 +1,4 @@
-# 💖 Real-Time Secret Love Chat App 🔒
+# 💖 Real-Time Secret Chatting Web Server
 
 Ek secure, hacker-themed real-time chat aur romantic web application jo speziell Bini aur Faru ke liye banayi gayi hai. Isme high-security passcode lock, live voice calling, secret love notes, aur interactive scratch cards jaise faadu features hain.
 
@@ -38,11 +38,3 @@ Ek secure, hacker-themed real-time chat aur romantic web application jo speziell
 - **Hosting / Deployment:** Render Cloud Platform
 
 ---
-
-## 🛠️ Local Setup & Installation
-
-1. Repository clone karein:
-   ```bash
-   git clone https://github.com/Hckrr-BaziGarr/bazigar-chat.git
-   cd bazigar-chat
-   
