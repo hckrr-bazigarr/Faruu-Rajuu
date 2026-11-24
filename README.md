@@ -1,4 +1,4 @@
-💬 ***BaziGarr — Real-Time Private Chat Application***
+<h1 alingh="centre">💬 BaziGarr — Real-Time Private Chat Application</h1>
 
 <p align="center">
   <img src="hacker.jpg" width="100%" alt="Faruu-Rajuu Chat Application">
