@@ -1,4 +1,4 @@
-💬 Faruu-Rajuu — Real-Time Private Chat Application
+💬 ***BaziGarr — Real-Time Private Chat Application***
 
 <p align="center">
   <img src="hacker.jpg" width="100%" alt="Faruu-Rajuu Chat Application">
@@ -18,7 +18,7 @@
 
 📌 About
 
-Faruu-Rajuu is a real-time private chat web application designed to deliver an interactive and engaging messaging experience.
+*This is a real-time private chat web application designed to deliver an interactive and engaging messaging experience.*
 
 Built using HTML5, CSS3, JavaScript, Node.js, Express.js, Socket.IO, and MongoDB, the application combines instant messaging, voice communication, persistent chat history, and interactive features in a modern web interface.
 
@@ -86,35 +86,35 @@ Before installation, make sure you have:
 🚀 Installation
 
 Step 1 — Clone Repository
-
+```bash
 git clone https://github.com/hckrr-bazigarr/Faruu-Rajuu.git
-
+```
 Step 2 — Open Project Directory
-
+```bash
 cd Faruu-Rajuu
-
+```
 Step 3 — Install Dependencies
-
+```bash
 npm install
-
+```
 Step 4 — Configure MongoDB
 
 Create a MongoDB database and obtain your database connection URI.
 
 Set the connection URI as an environment variable:
-
+```
 export MONGO_URI="your_mongodb_connection_string"
-
+```
 Replace the example value with your actual MongoDB connection string.
 
 Step 5 — Start the Server
-
+```bash
 npm start
-
+```
 Step 6 — Open in Browser
-
+```
 http://localhost:3000
-
+```
 Your local chat server should now be running.
 
 ---
@@ -123,10 +123,10 @@ Your local chat server should now be running.
 
 <p align="center">
   <a href="https://bazigar-moonie.onrender.com/">
-    <img src="https://img.shields.io/badge/🚀_LIVE_PREVIEW-OPEN_FARUU--RAJUU-00C853?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live Preview">
+    <img src="https://img.shields.io/badge/OPEN-LIVE%20APPLICATION-00C853?style=for-the-badge&logo=googlechrome&logoColor=white">
   </a>
 </p><p align="center">
-  <i>Click the badge above to explore Faruu-Rajuu.</i>
+  <a href="https://bazigar-moonie.onrender.com/">https://bazigar-moonie.onrender.com/</a>
 </p>---
 
 🎨 User Interface
@@ -181,7 +181,7 @@ Configure your environment variables through your hosting provider's dashboard.
   <a href="https://github.com/hckrr-bazigarr">
     <img src="https://img.shields.io/badge/GitHub-BAZIGARR-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
   </a>
-  <a href="https://www.instagram.com/YOUR_USERNAME/">
+  <a href="https://www.instagram.com/hckr__bazigarr/">
     <img src="https://img.shields.io/badge/Instagram-FOLLOW_ME-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Instagram">
   </a>
 </p>---
@@ -199,7 +199,7 @@ If you like Faruu-Rajuu, consider supporting the project:
 ---
 
 <p align="center">
-  <b>💬 FARUU-RAJUU 💬</b>
+  <b>💬 BAZIGARR 💬</b>
   <br>
   <i>Connected in Real Time. Designed with Care.</i>
   <br><br>
