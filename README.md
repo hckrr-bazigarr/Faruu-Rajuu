@@ -1,4 +1,4 @@
-<h1 alingh="centre">💬 BaziGarr — Real-Time Private Chat Web Application</h1>
+<h1 alingh="centre">BaziGarr — Real-Time Private Chat Web Application💬</h1>
 
 <p align="center">
   <img src="hacker.jpg" width="100%" alt="Faruu-Rajuu Chat Application">
@@ -20,15 +20,15 @@
 
 *This is a real-time private chat web application designed to deliver an interactive and engaging messaging experience.*
 
-**Built using HTML5, CSS3, JavaScript, Node.js, Express.js, Socket.IO, and MongoDB, the application combines instant messaging, voice communication, persistent chat history, and interactive features in a modern web interface.**
+***Built using HTML5, CSS3, JavaScript, Node.js, Express.js, Socket.IO, and MongoDB, the application combines instant messaging, voice communication, persistent chat history, and interactive features in a modern web interface.***
 
-**From real-time conversations to personalized experiences, Faruu-Rajuu brings communication and creativity together in one place.**
+***From real-time conversations to personalized experiences, Faruu-Rajuu brings communication and creativity together in one place.***
 
 ***Connect. Communicate. Stay Connected. ❤️***
 
 ---
 
-✨ Features
+#***✨ Features***
 
 - 💬 Real-Time Messaging — Instant message exchange using Socket.IO.
 - 🔐 Passcode Screen — Passcode-based chat unlock interface.
