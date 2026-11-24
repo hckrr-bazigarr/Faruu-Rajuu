@@ -170,7 +170,6 @@ Configure your environment variables through your hosting provider's dashboard.
 - Review authentication and WebSocket event permissions before using the application for sensitive conversations.
 
 ---
-
 👨‍💻 Developer
 
 <p align="center">
@@ -179,12 +178,12 @@ Configure your environment variables through your hosting provider's dashboard.
   Developer & Project Creator
   <br><br>
   <a href="https://github.com/hckrr-bazigarr">
-    <img src="https://img.shields.io/badge/GitHub-BAZIGARR-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
+    <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
   </a>
   <a href="https://www.instagram.com/hckr__bazigarr/">
-    <img src="https://img.shields.io/badge/Instagram-FOLLOW_ME-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Instagram">
+    <img src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Instagram">
   </a>
-</p>---
+</p>
 
 ⭐ Support the Project
 
