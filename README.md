@@ -5,20 +5,28 @@
 </p><p align="center">
   <b>A Real-Time Messaging Experience with Voice Calling and Interactive Features.</b>
 </p><p align="center">
-  <img src="https://img.shields.io/badge/Node.js-18%2B-green?style=for-the-badge&logo=node.js&logoColor=white">
-  <img src="https://img.shields.io/badge/Express.js-Backend-black?style=for-the-badge&logo=express">
-  <img src="https://img.shields.io/badge/Socket.IO-Realtime-white?style=for-the-badge&logo=socket.io">
-  <img src="https://img.shields.io/badge/MongoDB-Database-green?style=for-the-badge&logo=mongodb">
-  <img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge">
+  <img src="https://img.shields.io/badge/HTML5-FRONTEND-E34F26?style=for-the-badge&logo=html5&logoColor=white">
+  <img src="https://img.shields.io/badge/CSS3-STYLING-1572B6?style=for-the-badge&logo=css3&logoColor=white">
+  <img src="https://img.shields.io/badge/JAVASCRIPT-FRONTEND-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black">
+  <img src="https://img.shields.io/badge/NODE.JS-18%2B-green?style=for-the-badge&logo=node.js&logoColor=white">
+  <img src="https://img.shields.io/badge/EXPRESS.JS-BACKEND-black?style=for-the-badge&logo=express">
+  <img src="https://img.shields.io/badge/SOCKET.IO-REALTIME-white?style=for-the-badge&logo=socket.io&logoColor=black">
+  <img src="https://img.shields.io/badge/MONGODB-DATABASE-green?style=for-the-badge&logo=mongodb&logoColor=white">
+</p><p align="center">
+  <img src="https://img.shields.io/badge/STATUS-ACTIVE-00C853?style=for-the-badge">
 </p>---
 
 📌 About
 
-Faruu-Rajuu is a real-time private chat web application designed to deliver an interactive messaging experience with a modern, mobile-friendly interface.
+This is a real-time private chat web application designed to deliver an interactive and engaging messaging experience.
 
-Built using Node.js, Express.js, Socket.IO, and MongoDB, the application supports instant messaging, persistent chat history, voice communication, online presence, and interactive personal features.
+Built using HTML5, CSS3, JavaScript, Node.js, Express.js, Socket.IO, and MongoDB, the application combines instant messaging, voice communication, persistent chat history, and interactive features in a modern web interface.
 
-It combines real-time communication with a customized interface and engaging features to create a unique private chatting experience.
+From real-time conversations to personalized experiences, Faruu-Rajuu brings communication and creativity together in one place.
+
+Connect. Communicate. Stay Connected. ❤️
+
+---
 
 ✨ Features
 
@@ -30,7 +38,7 @@ Feature| Description
 ❤️ Message Reactions| React to messages with emojis
 ↩️ Reply to Messages| Reply to specific messages
 ✏️ Edit Messages| Modify previously sent messages
-🗑️ Delete Messages| Delete messages for yourself or everyone
+🗑️ Delete Messages| Delete messages
 🖼️ Image Sharing| Share images with client-side compression
 🟢 Online Presence| Display currently active users
 ⌨️ Typing Indicator| Show when someone is typing
@@ -38,21 +46,24 @@ Feature| Description
 🎁 Interactive Scratch Cards| Reveal hidden messages through scratching
 ⏳ Days Together Counter| Display a live relationship day counter
 💾 Message Persistence| Store chat history using MongoDB
-📱 Responsive Interface| Optimized for mobile and desktop screens
+📱 Responsive Interface| Mobile and desktop-friendly design
+
+---
 
 🛠️ Technology Stack
 
 Technology| Purpose
-HTML5| Application structure
+HTML5| Frontend structure
 CSS3| Styling and responsive interface
 JavaScript| Frontend functionality
 Node.js| Server-side runtime
-Express.js| Web server framework
+Express.js| Backend web framework
 Socket.IO| Real-time communication
-MongoDB| Database
+MongoDB| Database and message storage
 Mongoose| MongoDB object modeling
-WebRTC| Peer-to-peer audio communication
-Render| Application hosting
+WebRTC| Peer-to-peer voice communication
+
+---
 
 ⚙️ Requirements
 
@@ -61,8 +72,10 @@ Before installation, make sure you have:
 - Node.js 18 or newer
 - npm
 - Git
-- A MongoDB database
-- A modern web browser
+- MongoDB database
+- Modern web browser
+
+---
 
 🚀 Installation
 
@@ -80,13 +93,13 @@ npm install
 
 Step 4 — Configure MongoDB
 
-Create a MongoDB database and obtain its connection URI.
+Create a MongoDB database and obtain your database connection URI.
 
-Set the database connection string as an environment variable:
+Set the connection URI as an environment variable:
 
 export MONGO_URI="your_mongodb_connection_string"
 
-Important: Replace the example value with your own MongoDB URI. Never publish database credentials or API secrets in your source code.
+Replace the example value with your actual MongoDB connection string.
 
 Step 5 — Start the Server
 
@@ -98,13 +111,29 @@ http://localhost:3000
 
 Your local chat server should now be running.
 
+---
+
 🌐 Live Demo
 
 <p align="center">
   <a href="https://bazigar-moonie.onrender.com/">
     <img src="https://img.shields.io/badge/OPEN-LIVE%20APPLICATION-00C853?style=for-the-badge&logo=googlechrome&logoColor=white">
   </a>
-</p>Live Application: https://bazigar-moonie.onrender.com/
+</p><p align="center">
+  <a href="https://bazigar-moonie.onrender.com/">https://bazigar-moonie.onrender.com/</a>
+</p>---
+
+🎨 Frontend
+
+The frontend is developed using:
+
+- HTML5 — Structures the application interface.
+- CSS3 — Provides styling, animations, and responsive layouts.
+- JavaScript — Handles interactive elements and client-side functionality.
+
+The interface is designed to provide a smooth and engaging chatting experience across supported devices.
+
+---
 
 📁 Project Structure
 
@@ -119,9 +148,11 @@ Faruu-Rajuu/
 ├── unlock.mp4
 └── .gitignore
 
+---
+
 ☁️ Deployment
 
-The application can be deployed on platforms such as Render.
+The application can be deployed using platforms such as Render.
 
 General deployment configuration:
 
@@ -129,10 +160,12 @@ Setting| Value
 Runtime| Node.js
 Build Command| "npm install"
 Start Command| "npm start"
-Environment| "MONGO_URI"
-Port| Automatically configured through "process.env.PORT"
+Database| MongoDB
+Environment Variable| "MONGO_URI"
 
-Add your MongoDB connection string through the hosting platform's environment-variable settings. Do not commit it to GitHub.
+Configure your environment variables through your hosting provider's dashboard.
+
+---
 
 🔒 Security Notice
 
@@ -140,8 +173,10 @@ Add your MongoDB connection string through the hosting platform's environment-va
 - Use environment variables for sensitive configuration.
 - Never commit ".env" files or production secrets.
 - Use HTTPS for public deployments.
-- The passcode interface should not be treated as server-side authentication.
-- Review access controls and WebSocket event permissions before using the application for sensitive conversations.
+- Do not treat a frontend passcode screen as server-side authentication.
+- Review authentication and WebSocket event permissions before using the application for sensitive conversations.
+
+---
 
 👨‍💻 Developer
 
@@ -151,20 +186,22 @@ Add your MongoDB connection string through the hosting platform's environment-va
   Developer & Project Creator
   <br>
   <a href="https://github.com/hckrr-bazigarr">GitHub Profile</a>
-</p>⭐ Support
+</p>---
 
-If you find this project interesting:
+⭐ Support the Project
 
-- ⭐ Star the repository.
-- 🍴 Fork the project.
+If you like Faruu-Rajuu, consider supporting the project:
+
+- ⭐ Star this repository.
+- 🍴 Fork the repository.
 - 🐛 Report bugs through GitHub Issues.
-- 💡 Suggest improvements.
+- 💡 Suggest new features.
 - 🤝 Contributions are welcome.
 
 ---
 
 <p align="center">
-  <b>💬 FARUU-RAJUU</b>
+  <b>💬 FARUU-RAJUU 💬</b>
   <br>
   <i>Connected in Real Time. Designed with Care.</i>
   <br><br>
