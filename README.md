@@ -28,7 +28,7 @@
 
 ---
 
-#***✨ Features***
+✨ Features
 
 - 💬 Real-Time Messaging — Instant message exchange using Socket.IO.
 - 🔐 Passcode Screen — Passcode-based chat unlock interface.
