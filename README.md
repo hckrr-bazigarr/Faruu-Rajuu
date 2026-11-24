@@ -30,38 +30,43 @@ Connect. Communicate. Stay Connected. ❤️
 
 ✨ Features
 
-Feature| Description
-💬 Real-Time Messaging| Instant message exchange using Socket.IO
-🔐 Passcode Screen| Passcode-based chat unlock interface
-📞 Voice Calling| Peer-to-peer audio calling with WebRTC signaling
-✓✓ Message Status| Sent, delivered, and read indicators
-❤️ Message Reactions| React to messages with emojis
-↩️ Reply to Messages| Reply to specific messages
-✏️ Edit Messages| Modify previously sent messages
-🗑️ Delete Messages| Delete messages
-🖼️ Image Sharing| Share images with client-side compression
-🟢 Online Presence| Display currently active users
-⌨️ Typing Indicator| Show when someone is typing
-💌 Special Notes| Send personalized notes
-🎁 Interactive Scratch Cards| Reveal hidden messages through scratching
-⏳ Days Together Counter| Display a live relationship day counter
-💾 Message Persistence| Store chat history using MongoDB
-📱 Responsive Interface| Mobile and desktop-friendly design
+- 💬 Real-Time Messaging — Instant message exchange using Socket.IO.
+- 🔐 Passcode Screen — Passcode-based chat unlock interface.
+- 📞 Voice Calling — Peer-to-peer audio calling with WebRTC signaling.
+- ✓✓ Message Status — Sent, delivered, and read indicators.
+- ❤️ Message Reactions — React to messages with emojis.
+- ↩️ Reply to Messages — Reply to specific messages.
+- ✏️ Edit Messages — Modify previously sent messages.
+- 🗑️ Delete Messages — Delete messages.
+- 🖼️ Image Sharing — Share images with client-side compression.
+- 🟢 Online Presence — Display currently active users.
+- ⌨️ Typing Indicator — Show when someone is typing.
+- 💌 Special Notes — Send personalized notes.
+- 🎁 Interactive Scratch Cards — Reveal hidden messages through scratching.
+- ⏳ Days Together Counter — Display a live relationship day counter.
+- 📱 Responsive Interface — Mobile and desktop-friendly design.
 
 ---
 
 🛠️ Technology Stack
 
-Technology| Purpose
-HTML5| Frontend structure
-CSS3| Styling and responsive interface
-JavaScript| Frontend functionality
-Node.js| Server-side runtime
-Express.js| Backend web framework
-Socket.IO| Real-time communication
-MongoDB| Database and message storage
-Mongoose| MongoDB object modeling
-WebRTC| Peer-to-peer voice communication
+Frontend
+
+- HTML5 — Application structure and page layout.
+- CSS3 — Styling, animations, and responsive design.
+- JavaScript — Client-side functionality and interactions.
+
+Backend
+
+- Node.js — Server-side JavaScript runtime.
+- Express.js — Backend web framework.
+- Socket.IO — Real-time messaging and communication.
+
+Database & Communication
+
+- MongoDB — Database and message storage.
+- Mongoose — MongoDB object modeling.
+- WebRTC — Peer-to-peer voice communication.
 
 ---
 
@@ -80,25 +85,25 @@ Before installation, make sure you have:
 🚀 Installation
 
 Step 1 — Clone Repository
-
+```bash
 git clone https://github.com/hckrr-bazigarr/Faruu-Rajuu.git
-
+```
 Step 2 — Open Project Directory
-
+```bash
 cd Faruu-Rajuu
-
+```
 Step 3 — Install Dependencies
-
+```bash
 npm install
-
+```
 Step 4 — Configure MongoDB
 
 Create a MongoDB database and obtain your database connection URI.
 
 Set the connection URI as an environment variable:
-
+```
 export MONGO_URI="your_mongodb_connection_string"
-
+```
 Replace the example value with your actual MongoDB connection string.
 
 Step 5 — Start the Server
@@ -120,18 +125,17 @@ Your local chat server should now be running.
     <img src="https://img.shields.io/badge/OPEN-LIVE%20APPLICATION-00C853?style=for-the-badge&logo=googlechrome&logoColor=white">
   </a>
 </p><p align="center">
-  <a href="https://bazigar-moonie.onrender.com/">https://bazigar-moonie.onrender.com/</a>
+  <a href="https://bazigar-moonie.onrender.com/">Visit Faruu-Rajuu</a>
 </p>---
 
-🎨 Frontend
+🎨 User Interface
 
-The frontend is developed using:
+The application uses a modern web interface developed with HTML5, CSS3, and JavaScript.
 
-- HTML5 — Structures the application interface.
-- CSS3 — Provides styling, animations, and responsive layouts.
-- JavaScript — Handles interactive elements and client-side functionality.
-
-The interface is designed to provide a smooth and engaging chatting experience across supported devices.
+- Responsive layout for mobile and desktop.
+- Interactive messaging components.
+- Customized visual elements and animations.
+- User-friendly chat experience.
 
 ---
 
@@ -152,16 +156,15 @@ Faruu-Rajuu/
 
 ☁️ Deployment
 
-The application can be deployed using platforms such as Render.
+The application can be deployed using hosting platforms such as Render.
 
-General deployment configuration:
+General Deployment Configuration:
 
-Setting| Value
-Runtime| Node.js
-Build Command| "npm install"
-Start Command| "npm start"
-Database| MongoDB
-Environment Variable| "MONGO_URI"
+- Runtime: Node.js
+- Build Command: "npm install"
+- Start Command: "npm start"
+- Database: MongoDB
+- Environment Variable: "MONGO_URI"
 
 Configure your environment variables through your hosting provider's dashboard.
 
@@ -185,7 +188,8 @@ Configure your environment variables through your hosting provider's dashboard.
   <br>
   Developer & Project Creator
   <br>
-  <a href="https://github.com/hckrr-bazigarr">GitHub Profile</a>
+  <a href="https://github.com/hckrr-bazigarr">GitHub</a>
+  <a href="https://instagram.com/hckr__bazigarr">Instagram</a>
 </p>---
 
 ⭐ Support the Project
@@ -201,7 +205,7 @@ If you like Faruu-Rajuu, consider supporting the project:
 ---
 
 <p align="center">
-  <b>💬 FARUU-RAJUU 💬</b>
+  <b>💬 BAZIGARR 💬</b>
   <br>
   <i>Connected in Real Time. Designed with Care.</i>
   <br><br>
